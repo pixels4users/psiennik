@@ -62,7 +62,7 @@ function LandingPage() {
         <div className="grid items-center gap-12 lg:grid-cols-2 lg:gap-16">
           <div className="flex flex-col items-start gap-6">
             <h1 className="max-w-xl text-4xl leading-tight text-primary md:text-5xl lg:text-6xl">
-              Dziennik behawioralny psa, który prowadzi się sam
+              Lepsza współpraca. Szybsze postępy psa.
             </h1>
             <p className="max-w-lg text-lg text-muted-foreground">
               Zapisuj, co działo się w ciągu dnia, oznaczaj kolorem i dziel się dziennikiem z
