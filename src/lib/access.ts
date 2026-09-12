@@ -289,6 +289,42 @@ export function useRemoveOwnerBehaviorist() {
   });
 }
 
+/** Czy użytkownik ma rolę właściciela (lub współwłaściciela) w jakimkolwiek psie. */
+export function useIsOwner() {
+  const { user } = useAuth();
+  return useQuery({
+    queryKey: ["is-owner", user?.id],
+    enabled: !!user,
+    queryFn: async (): Promise<boolean> => {
+      const { count, error } = await supabase
+        .from("dog_access")
+        .select("*", { count: "exact", head: true })
+        .eq("user_id", user!.id)
+        .eq("role", "owner");
+      if (error) throw error;
+      return (count ?? 0) > 0;
+    },
+  });
+}
+
+/** Czy użytkownik ma rolę behawiorysty w jakimkolwiek psie. */
+export function useIsBehaviorist() {
+  const { user } = useAuth();
+  return useQuery({
+    queryKey: ["is-behaviorist", user?.id],
+    enabled: !!user,
+    queryFn: async (): Promise<boolean> => {
+      const { count, error } = await supabase
+        .from("dog_access")
+        .select("*", { count: "exact", head: true })
+        .eq("user_id", user!.id)
+        .eq("role", "behaviorist");
+      if (error) throw error;
+      return (count ?? 0) > 0;
+    },
+  });
+}
+
 /** Limity aktywnych procesów dla behawiorysty. */
 export function useSubscriptionLimits() {
   const { user } = useAuth();
