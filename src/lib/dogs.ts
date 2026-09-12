@@ -96,9 +96,9 @@ export function useRecentEntries(limit = 5) {
   });
 }
 
-export async function uploadDogPhoto(file: File): Promise<string> {
+export async function uploadDogPhoto(file: File, dogId: string): Promise<string> {
   const ext = file.name.split(".").pop() ?? "jpg";
-  const path = `${crypto.randomUUID()}.${ext}`;
+  const path = `${dogId}/${crypto.randomUUID()}.${ext}`;
   const { error } = await supabase.storage.from("dog-photos").upload(path, file);
   if (error) throw error;
   return path;
