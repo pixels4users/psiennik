@@ -12,7 +12,7 @@
 ## Nowa zakładka „Zalecenia”
 
 - Dodać „Zalecenia” do przełącznika widoków psa obok Listy, Kalendarza, Tabeli i Analizy.
-- Utworzyć osobny widok pokazujący tylko wydarzenia, do których behawiorysta dodał zalecenie.
+- Utworzyć osobny widok pokazujący tylko zalecenia, bez prezentowania wydarzeń; zalecenie może jedynie linkować do powiązanego wydarzenia.
 - Każda pozycja pokaże zalecenie wraz z datą i kontekstem wydarzenia, aby właściciel wiedział, czego dotyczy.
 - Domyślnie sortować od najnowszego zalecenia; dodać wybór „Najnowsze” / „Najstarsze”.
 - Dodać czytelny pusty stan, gdy pies nie ma jeszcze żadnych zaleceń.
