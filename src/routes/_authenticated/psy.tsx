@@ -150,11 +150,11 @@ function DogsPage() {
   const roleLabel = isBehaviorist ? "behaviorist" : "owner";
 
   const grouped = useMemo(() => {
-    const active: typeof dogs = [];
-    const completed: typeof dogs = [];
-    const pending: typeof dogs = [];
-    for (const dog of dogs ?? []) {
-      const status = dog.access?.[0]?.process_status ?? "active";
+    const active: DogWithAccess[] = [];
+    const completed: DogWithAccess[] = [];
+    const pending: DogWithAccess[] = [];
+    for (const dog of (dogs as DogWithAccess[] | undefined) ?? []) {
+      const status = dog.dog_access?.[0]?.process_status ?? "active";
       if (status === "completed") completed.push(dog);
       else if (status === "pending") pending.push(dog);
       else active.push(dog);
