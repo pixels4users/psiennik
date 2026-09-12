@@ -19,40 +19,48 @@ Skan bezpieczeństwa wykrył dwa błędy poziomu `error`:
    - `uploadDogPhoto(file, dogId)` zapisuje plik pod ścieżką zawierającą `dog_id`.
    - Formularz dodawania psa najpierw tworzy rekord psa, potem uploaduje zdjęcie i aktualizuje `photo_url`.
    - Przy edycji psa używa istniejącego `dog_id`.
-3. Napisać nowe polityki RLS na `storage.objects`:
-   - Usunąć polityki dla roli `anon`.
-   - Dla roli `authenticated` sprawdzać, że ścieżka zaczyna się od `dogs/{dog_id}/` i że użytkownik ma dostęp do tego psa (przez `private.has_dog_access(dog_id, auth.uid())` lub analogiczną funkcję).
-4. Przeprowadzić migrację danych:
-   - Dla istniejących zdjęć o płaskich nazwach (losowy UUID) przenieść obiekty do nowej ścieżki `dogs/{dog_id}/{nazwa}` i zaktualizować `dogs.photo_url`.
-5. Przetestować:
+3. Ustawić bucket `dog-photos` jako publiczny i uprościć odczyt:
+   - Odczyt (SELECT) pozostaje całkowicie publiczny, dzięki czemu front renderuje zwykłe adresy obrazków bez podpisanych linków.
+   - `useDogPhotoUrl` przechodzi z `createSignedUrl` na publiczny adres pliku.
+4. Napisać nowe polityki RLS na `storage.objects` wyłącznie dla zapisu:
+   - Blokujemy `INSERT`, `UPDATE` i `DELETE` — każda z nich sprawdza `private.has_dog_access`.
+   - Ścieżka musi mieć postać `dogs/{dog_id}/{nazwa_pliku}`.
+   - Przed rzutowaniem `::uuid` sprawdzamy wyrażeniem regularnym, że `(storage.foldername(name))[1]` jest poprawnym UUID — inaczej niepasujący plik wywoła błąd w Postgresie.
+5. Przeprowadzić migrację starych zdjęć skryptem TypeScript, nie SQL-em:
+   - `UPDATE` na `storage.objects` nie przenosi plików; używamy `supabase.storage.from('dog-photos').move(oldPath, newPath)`.
+   - Po każdym udanym przeniesieniu skrypt aktualizuje `dogs.photo_url` z poziomu kodu.
+6. Przetestować:
    - upload zdjęcia przy tworzeniu psa,
    - podmianę i usunięcie zdjęcia przy edycji,
    - podgląd zdjęcia na liście psów i w formularzu,
    - dostęp behawiorysty do psa ze zdjęciem.
-6. Ponownie uruchomić `bunx tsc --noEmit`, `bun run build`, skan bezpieczeństwa i Playwright na desktopie oraz telefonie.
-7. Opublikować aplikację.
+7. Ponownie uruchomić `bunx tsc --noEmit`, `bun run build`, skan bezpieczeństwa i Playwright na desktopie oraz telefonie.
+8. Opublikować aplikację.
 
 ## Szczegóły techniczne
 
-- Migracja SQL: `DROP POLICY ... ON storage.objects`, nowe polityki z użyciem `storage.foldername(name)` lub porównania prefiksu ścieżki, oraz `GRANT`/`ALTER TABLE` jeśli tworzona jest pomocnicza tabela.
-- Kod klienta: `src/lib/dogs.ts` (funkcje `uploadDogPhoto`, `deleteDogPhoto`) oraz `src/components/dog-form-dialog.tsx` (kolejność insert → upload → update).
-- Polityki storage mogą wyglądać np. tak:
+- Bucket `dog-photos` przełączamy na publiczny narzędziem do konfiguracji storage (nie SQL-em na `storage.buckets`).
+- Migracja SQL: `DROP POLICY ... ON storage.objects` dla wszystkich obecnych polityk zdjęć, następnie nowe polityki tylko dla `INSERT`, `UPDATE` i `DELETE`. Polityki SELECT nie ograniczamy.
+- Kod klienta: `src/lib/dogs.ts` (`uploadDogPhoto`, `deleteDogPhoto`, `useDogPhotoUrl` → `getPublicUrl`) oraz `src/components/dog-form-dialog.tsx` (kolejność insert → upload → update).
+- Polityka zapisu z bezpiecznym rzutowaniem UUID:
 
 ```text
-CREATE POLICY "Dog photos select by access"
-ON storage.objects FOR SELECT
+CREATE POLICY "Dog photos insert by access"
+ON storage.objects FOR INSERT
 TO authenticated
-USING (
+WITH CHECK (
   bucket_id = 'dog-photos'
-  AND (storage.foldername(name))[1] IS NOT NULL
+  AND (storage.foldername(name))[1] ~
+      '^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$'
   AND private.has_dog_access(
-        (storage.foldername(name))[1]::uuid,
+        ((storage.foldername(name))[1])::uuid,
         auth.uid()
       )
 );
 ```
 
-- Podobne polityki dla `INSERT`, `UPDATE`, `DELETE`.
+- Analogiczne polityki dla `UPDATE` (z `USING` i `WITH CHECK`) oraz `DELETE` (z `USING`).
+- Skrypt migracyjny w TypeScript: pobiera psy z płaskim `photo_url`, wywołuje `supabase.storage.from('dog-photos').move(stara, 'dogs/{dog_id}/{nazwa}')`, a po sukcesie aktualizuje `dogs.photo_url`. Uruchamiany jednorazowo z uprawnieniami serwisowymi.
 
 ## Weryfikacja końcowa
 
