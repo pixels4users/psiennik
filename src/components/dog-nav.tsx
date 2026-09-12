@@ -18,6 +18,7 @@ export function DogNav({
 }) {
   const { role } = useRole();
   const [editOpen, setEditOpen] = useState(false);
+  const [inviteOpen, setInviteOpen] = useState(false);
 
   return (
     <div className="grid gap-4">
@@ -35,9 +36,19 @@ export function DogNav({
             <div className="flex min-w-0 items-center gap-2">
               <h1 className="truncate text-4xl">{dog.name}</h1>
               {role === "owner" && (
-                <Button variant="ghost" size="icon" aria-label="Edytuj psa" onClick={() => setEditOpen(true)}>
-                  <Pencil className="size-4" />
-                </Button>
+                <>
+                  <Button variant="ghost" size="icon" aria-label="Edytuj psa" onClick={() => setEditOpen(true)}>
+                    <Pencil className="size-4" />
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    aria-label="Zaproś behawiorystkę"
+                    onClick={() => setInviteOpen(true)}
+                  >
+                    <UserPlus className="size-4" />
+                  </Button>
+                </>
               )}
             </div>
             <p className="mt-1 truncate text-muted-foreground">
