@@ -13,3 +13,6 @@
 - [ ] Ujednolicić szerokość widoku Lista z Kalendarzem
 - [ ] Dodać widok Tabela z sortowaniem i filtrami
 - [ ] Zweryfikować nowy widok na komputerze i telefonie
+- [ ] Ujednolicić szerokość widoku Lista z Kalendarzem
+- [ ] Dodać widok Tabela z sortowaniem i filtrami
+- [ ] Zweryfikować nowy widok na komputerze i telefonie
