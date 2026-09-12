@@ -48,7 +48,7 @@ Prosty ekran: „Jestem właścicielem" | „Jestem behawiorystą". Wybór zapam
 - Struktura ekranów (lista psów → profil psa) jest już taka, jak przy kontach — dochodzi tylko logowanie i zapraszanie behawiorysty do konkretnego psa.
 
 ## Technicznie
-- Lovable Cloud: jedna migracja z dwiema tabelami, bez auth.
+- Lovable Cloud: jedna migracja z dwiema tabelami + storage na zdjęcia psów, bez auth.
 - TanStack Start, trasy: `/` (wybór roli), `/psy`, `/pies/$id`, `/pies/$id/kalendarz`.
 - shadcn: Dialog, Datepicker, Badge, Card, Tabs, Skeleton.
 - Interfejs po polsku, czytelny i prosty; metadane head() na każdej stronie.
