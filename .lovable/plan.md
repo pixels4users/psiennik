@@ -39,25 +39,28 @@ Skan bezpieczeństwa wykrył dwa błędy poziomu `error`:
 
 ## Szczegóły techniczne
 
-- Migracja SQL: `DROP POLICY ... ON storage.objects`, nowe polityki z użyciem `storage.foldername(name)` lub porównania prefiksu ścieżki, oraz `GRANT`/`ALTER TABLE` jeśli tworzona jest pomocnicza tabela.
-- Kod klienta: `src/lib/dogs.ts` (funkcje `uploadDogPhoto`, `deleteDogPhoto`) oraz `src/components/dog-form-dialog.tsx` (kolejność insert → upload → update).
-- Polityki storage mogą wyglądać np. tak:
+- Bucket `dog-photos` przełączamy na publiczny narzędziem do konfiguracji storage (nie SQL-em na `storage.buckets`).
+- Migracja SQL: `DROP POLICY ... ON storage.objects` dla wszystkich obecnych polityk zdjęć, następnie nowe polityki tylko dla `INSERT`, `UPDATE` i `DELETE`. Polityki SELECT nie ograniczamy.
+- Kod klienta: `src/lib/dogs.ts` (`uploadDogPhoto`, `deleteDogPhoto`, `useDogPhotoUrl` → `getPublicUrl`) oraz `src/components/dog-form-dialog.tsx` (kolejność insert → upload → update).
+- Polityka zapisu z bezpiecznym rzutowaniem UUID:
 
 ```text
-CREATE POLICY "Dog photos select by access"
-ON storage.objects FOR SELECT
+CREATE POLICY "Dog photos insert by access"
+ON storage.objects FOR INSERT
 TO authenticated
-USING (
+WITH CHECK (
   bucket_id = 'dog-photos'
-  AND (storage.foldername(name))[1] IS NOT NULL
+  AND (storage.foldername(name))[1] ~
+      '^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$'
   AND private.has_dog_access(
-        (storage.foldername(name))[1]::uuid,
+        ((storage.foldername(name))[1])::uuid,
         auth.uid()
       )
 );
 ```
 
-- Podobne polityki dla `INSERT`, `UPDATE`, `DELETE`.
+- Analogiczne polityki dla `UPDATE` (z `USING` i `WITH CHECK`) oraz `DELETE` (z `USING`).
+- Skrypt migracyjny w TypeScript: pobiera psy z płaskim `photo_url`, wywołuje `supabase.storage.from('dog-photos').move(stara, 'dogs/{dog_id}/{nazwa}')`, a po sukcesie aktualizuje `dogs.photo_url`. Uruchamiany jednorazowo z uprawnieniami serwisowymi.
 
 ## Weryfikacja końcowa
 
