@@ -148,7 +148,7 @@ function DogTablePage() {
                   selected={dateRange}
                   onSelect={setDateRange}
                   locale={pl}
-                  defaultMonth={dateRange?.from}
+                  {...(dateRange?.from ? { defaultMonth: dateRange.from } : {})}
                 />
               </PopoverContent>
             </Popover>
