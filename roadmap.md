@@ -33,4 +33,4 @@
 - [x] Stały kod behawiorysty i relacja owner–behaviorist
 - [x] Limity darmowego planu behawiorysty bez blokowania tworzenia psa
 - [x] Dashboard behawiorysty z aktywnymi/zakończonymi/oczekującymi procesami
-- [ ] Galeria przykładowych dzienników psów na stronie głównej
+- [x] Galeria przykładowych dzienników psów na stronie głównej
