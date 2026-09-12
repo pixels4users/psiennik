@@ -77,13 +77,13 @@ Weryfikacja: przepływ zaproszenia współwłaściciela i behawiorysty na kontac
 Migracja bazy:
 
 - `dog_access.process_status` (text, domyślnie `active`, wartości `active` / `completed`).
-- `private.can_manage_dog` dodatkowo wymaga, aby dla psa istniał wiersz behawiorysty ze statusem `active`; brak takiego wiersza oznacza tryb tylko do odczytu dla wpisów (`entries` insert/update/delete). Odczyt i zarządzanie samym psem pozostają bez zmian.
+- `private.can_manage_dog` pozwala na edycję wpisów, gdy pies NIE MA żadnego przypisanego behawiorysty LUB gdy ma przynajmniej jednego ze statusem `active`. Tryb tylko do odczytu dla wpisów (`entries` insert/update/delete) włącza się TYLKO wtedy, gdy pies ma przypisanych behawiorystów, ale wszyscy mają status `completed`. Odczyt i zarządzanie samym psem pozostają bez zmian.
 - RPC `complete_behavioral_process(p_dog_id, p_behaviorist_id)` — zmiana statusu na `completed`, wywoływalna wyłącznie przez przypisanego behawiorystę.
 - Tabela `behaviorist_links` (`id`, `behaviorist_id`, `invite_code` unikalny, `is_active`), z grantami i RLS: odczyt własnego kodu, publiczne rozpoznanie kodu przez RPC. Kod tworzony automatycznie przy rejestracji behawiorysty (rozszerzenie `private.handle_new_user`) oraz uzupełniany dla istniejących kont.
 - Tabela `owner_behaviorists` (`owner_id`, `behaviorist_id`) — trwałe powiązanie właściciela z behawiorystą; `private.handle_new_dog` dopisuje powiązanych behawiorystów do `dog_access` z aktywnym statusem.
 - `redeem_dog_invite` rozpoznaje też kod behawiorysty i zakłada powiązanie zamiast dostępu do konkretnego psa; zwraca informację, którą ścieżkę wykonano.
 - `profiles.plan_type` (text, domyślnie `free`) i `profiles.max_active_dogs` (integer, domyślnie 2).
-- Trigger na `dog_access` (insert oraz zmiana statusu na `active`) liczy aktywne procesy behawiorysty i odrzuca akcję po przekroczeniu `max_active_dogs`.
+- Trigger na `dog_access` (insert oraz zmiana statusu na `active`) liczy aktywne procesy behawiorysty i odrzuca przypisanie po przekroczeniu `max_active_dogs` — z wyjątkiem ścieżki automatycznej: jeśli `private.handle_new_dog` próbuje przypisać behawiorystę do nowo utworzonego psa, a limit jest wykorzystany, funkcja tworzy psa BEZ przypisywania behawiorysty (nie rzuca błędu zatrzymującego dodanie psa). Frontend po udanym dodaniu psa pokazuje właścicielowi ostrzeżenie: „Pies został dodany, ale Twój behawiorysta osiągnął limit aktywnych pacjentów i nie został automatycznie przypisany. Skontaktuj się z nim”. Jawne akcje (użycie kodu, ręczne dodanie) nadal zwracają czytelny błąd o limicie.
 
 Frontend:
 
