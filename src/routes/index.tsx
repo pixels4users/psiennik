@@ -65,8 +65,8 @@ function LandingPage() {
               Lepsza współpraca. Szybsze postępy psa.
             </h1>
             <p className="max-w-lg text-lg text-muted-foreground">
-              Zapisuj, co działo się w ciągu dnia, oznaczaj kolorem i dziel się dziennikiem z
-              behawiorystką — bez arkuszy i notatek rozsianych po telefonie.
+              Wspólny dziennik treningowy dla Ciebie i behawiorysty. Wiedza i instrukcje, które
+              nigdy nie giną.
             </p>
             <div className="flex w-full flex-col gap-3 sm:flex-row">
               <Button asChild size="lg" className="w-full sm:w-auto">
