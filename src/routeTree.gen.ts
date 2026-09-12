@@ -10,33 +10,53 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as PsyRouteImport } from './routes/psy'
+import { Route as PiesIdRouteImport } from './routes/pies.$id'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const PsyRoute = PsyRouteImport.update({
+  id: '/psy',
+  path: '/psy',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PiesIdRoute = PiesIdRouteImport.update({
+  id: '/pies/$id',
+  path: '/pies/$id',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/psy': typeof PsyRoute
+  '/pies/$id': typeof PiesIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/psy': typeof PsyRoute
+  '/pies/$id': typeof PiesIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/psy': typeof PsyRoute
+  '/pies/$id': typeof PiesIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths: '/' | '/psy' | '/pies/$id'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to: '/' | '/psy' | '/pies/$id'
+  id: '__root__' | '/' | '/psy' | '/pies/$id'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  PsyRoute: typeof PsyRoute
+  PiesIdRoute: typeof PiesIdRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -48,11 +68,27 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/psy': {
+      id: '/psy'
+      path: '/psy'
+      fullPath: '/psy'
+      preLoaderRoute: typeof PsyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/pies/$id': {
+      id: '/pies/$id'
+      path: '/pies/$id'
+      fullPath: '/pies/$id'
+      preLoaderRoute: typeof PiesIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  PsyRoute: PsyRoute,
+  PiesIdRoute: PiesIdRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
