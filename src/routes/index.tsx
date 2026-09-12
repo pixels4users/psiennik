@@ -6,7 +6,6 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import heroAsset from "@/assets/hero.jpg.asset.json";
 import socialProofAsset from "@/assets/social-proof.jpg.asset.json";
-import avatarAsset from "@/assets/avatar.jpg.asset.json";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -108,16 +107,6 @@ function LandingPage() {
             <p className="max-w-lg text-2xl leading-snug text-primary md:text-3xl lg:text-4xl">
               Aplikacja przetestowana na prawdziwych spacerach i brudnych łapach.
             </p>
-            <div className="flex items-center gap-3">
-              <img
-                src={avatarAsset.url}
-                alt="Pies na spacerze"
-                className="h-12 w-12 rounded-full object-cover"
-              />
-              <span className="text-sm font-medium text-muted-foreground">
-                Zespół Psiennika + setki testujących czworonogów
-              </span>
-            </div>
           </div>
         </div>
       </section>
