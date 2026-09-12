@@ -94,16 +94,30 @@ function LandingPage() {
       </section>
 
       {/* Social proof */}
-      <section className="w-full bg-slate-50 py-5">
-        <div className="mx-auto flex max-w-7xl items-center justify-center gap-3 px-5">
-          <img
-            src={avatarAsset.url}
-            alt="Pies na spacerze"
-            className="h-12 w-12 rounded-full object-cover"
-          />
-          <p className="text-sm text-muted-foreground">
-            Aplikacja przetestowana na prawdziwych spacerach i brudnych łapach.
-          </p>
+      <section className="w-full bg-slate-50 py-16 lg:py-24">
+        <div className="mx-auto grid max-w-7xl items-center gap-10 px-5 lg:grid-cols-2 lg:gap-16">
+          <div className="relative">
+            <img
+              src={heroAsset.url}
+              alt="Para z border collie na spacerze"
+              className="aspect-[4/3] w-full rounded-2xl object-cover shadow-xl"
+            />
+          </div>
+          <div className="flex flex-col items-start gap-6">
+            <p className="max-w-lg text-2xl leading-snug text-primary md:text-3xl lg:text-4xl">
+              Aplikacja przetestowana na prawdziwych spacerach i brudnych łapach.
+            </p>
+            <div className="flex items-center gap-3">
+              <img
+                src={avatarAsset.url}
+                alt="Pies na spacerze"
+                className="h-12 w-12 rounded-full object-cover"
+              />
+              <span className="text-sm font-medium text-muted-foreground">
+                Zespół Psiennika + setki testujących czworonogów
+              </span>
+            </div>
+          </div>
         </div>
       </section>
 
