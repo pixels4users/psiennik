@@ -16,3 +16,6 @@
 - [x] Dodać podgląd zdjęcia przy tworzeniu psa
 - [x] Dodać edycję danych oraz zdjęcia istniejącego psa
 - [x] Zweryfikować dodawanie, podmianę i usuwanie zdjęcia
+- [x] Dodać panel szczegółów dnia otwierany z kalendarza
+- [x] Zachować edycję wydarzeń i komentarzy w panelu dnia
+- [x] Zweryfikować panel dnia na komputerze i telefonie

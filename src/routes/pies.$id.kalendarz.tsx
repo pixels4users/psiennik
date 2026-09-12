@@ -1,5 +1,5 @@
 import { useMemo, useState } from "react";
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute } from "@tanstack/react-router";
 import {
   addDays,
   addWeeks,
@@ -11,10 +11,22 @@ import {
 import { pl } from "date-fns/locale";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { useDog, useEntries, ACTIVITY_TYPES, type Entry } from "@/lib/dogs";
+import { useRole } from "@/lib/role";
 import { DogNav } from "@/components/dog-nav";
+import { EntryCard } from "@/components/entry-card";
+import { EntryFormDialog } from "@/components/entry-form-dialog";
+import { CommentDialog } from "@/components/comment-dialog";
 import { ratingToneClass } from "@/components/rating-badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import {
+  Sheet,
+  SheetContent,
+  SheetDescription,
+  SheetHeader,
+  SheetTitle,
+} from "@/components/ui/sheet";
 import { Skeleton } from "@/components/ui/skeleton";
 import { cn } from "@/lib/utils";
 
@@ -73,11 +85,17 @@ function keywordCounts(entries: Entry[]): [string, number][] {
 
 function DogCalendarPage() {
   const { id } = Route.useParams();
+  const { role } = useRole();
   const { data: dog } = useDog(id);
   const { data: entries, isLoading } = useEntries(id);
   const [weekStart, setWeekStart] = useState(() =>
     startOfWeek(new Date(), { weekStartsOn: 1 }),
   );
+  const [selectedDate, setSelectedDate] = useState<Date | null>(null);
+  const [editedEntry, setEditedEntry] = useState<Entry | null>(null);
+  const [entryDialogOpen, setEntryDialogOpen] = useState(false);
+  const [commentedEntry, setCommentedEntry] = useState<Entry | null>(null);
+  const [commentDialogOpen, setCommentDialogOpen] = useState(false);
 
   const byDate = useMemo(() => {
     const map = new Map<string, Entry[]>();
@@ -138,6 +156,8 @@ function DogCalendarPage() {
   }
 
   const totalCount = analysis.total.all;
+  const selectedDateKey = selectedDate ? format(selectedDate, "yyyy-MM-dd") : null;
+  const selectedDayEntries = selectedDateKey ? (byDate.get(selectedDateKey) ?? []) : [];
   const barSegments = [
     { key: "green", className: "bg-good", count: analysis.total.green },
     { key: "amber", className: "bg-warn", count: analysis.total.amber },
@@ -288,12 +308,14 @@ function DogCalendarPage() {
                   dayEntries.length ? worstRating(dayEntries) : null,
                 );
                 return (
-                  <Link
+                  <Button
+                    type="button"
+                    variant="outline"
                     key={key}
-                    to="/pies/$id"
-                    params={{ id }}
+                    onClick={() => setSelectedDate(day)}
+                    aria-label={`Pokaż wydarzenia z ${format(day, "d MMMM yyyy", { locale: pl })}`}
                     className={cn(
-                      "flex min-h-20 flex-col rounded-lg border border-border p-2 transition-colors",
+                      "h-auto min-h-20 flex-col items-stretch justify-start rounded-lg p-2 text-left font-normal",
                       tone || "hover:bg-keylime",
                       isToday(day) && "ring-2 ring-ring",
                     )}
@@ -312,17 +334,78 @@ function DogCalendarPage() {
                         {dayEntries.length === 1 ? "wpis" : dayEntries.length < 5 ? "wpisy" : "wpisów"}
                       </span>
                     )}
-                  </Link>
+                  </Button>
                 );
               })}
             </div>
             <p className="mt-3 text-xs text-muted-foreground">
-              Kolor dnia pokazuje najtrudniejszą ocenę z wpisów. Kliknij dzień, aby zobaczyć
-              szczegóły na liście.
+              Kolor dnia pokazuje najtrudniejszą ocenę z wpisów. Kliknij dzień, aby otworzyć
+              jego szczegóły.
             </p>
           </section>
         </>
       )}
+
+      <Sheet open={selectedDate !== null} onOpenChange={(open) => !open && setSelectedDate(null)}>
+        <SheetContent
+          side="right"
+          className="flex h-dvh w-full max-w-none flex-col gap-0 p-0 sm:w-[34rem] sm:max-w-[90vw]"
+        >
+          <SheetHeader className="border-b border-border px-5 py-6 pr-14 text-left sm:px-7">
+            <SheetTitle className="font-display text-3xl font-light capitalize text-primary">
+              {selectedDate
+                ? format(selectedDate, "EEEE, d MMMM yyyy", { locale: pl })
+                : "Szczegóły dnia"}
+            </SheetTitle>
+            <SheetDescription>
+              {selectedDayEntries.length === 0
+                ? "Brak wydarzeń"
+                : `${selectedDayEntries.length} ${selectedDayEntries.length === 1 ? "wydarzenie" : selectedDayEntries.length < 5 ? "wydarzenia" : "wydarzeń"}`}
+            </SheetDescription>
+          </SheetHeader>
+
+          <ScrollArea className="min-h-0 flex-1">
+            <div className="grid gap-3 p-5 sm:p-7">
+              {selectedDayEntries.length === 0 ? (
+                <div className="rounded-xl bg-keylime px-5 py-12 text-center">
+                  <h3 className="text-2xl">Spokojny dzień</h3>
+                  <p className="mt-2 text-sm text-muted-foreground">
+                    Nie zapisano żadnych wydarzeń dla tej daty.
+                  </p>
+                </div>
+              ) : (
+                selectedDayEntries.map((entry) => (
+                  <EntryCard
+                    key={entry.id}
+                    entry={entry}
+                    role={role}
+                    onEdit={(item) => {
+                      setEditedEntry(item);
+                      setEntryDialogOpen(true);
+                    }}
+                    onComment={(item) => {
+                      setCommentedEntry(item);
+                      setCommentDialogOpen(true);
+                    }}
+                  />
+                ))
+              )}
+            </div>
+          </ScrollArea>
+        </SheetContent>
+      </Sheet>
+
+      <EntryFormDialog
+        dogId={id}
+        open={entryDialogOpen}
+        onOpenChange={setEntryDialogOpen}
+        entry={editedEntry}
+      />
+      <CommentDialog
+        entry={commentedEntry}
+        open={commentDialogOpen}
+        onOpenChange={setCommentDialogOpen}
+      />
     </div>
   );
 }
