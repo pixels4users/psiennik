@@ -3,7 +3,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { format, parseISO } from "date-fns";
 import { pl } from "date-fns/locale";
 import { Plus } from "lucide-react";
-import { useRole } from "@/lib/role";
+import { useRole } from "@/lib/auth";
 import { useDog, useEntries, type Entry } from "@/lib/dogs";
 import { DogNav } from "@/components/dog-nav";
 import { EntryCard } from "@/components/entry-card";
