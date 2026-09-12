@@ -99,8 +99,8 @@ function LandingPage() {
         <div className="mx-auto grid max-w-7xl items-center gap-10 px-5 lg:grid-cols-2 lg:gap-16">
           <div className="relative">
             <img
-              src={heroAsset.url}
-              alt="Para z border collie na spacerze"
+              src={socialProofAsset.url}
+              alt="Dwa psy bawiące się na trawie"
               className="aspect-[4/3] w-full rounded-2xl object-cover shadow-xl"
             />
           </div>
