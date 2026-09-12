@@ -14,7 +14,7 @@ export function DogNav({
   active,
 }: {
   dog: Dog;
-  active: "lista" | "kalendarz" | "tabela" | "zalecenia" | "analiza";
+  active: "dziennik" | "kalendarz" | "tabela" | "zalecenia" | "analiza";
 }) {
   const { data: role, isLoading } = useDogRole(dog.id);
   const [editOpen, setEditOpen] = useState(false);
@@ -67,12 +67,12 @@ export function DogNav({
             params={{ id: dog.id }}
             className={cn(
               "rounded-full px-4 py-1.5 text-sm transition-colors",
-              active === "lista"
+              active === "dziennik"
                 ? "bg-primary text-primary-foreground"
                 : "text-secondary-foreground hover:bg-accent/60",
             )}
           >
-            Lista
+            Dziennik
           </Link>
           <Link
             to="/pies/$id/kalendarz"
