@@ -53,20 +53,20 @@ const FEATURES = [
 
 const JOURNAL_PREVIEWS = [
   {
-    name: "Lucy",
+    name: "Humus",
     imageUrl: dogProfile1Asset.url,
-    imageAlt: "Lucy odpoczywająca z głową na poduszce",
+    imageAlt: "Humus odpoczywający z głową na poduszce",
     activity: "Spokojny spacer",
-    description: "Minęłyśmy dwa psy bez szczekania. Pomogło zwiększenie dystansu i spokojna komenda.",
+    description: "Minęliśmy dwa psy bez szczekania. Pomogło zwiększenie dystansu i spokojna komenda.",
     timeOfDay: "Rano",
     rating: "good" as const,
     ratingLabel: "Dobrze",
     icon: Footprints,
   },
   {
-    name: "Kokos",
+    name: "Lunka",
     imageUrl: dogProfile2Asset.url,
-    imageAlt: "Kokos jako czarny szczeniak z białymi łapkami",
+    imageAlt: "Lunka jako czarny szczeniak z białymi łapkami",
     activity: "Trening zostawania",
     description: "Trzy krótkie serie po dwie minuty. Coraz łatwiej wraca na swoje miejsce po przerwie.",
     timeOfDay: "Południe",
