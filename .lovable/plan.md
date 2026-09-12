@@ -7,7 +7,7 @@ Na razie **bez logowania** — rolę wybiera się na wejściu. Struktura danych 
 ## Dane (Lovable Cloud)
 
 **`dogs`** — pies jako osobny rekord
-- `id`, `name`, `birth_year` (lub wiek), `breed`, `sex` (suka/pies), `created_at`
+- `id`, `name`, `birth_year` (lub wiek), `breed`, `sex` (suka/pies), `photo_url` (opcjonalne zdjęcie), `created_at`
 - `owner_id` — puste na razie, gotowe pod konta
 
 **`entries`** — wydarzenia
@@ -27,8 +27,8 @@ Bez logowania: odczyt i zapis publiczny (kto zna adres, ten korzysta). Przy wpro
 Prosty ekran: „Jestem właścicielem" | „Jestem behawiorystą". Wybór zapamiętany w przeglądarce, można go zmienić w nagłówku. To tymczasowa atrapa logowania — docelowo zastąpi ją ekran konta.
 
 ### Widok właściciela
-1. **Lista psów** (`/psy`) — karty psów + „Dodaj psa". Gdy pusto: stan pusty (szkielety) i duże „Dodaj psa".
-2. **Dodawanie psa** — formularz: imię, wiek, rasa, płeć. Po zapisie wchodzimy w profil psa.
+1. **Lista psów** (`/psy`) — karty psów ze zdjęciem + „Dodaj psa". Gdy pusto: stan pusty (szkielety) i duże „Dodaj psa".
+2. **Dodawanie psa** — formularz: imię, wiek, rasa, płeć, zdjęcie (opcjonalne, wgrywanie pliku). Po zapisie wchodzimy w profil psa.
 3. **Profil psa** — zakładki **Lista** i **Kalendarz**:
    - **Lista** (`/pies/$id`): wydarzenia pogrupowane po dacie (nagłówek dnia), pod nim karty wydarzeń z kolorowym tagiem. Edycja wpisu na karcie. Przycisk „Dodaj wydarzenie" (modal: data, typ aktywności, tytuł, opis, tag). Komentarz behawiorystki widoczny na karcie, ale **tylko do odczytu**.
    - **Kalendarz** (`/pies/$id/kalendarz`): widok tygodniowy od września 2026, każdy dzień pokolorowany według najgorszego tagu dnia, nawigacja tydzień w przód/tył. Nad kalendarzem sekcja analiz (poniżej).
@@ -55,4 +55,4 @@ Prosty ekran: „Jestem właścicielem" | „Jestem behawiorystą". Wybór zapam
 
 ## Czego teraz NIE robimy
 - Logowanie, konta, zaproszenia (etap 2).
-- Zdjęcia, eksport CSV, powiadomienia.
+- Eksport CSV, powiadomienia.
