@@ -152,7 +152,7 @@ function LandingPage() {
       </section>
 
       {/* Journal previews */}
-      <section className="border-y bg-background py-16 lg:py-24">
+      <section className="bg-background py-16 lg:py-24">
         <div className="mx-auto max-w-7xl px-5">
           <div className="mb-10 max-w-2xl lg:mb-14">
             <p className="mb-3 text-sm font-semibold text-muted-foreground">Dziennik w praktyce</p>
