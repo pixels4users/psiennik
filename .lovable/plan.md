@@ -13,6 +13,7 @@ Na razie **bez logowania** — rolę wybiera się na wejściu. Struktura danych 
 **`entries`** — wydarzenia
 - `id`, `dog_id` → dogs
 - `date`, `title`, `activity_type` (spacer, trening, socjalizacja, goście/wizyta, wypoczynek, inne)
+- `time_of_day` — rano / południe / wieczór
 - `description` — brak zachowań problemowych albo opis sytuacji
 - `rating` — zielony / pomarańczowy / czerwony
 - `behaviorist_comment` — komentarz i zalecenia behawiorystki
