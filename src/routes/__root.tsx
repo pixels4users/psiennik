@@ -10,7 +10,7 @@ export const Route = createRootRoute({
   head: () => ({
     meta: [
       {
-        title: "Dziennik psa — dziennik behawioralny",
+        title: "Psiennik — dziennik behawioralny",
       },
       {
         name: "description",

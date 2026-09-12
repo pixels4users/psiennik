@@ -6,13 +6,13 @@ import { Card, CardContent } from "@/components/ui/card";
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "Dziennik psa — wybierz rolę" },
+      { title: "Psiennik — wybierz rolę" },
       {
         name: "description",
         content:
           "Wspólny dziennik behawioralny psa: właściciel zapisuje wydarzenia, behawiorysta dodaje zalecenia.",
       },
-      { property: "og:title", content: "Dziennik psa — wybierz rolę" },
+      { property: "og:title", content: "Psiennik — wybierz rolę" },
       {
         property: "og:description",
         content:
