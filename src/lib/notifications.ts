@@ -1,6 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { useAuth, useRole } from "@/lib/auth";
+import { useAuth } from "@/lib/auth";
+import { useIsBehaviorist } from "@/lib/access";
 
 export type DogNews = {
   dogId: string;
@@ -11,11 +12,11 @@ export type DogNews = {
 /** Nowe wpisy (dla behawiorysty) lub nowe komentarze (dla właściciela) od ostatniej wizyty. */
 export function useNews() {
   const { user } = useAuth();
-  const { role } = useRole();
+  const { data: isBehaviorist } = useIsBehaviorist();
 
   return useQuery({
-    queryKey: ["news", user?.id, role],
-    enabled: !!user && !!role,
+    queryKey: ["news", user?.id, isBehaviorist],
+    enabled: !!user && isBehaviorist !== undefined,
     queryFn: async (): Promise<DogNews[]> => {
       const [{ data: dogs }, { data: entries }, { data: views }] = await Promise.all([
         supabase.from("dogs").select("id, name"),
@@ -30,7 +31,7 @@ export function useNews() {
           const since = seen.get(dog.id);
           const count = (entries ?? []).filter((entry) => {
             if (entry.dog_id !== dog.id) return false;
-            const stamp = role === "owner" ? entry.commented_at : entry.created_at;
+            const stamp = isBehaviorist ? entry.created_at : entry.commented_at;
             if (!stamp) return false;
             return !since || stamp > since;
           }).length;

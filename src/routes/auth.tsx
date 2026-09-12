@@ -1,19 +1,30 @@
 import { useEffect, useState } from "react";
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, useNavigate, useSearch } from "@tanstack/react-router";
 import { toast } from "sonner";
+import { z } from "zod";
 import { supabase } from "@/integrations/supabase/client";
 import { lovable } from "@/integrations/lovable";
 import { useAuth } from "@/lib/auth";
-import { DEMO_BEHAVIORIST_EMAIL, DEMO_OWNER_EMAIL, DEMO_PASSWORD, ensureDemoAccounts } from "@/lib/demo.functions";
+import { useRedeemInvite } from "@/lib/access";
+import {
+  DEMO_BEHAVIORIST_EMAIL,
+  DEMO_OWNER_EMAIL,
+  DEMO_PASSWORD,
+  ensureDemoAccounts,
+} from "@/lib/demo.functions";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+
+const searchSchema = z.object({
+  code: z.string().optional(),
+});
 
 export const Route = createFileRoute("/auth")({
   ssr: false,
+  validateSearch: searchSchema,
   head: () => ({
     meta: [
       { title: "Logowanie — Psiennik" },
@@ -36,22 +47,47 @@ export const Route = createFileRoute("/auth")({
 function AuthPage() {
   const navigate = useNavigate();
   const { user, loading } = useAuth();
+  const { code } = useSearch({ from: "/auth" });
+  const redeem = useRedeemInvite();
   const [busy, setBusy] = useState(false);
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [name, setName] = useState("");
-  const [role, setRole] = useState<"owner" | "behaviorist">("owner");
 
   useEffect(() => {
-    if (!loading && user) navigate({ to: "/psy", replace: true });
-  }, [loading, user, navigate]);
+    if (loading || !user) return;
+
+    if (code?.trim()) {
+      redeem.mutate(code.trim(), {
+        onSuccess: ({ dogId, behavioristId }) => {
+          toast.success("Kod został użyty");
+          if (dogId) {
+            navigate({ to: "/pies/$id", params: { id: dogId }, replace: true });
+          } else if (behavioristId) {
+            navigate({ to: "/psy", replace: true });
+          } else {
+            navigate({ to: "/psy", replace: true });
+          }
+        },
+        onError: (err) => {
+          toast.error(err instanceof Error ? err.message : "Nie udało się użyć kodu");
+          navigate({ to: "/psy", replace: true });
+        },
+      });
+    } else {
+      navigate({ to: "/psy", replace: true });
+    }
+  }, [loading, user, code, navigate, redeem]);
 
   const oauth = async (provider: "google" | "apple") => {
     setBusy(true);
     try {
+      const redirectTo = code
+        ? `${window.location.origin}/auth?code=${encodeURIComponent(code)}`
+        : window.location.origin;
       const result = await lovable.auth.signInWithOAuth(provider, {
-        redirect_uri: window.location.origin,
+        redirect_uri: redirectTo,
       });
       if (result.error) throw result.error;
       if (!result.redirected) navigate({ to: "/psy", replace: true });
@@ -68,7 +104,7 @@ function AuthPage() {
     try {
       const { error } = await supabase.auth.signInWithPassword({ email, password });
       if (error) throw error;
-      navigate({ to: "/psy", replace: true });
+      // redirect handled by useEffect with code
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Nie udało się zalogować");
     } finally {
@@ -84,13 +120,18 @@ function AuthPage() {
         email,
         password,
         options: {
-          emailRedirectTo: window.location.origin,
-          data: { display_name: name, role },
+          emailRedirectTo: code
+            ? `${window.location.origin}/auth?code=${encodeURIComponent(code)}`
+            : window.location.origin,
+          data: { display_name: name },
         },
       });
       if (error) throw error;
-      if (data.session) navigate({ to: "/psy", replace: true });
-      else toast.success("Sprawdź skrzynkę i potwierdź adres e-mail, aby dokończyć rejestrację.");
+      if (data.session) {
+        // redirect handled by useEffect with code
+      } else {
+        toast.success("Sprawdź skrzynkę i potwierdź adres e-mail, aby dokończyć rejestrację.");
+      }
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Nie udało się założyć konta");
     } finally {
@@ -107,7 +148,7 @@ function AuthPage() {
         password: DEMO_PASSWORD,
       });
       if (error) throw error;
-      navigate({ to: "/psy", replace: true });
+      // redirect handled by useEffect with code
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Nie udało się wejść na konto demo");
     } finally {
@@ -121,6 +162,12 @@ function AuthPage() {
       <p className="mt-2 text-muted-foreground">
         Zaloguj się, aby prowadzić dziennik behawioralny swojego psa.
       </p>
+
+      {code && (
+        <div className="mt-6 rounded-lg bg-keylime p-4 text-center text-sm">
+          Po zalogowaniu użyjemy kodu <span className="font-display text-lg tracking-widest">{code}</span>
+        </div>
+      )}
 
       <Card className="mt-8 shadow-none">
         <CardContent className="grid gap-5 p-6">
@@ -208,27 +255,6 @@ function AuthPage() {
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                   />
-                </div>
-                <div className="grid gap-2">
-                  <Label>Jestem</Label>
-                  <RadioGroup
-                    value={role}
-                    onValueChange={(v) => setRole(v as "owner" | "behaviorist")}
-                    className="grid gap-2"
-                  >
-                    <div className="flex items-center gap-2">
-                      <RadioGroupItem value="owner" id="role-owner" />
-                      <Label htmlFor="role-owner" className="font-normal">
-                        Właścicielem psa
-                      </Label>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <RadioGroupItem value="behaviorist" id="role-behaviorist" />
-                      <Label htmlFor="role-behaviorist" className="font-normal">
-                        Behawiorystą
-                      </Label>
-                    </div>
-                  </RadioGroup>
                 </div>
                 <Button type="submit" disabled={busy}>
                   Załóż konto

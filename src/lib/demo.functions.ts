@@ -86,8 +86,22 @@ export const ensureDemoAccounts = createServerFn({ method: "POST" }).handler(asy
   await supabaseAdmin
     .from("dog_access")
     .upsert(
-      { dog_id: dogId, user_id: behavioristId, role: "behaviorist" },
+      { dog_id: dogId, user_id: behavioristId, role: "behaviorist", process_status: "active" },
       { onConflict: "dog_id,user_id" },
+    );
+
+  await supabaseAdmin
+    .from("owner_behaviorists")
+    .upsert(
+      { owner_id: ownerId, behaviorist_id: behavioristId, process_status: "active" },
+      { onConflict: "owner_id,behaviorist_id" },
+    );
+
+  await supabaseAdmin
+    .from("behaviorist_links")
+    .upsert(
+      { behaviorist_id: behavioristId, invite_code: "DEMO12", is_active: true },
+      { onConflict: "behaviorist_id" },
     );
 
   return { ownerEmail: DEMO_OWNER_EMAIL, behavioristEmail: DEMO_BEHAVIORIST_EMAIL };

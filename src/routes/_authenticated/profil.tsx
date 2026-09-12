@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { Copy, RefreshCw, Trash2, Users, UserCheck } from "lucide-react";
+import { Copy, RefreshCw, Trash2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth, useProfile } from "@/lib/auth";
 import {
@@ -12,6 +12,7 @@ import {
   useBehavioristOwners,
   useRemoveOwnerBehaviorist,
   useSubscriptionLimits,
+  useIsBehaviorist,
   type OwnerBehavioristWithProfile,
 } from "@/lib/access";
 import { Button } from "@/components/ui/button";
@@ -172,6 +173,9 @@ function ProfilePage() {
 function BehavioristCodeCard() {
   const { data: link, isLoading } = useBehavioristLink();
   const create = useCreateBehavioristLink();
+  const { data: isBehaviorist, isLoading: roleLoading } = useIsBehaviorist();
+
+  if (!roleLoading && !isBehaviorist) return null;
 
   return (
     <Card className="mt-6 shadow-none">

@@ -232,18 +232,21 @@ export type Database = {
           created_at: string
           id: string
           owner_id: string
+          process_status: string
         }
         Insert: {
           behaviorist_id: string
           created_at?: string
           id?: string
           owner_id: string
+          process_status?: string
         }
         Update: {
           behaviorist_id?: string
           created_at?: string
           id?: string
           owner_id?: string
+          process_status?: string
         }
         Relationships: []
       }
