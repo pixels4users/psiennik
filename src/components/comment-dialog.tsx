@@ -42,10 +42,10 @@ export function CommentDialog({
         .eq("id", entry.id);
       if (error) throw error;
       await queryClient.invalidateQueries({ queryKey: ["entries", entry.dog_id] });
-      toast.success("Komentarz zapisany");
+      toast.success("Zalecenie zapisane");
       onOpenChange(false);
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : "Nie udało się zapisać komentarza");
+      toast.error(err instanceof Error ? err.message : "Nie udało się zapisać zalecenia");
     } finally {
       setSaving(false);
     }
@@ -56,7 +56,7 @@ export function CommentDialog({
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
           <DialogTitle className="font-display text-2xl font-light text-primary">
-            Komentarz behawiorysty
+            Zalecenie behawiorysty
           </DialogTitle>
           <DialogDescription>
             {entry ? `Wydarzenie: ${entry.title}` : ""}

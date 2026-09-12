@@ -52,7 +52,7 @@ export function EntryCard({
             <div className="flex items-center justify-between gap-2">
               <p className="flex items-center gap-1.5 text-xs font-medium tracking-wide text-primary uppercase">
                 <MessageSquareText className="size-3.5" />
-                Komentarz behawiorysty
+                Zalecenie behawiorysty
               </p>
               {canComment && onComment && (
                 <Button variant="ghost" size="sm" onClick={() => onComment(entry)}>
@@ -74,7 +74,7 @@ export function EntryCard({
               onClick={() => onComment(entry)}
             >
               <MessageSquarePlus className="size-4" />
-              Dodaj komentarz
+              Dodaj zalecenie
             </Button>
           )
         )}

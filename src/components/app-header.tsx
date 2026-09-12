@@ -55,7 +55,7 @@ export function AppHeader() {
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-64">
                 <DropdownMenuLabel>
-                  {isBehaviorist ? "Nowe wpisy" : "Nowe komentarze"}
+                  {isBehaviorist ? "Nowe wpisy" : "Nowe zalecenia"}
                 </DropdownMenuLabel>
                 <DropdownMenuSeparator />
                 {total === 0 ? (

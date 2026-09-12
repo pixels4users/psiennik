@@ -22,8 +22,8 @@ export const TIMES_OF_DAY = [
 
 export const RATINGS = [
   { value: "green", label: "Dobrze" },
-  { value: "amber", label: "Tak sobie" },
-  { value: "red", label: "Trudne" },
+  { value: "amber", label: "Wyzwanie" },
+  { value: "red", label: "Trudno" },
 ] as const;
 
 export function labelFor(

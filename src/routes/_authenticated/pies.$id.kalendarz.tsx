@@ -53,7 +53,7 @@ const WEEKDAY_LABELS = ["Pon", "Wt", "Śr", "Czw", "Pt", "Sob", "Nd"];
 
 const RATING_DOTS = [
   { rating: "green", label: "dobrych", className: "bg-good" },
-  { rating: "amber", label: "takich sobie", className: "bg-warn" },
+  { rating: "amber", label: "wyzwań", className: "bg-warn" },
   { rating: "red", label: "trudnych", className: "bg-bad" },
 ] as const;
 
