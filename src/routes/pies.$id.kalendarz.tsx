@@ -5,12 +5,12 @@ import {
   addWeeks,
   format,
   isToday,
-  parseISO,
+
   startOfWeek,
 } from "date-fns";
 import { pl } from "date-fns/locale";
 import { ChevronLeft, ChevronRight } from "lucide-react";
-import { useDog, useEntries, ACTIVITY_TYPES, labelFor, type Entry } from "@/lib/dogs";
+import { useDog, useEntries, ACTIVITY_TYPES, type Entry } from "@/lib/dogs";
 import { DogNav } from "@/components/dog-nav";
 import { ratingToneClass } from "@/components/rating-badge";
 import { Button } from "@/components/ui/button";
