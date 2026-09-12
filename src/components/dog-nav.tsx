@@ -108,6 +108,7 @@ export function DogNav({
         </div>
       </div>
       <DogFormDialog dog={dog} open={editOpen} onOpenChange={setEditOpen} />
+      <InviteDialog dogId={dog.id} open={inviteOpen} onOpenChange={setInviteOpen} />
     </div>
   );
 }
