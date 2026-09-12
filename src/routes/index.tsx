@@ -4,6 +4,8 @@ import { CalendarRange, MessageSquareText, PawPrint } from "lucide-react";
 import { useAuth } from "@/lib/auth";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
+import heroAsset from "@/assets/hero.jpg.asset.json";
+import avatarAsset from "@/assets/avatar.jpg.asset.json";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -54,31 +56,71 @@ function LandingPage() {
   }, [loading, user, navigate]);
 
   return (
-    <div className="mx-auto max-w-5xl px-5 py-16">
-      <h1 className="max-w-2xl text-5xl leading-tight">
-        Dziennik behawioralny psa, który prowadzi się sam
-      </h1>
-      <p className="mt-4 max-w-xl text-muted-foreground">
-        Zapisuj, co działo się w ciągu dnia, oznaczaj kolorem i dziel się dziennikiem z
-        behawiorystką — bez arkuszy i notatek rozsianych po telefonie.
-      </p>
-      <div className="mt-8 flex flex-wrap gap-3">
-        <Button asChild size="lg">
-          <Link to="/auth">Zacznij za darmo</Link>
-        </Button>
-      </div>
+    <div className="bg-background">
+      {/* Hero */}
+      <section className="mx-auto max-w-7xl px-5 py-16 lg:py-24">
+        <div className="grid items-center gap-12 lg:grid-cols-2 lg:gap-16">
+          <div className="flex flex-col items-start gap-6">
+            <h1 className="max-w-xl text-4xl leading-tight text-primary md:text-5xl lg:text-6xl">
+              Dziennik behawioralny psa, który prowadzi się sam
+            </h1>
+            <p className="max-w-lg text-lg text-muted-foreground">
+              Zapisuj, co działo się w ciągu dnia, oznaczaj kolorem i dziel się dziennikiem z
+              behawiorystką — bez arkuszy i notatek rozsianych po telefonie.
+            </p>
+            <div className="flex w-full flex-col gap-3 sm:flex-row">
+              <Button asChild size="lg" className="w-full sm:w-auto">
+                <Link to="/auth">Jestem właścicielem</Link>
+              </Button>
+              <Button
+                asChild
+                size="lg"
+                variant="outline"
+                className="w-full border-primary text-primary hover:bg-slate-50 sm:w-auto"
+              >
+                <Link to="/auth">Jestem behawiorystą</Link>
+              </Button>
+            </div>
+          </div>
 
-      <div className="mt-14 grid gap-5 sm:grid-cols-3">
-        {FEATURES.map(({ icon: Icon, title, description }) => (
-          <Card key={title} className="shadow-none">
-            <CardContent className="grid gap-3 p-6">
-              <Icon className="size-6 text-primary" />
-              <h2 className="text-2xl">{title}</h2>
-              <p className="text-sm leading-relaxed text-muted-foreground">{description}</p>
-            </CardContent>
-          </Card>
-        ))}
-      </div>
+          <div className="relative">
+            <img
+              src={heroAsset.url}
+              alt="Para z border collie na spacerze"
+              className="aspect-[4/3] w-full rounded-2xl object-cover shadow-xl"
+            />
+          </div>
+        </div>
+      </section>
+
+      {/* Social proof */}
+      <section className="w-full bg-slate-50 py-5">
+        <div className="mx-auto flex max-w-7xl items-center justify-center gap-3 px-5">
+          <img
+            src={avatarAsset.url}
+            alt="Pies na spacerze"
+            className="h-12 w-12 rounded-full object-cover"
+          />
+          <p className="text-sm text-muted-foreground">
+            Aplikacja przetestowana na prawdziwych spacerach i brudnych łapach.
+          </p>
+        </div>
+      </section>
+
+      {/* Features */}
+      <section className="mx-auto max-w-6xl px-5 py-16 lg:py-24">
+        <div className="grid gap-6 md:grid-cols-3">
+          {FEATURES.map(({ icon: Icon, title, description }) => (
+            <Card key={title} className="border bg-slate-50 shadow-none rounded-xl">
+              <CardContent className="grid gap-4 p-6">
+                <Icon className="size-7 text-primary" />
+                <h2 className="text-2xl text-primary">{title}</h2>
+                <p className="text-sm leading-relaxed text-muted-foreground">{description}</p>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+      </section>
     </div>
   );
 }
