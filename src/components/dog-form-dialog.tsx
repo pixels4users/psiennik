@@ -1,9 +1,10 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "@tanstack/react-router";
 import { useQueryClient } from "@tanstack/react-query";
+import { ImagePlus, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
-import { uploadDogPhoto } from "@/lib/dogs";
+import { deleteDogPhoto, uploadDogPhoto, useDogPhotoUrl, type Dog } from "@/lib/dogs";
 import {
   Dialog,
   DialogContent,
@@ -25,9 +26,11 @@ import {
 export function DogFormDialog({
   open,
   onOpenChange,
+  dog,
 }: {
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  dog?: Dog;
 }) {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
@@ -36,7 +39,26 @@ export function DogFormDialog({
   const [breed, setBreed] = useState("");
   const [sex, setSex] = useState<string>("");
   const [photo, setPhoto] = useState<File | null>(null);
+  const [removePhoto, setRemovePhoto] = useState(false);
   const [saving, setSaving] = useState(false);
+  const { data: currentPhotoUrl } = useDogPhotoUrl(dog?.photo_url ?? null);
+  const photoPreview = photo ? URL.createObjectURL(photo) : null;
+
+  useEffect(() => {
+    if (!open) return;
+    setName(dog?.name ?? "");
+    setAge(dog?.age ?? "");
+    setBreed(dog?.breed ?? "");
+    setSex(dog?.sex ?? "");
+    setPhoto(null);
+    setRemovePhoto(false);
+  }, [dog, open]);
+
+  useEffect(() => {
+    return () => {
+      if (photoPreview) URL.revokeObjectURL(photoPreview);
+    };
+  }, [photoPreview]);
 
   const reset = () => {
     setName("");
@@ -44,6 +66,7 @@ export function DogFormDialog({
     setBreed("");
     setSex("");
     setPhoto(null);
+    setRemovePhoto(false);
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -54,27 +77,40 @@ export function DogFormDialog({
     }
     setSaving(true);
     try {
-      let photoUrl: string | null = null;
+      let photoUrl = dog?.photo_url ?? null;
       if (photo) photoUrl = await uploadDogPhoto(photo);
+      else if (removePhoto) photoUrl = null;
 
-      const { data, error } = await supabase
-        .from("dogs")
-        .insert({
-          name: name.trim(),
-          age: age.trim() || null,
-          breed: breed.trim() || null,
-          sex: sex || null,
-          photo_url: photoUrl,
-        })
-        .select("id")
-        .single();
+      const values = {
+        name: name.trim(),
+        age: age.trim() || null,
+        breed: breed.trim() || null,
+        sex: sex || null,
+        photo_url: photoUrl,
+      };
+      const query = dog
+        ? supabase.from("dogs").update(values).eq("id", dog.id)
+        : supabase.from("dogs").insert(values);
+      const { data, error } = await query.select("id").single();
       if (error) throw error;
 
+      if (dog?.photo_url && dog.photo_url !== photoUrl) {
+        try {
+          await deleteDogPhoto(dog.photo_url);
+        } catch {
+          toast.warning("Dane zapisano, ale nie udało się usunąć poprzedniego zdjęcia");
+        }
+      }
+
       await queryClient.invalidateQueries({ queryKey: ["dogs"] });
-      toast.success(`${name.trim()} dodany do dziennika`);
+      await queryClient.invalidateQueries({ queryKey: ["dogs", data.id] });
+      if (dog?.photo_url) {
+        await queryClient.invalidateQueries({ queryKey: ["dog-photo", dog.photo_url] });
+      }
+      toast.success(dog ? "Dane psa zostały zapisane" : `${name.trim()} dodany do dziennika`);
       reset();
       onOpenChange(false);
-      navigate({ to: "/pies/$id", params: { id: data.id } });
+      if (!dog) navigate({ to: "/pies/$id", params: { id: data.id } });
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Nie udało się zapisać psa");
     } finally {
@@ -87,9 +123,11 @@ export function DogFormDialog({
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
           <DialogTitle className="font-display text-2xl font-light text-primary">
-            Dodaj psa
+            {dog ? "Edytuj psa" : "Dodaj psa"}
           </DialogTitle>
-          <DialogDescription>Podstawowe informacje o podopiecznym.</DialogDescription>
+          <DialogDescription>
+            {dog ? "Zmień dane lub zdjęcie podopiecznego." : "Podstawowe informacje o podopiecznym."}
+          </DialogDescription>
         </DialogHeader>
         <form onSubmit={handleSubmit} className="grid gap-4">
           <div className="grid gap-2">
@@ -136,12 +174,45 @@ export function DogFormDialog({
           </div>
           <div className="grid gap-2">
             <Label htmlFor="dog-photo">Zdjęcie (opcjonalnie)</Label>
-            <Input
-              id="dog-photo"
-              type="file"
-              accept="image/*"
-              onChange={(e) => setPhoto(e.target.files?.[0] ?? null)}
-            />
+            <div className="flex items-center gap-4 rounded-lg border border-border p-3">
+              {photoPreview || (!removePhoto && currentPhotoUrl) ? (
+                <img
+                  src={photoPreview ?? currentPhotoUrl}
+                  alt="Podgląd zdjęcia psa"
+                  className="size-20 shrink-0 rounded-full object-cover"
+                />
+              ) : (
+                <div className="flex size-20 shrink-0 items-center justify-center rounded-full bg-sage">
+                  <ImagePlus className="size-7 text-primary" />
+                </div>
+              )}
+              <div className="grid min-w-0 flex-1 gap-2">
+                <Input
+                  id="dog-photo"
+                  type="file"
+                  accept="image/*"
+                  onChange={(e) => {
+                    setPhoto(e.target.files?.[0] ?? null);
+                    setRemovePhoto(false);
+                  }}
+                />
+                {(photo || (!removePhoto && dog?.photo_url)) && (
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="sm"
+                    className="w-fit"
+                    onClick={() => {
+                      setPhoto(null);
+                      setRemovePhoto(true);
+                    }}
+                  >
+                    <Trash2 className="size-4" />
+                    Usuń zdjęcie
+                  </Button>
+                )}
+              </div>
+            </div>
           </div>
           <div className="flex justify-end gap-2 pt-2">
             <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>

@@ -2,8 +2,9 @@ import { useState } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { PawPrint, Plus } from "lucide-react";
 import { useRole } from "@/lib/role";
-import { useDogs, useDogPhotoUrl, type Dog } from "@/lib/dogs";
+import { useDogs } from "@/lib/dogs";
 import { DogFormDialog } from "@/components/dog-form-dialog";
+import { DogAvatar } from "@/components/dog-avatar";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -27,21 +28,6 @@ export const Route = createFileRoute("/psy")({
   }),
   component: DogsPage,
 });
-
-function DogPhoto({ dog }: { dog: Dog }) {
-  const { data: url } = useDogPhotoUrl(dog.photo_url);
-  if (!dog.photo_url) {
-    return (
-      <div className="flex size-16 items-center justify-center rounded-full bg-sage">
-        <PawPrint className="size-7 text-primary" />
-      </div>
-    );
-  }
-  if (!url) return <Skeleton className="size-16 rounded-full" />;
-  return (
-    <img src={url} alt={`Zdjęcie psa ${dog.name}`} className="size-16 rounded-full object-cover" />
-  );
-}
 
 function DogsPage() {
   const { role } = useRole();
@@ -117,7 +103,7 @@ function DogsPage() {
             <Link key={dog.id} to="/pies/$id" params={{ id: dog.id }} className="block">
               <Card className="shadow-none transition-colors hover:bg-keylime">
                 <CardContent className="flex items-center gap-4 p-6">
-                  <DogPhoto dog={dog} />
+                  <DogAvatar dog={dog} />
                   <div className="grid gap-0.5">
                     <h2 className="text-2xl">{dog.name}</h2>
                     <p className="text-sm text-muted-foreground">
