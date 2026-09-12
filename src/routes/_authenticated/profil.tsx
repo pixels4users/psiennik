@@ -12,6 +12,7 @@ import {
   useBehavioristOwners,
   useRemoveOwnerBehaviorist,
   useSubscriptionLimits,
+  useIsBehaviorist,
   type OwnerBehavioristWithProfile,
 } from "@/lib/access";
 import { Button } from "@/components/ui/button";
