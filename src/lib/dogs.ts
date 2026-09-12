@@ -82,15 +82,21 @@ export async function uploadDogPhoto(file: File): Promise<string> {
   return path;
 }
 
+export async function deleteDogPhoto(path: string): Promise<void> {
+  const { error } = await supabase.storage.from("dog-photos").remove([path]);
+  if (error) throw error;
+}
+
 export function useDogPhotoUrl(path: string | null) {
   return useQuery({
     queryKey: ["dog-photo", path],
     enabled: !!path,
     staleTime: 1000 * 60 * 45,
     queryFn: async (): Promise<string> => {
+      if (!path) throw new Error("Brak ścieżki zdjęcia");
       const { data, error } = await supabase.storage
         .from("dog-photos")
-        .createSignedUrl(path!, 3600);
+        .createSignedUrl(path, 3600);
       if (error) throw error;
       return data.signedUrl;
     },
