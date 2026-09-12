@@ -1,7 +1,7 @@
 import { HeadContent, Outlet, Scripts, createRootRoute } from "@tanstack/react-router";
 import appCss from "../styles.css?url";
 import { QueryClientProvider, type QueryClient } from "@tanstack/react-query";
-import { RoleProvider } from "@/lib/role";
+import { AuthProvider } from "@/lib/auth";
 import { AppHeader } from "@/components/app-header";
 import { Toaster } from "@/components/ui/sonner";
 
@@ -59,7 +59,7 @@ function RootComponent() {
   const { queryClient } = Route.useRouteContext() as { queryClient: QueryClient };
   return (
     <QueryClientProvider client={queryClient}>
-      <RoleProvider>
+      <AuthProvider>
         <div className="flex min-h-screen flex-col">
           <AppHeader />
           <main className="flex-1">
@@ -67,7 +67,7 @@ function RootComponent() {
           </main>
         </div>
         <Toaster />
-      </RoleProvider>
+      </AuthProvider>
     </QueryClientProvider>
   );
 }
