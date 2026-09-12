@@ -1,11 +1,12 @@
 import { useState } from "react";
 import { Link } from "@tanstack/react-router";
-import { ArrowLeft, Pencil } from "lucide-react";
+import { ArrowLeft, Pencil, UserPlus } from "lucide-react";
 import { cn } from "@/lib/utils";
 import type { Dog } from "@/lib/dogs";
 import { useRole } from "@/lib/auth";
 import { DogAvatar } from "@/components/dog-avatar";
 import { DogFormDialog } from "@/components/dog-form-dialog";
+import { InviteDialog } from "@/components/invite-dialog";
 import { Button } from "@/components/ui/button";
 
 export function DogNav({
