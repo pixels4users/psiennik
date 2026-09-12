@@ -1,6 +1,6 @@
 import { HeadContent, Outlet, Scripts, createRootRoute } from "@tanstack/react-router";
 import appCss from "../styles.css?url";
-import { QueryClientProvider } from "@tanstack/react-query";
+import { QueryClientProvider, type QueryClient } from "@tanstack/react-query";
 import { RoleProvider } from "@/lib/role";
 import { AppHeader } from "@/components/app-header";
 import { Toaster } from "@/components/ui/sonner";
