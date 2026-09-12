@@ -109,8 +109,8 @@ function JoinDialog({ open, onOpenChange }: { open: boolean; onOpenChange: (v: b
   );
 }
 
-function DogCard({ dog }: { dog: ReturnType<typeof useDogs>["data"][number] }) {
-  const status = dog.access?.[0]?.process_status ?? "active";
+function DogCard({ dog }: { dog: DogWithAccess }) {
+  const status = dog.dog_access?.[0]?.process_status ?? "active";
   const isPending = status === "pending";
   return (
     <Link to="/pies/$id" params={{ id: dog.id }} className="block">
