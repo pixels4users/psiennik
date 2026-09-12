@@ -12,4 +12,4 @@
 - [x] Weryfikacja build + preview
 - [x] Ujednolicić szerokość widoku Lista z Kalendarzem
 - [x] Dodać widok Tabela z sortowaniem i filtrami
-- [ ] Zweryfikować nowy widok na komputerze i telefonie
+- [x] Zweryfikować nowy widok na komputerze i telefonie
