@@ -76,7 +76,7 @@ Weryfikacja: przepływ zaproszenia współwłaściciela i behawiorysty na kontac
 
 Migracja bazy:
 
-- `dog_access.process_status` (text, domyślnie `active`, wartości `active` / `completed`).
+- `dog_access.process_status` (text, domyślnie `active`, wartości `active` / `completed` / `pending`). Status `pending` oznacza, że powiązanie czeka na zwolnienie limitu aktywnych procesów u behawiorysty.
 - `private.can_manage_dog` pozwala na edycję wpisów, gdy pies NIE MA żadnego przypisanego behawiorysty LUB gdy ma przynajmniej jednego ze statusem `active`. Tryb tylko do odczytu dla wpisów (`entries` insert/update/delete) włącza się TYLKO wtedy, gdy pies ma przypisanych behawiorystów, ale wszyscy mają status `completed`. Odczyt i zarządzanie samym psem pozostają bez zmian.
 - RPC `complete_behavioral_process(p_dog_id, p_behaviorist_id)` — zmiana statusu na `completed`, wywoływalna wyłącznie przez przypisanego behawiorystę.
 - Tabela `behaviorist_links` (`id`, `behaviorist_id`, `invite_code` unikalny, `is_active`), z grantami i RLS: odczyt własnego kodu, publiczne rozpoznanie kodu przez RPC. Kod tworzony automatycznie przy rejestracji behawiorysty (rozszerzenie `private.handle_new_user`) oraz uzupełniany dla istniejących kont.
