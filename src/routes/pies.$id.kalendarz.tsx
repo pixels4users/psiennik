@@ -308,13 +308,14 @@ function DogCalendarPage() {
                   dayEntries.length ? worstRating(dayEntries) : null,
                 );
                 return (
-                  <button
+                  <Button
                     type="button"
+                    variant="outline"
                     key={key}
                     onClick={() => setSelectedDate(day)}
                     aria-label={`Pokaż wydarzenia z ${format(day, "d MMMM yyyy", { locale: pl })}`}
                     className={cn(
-                      "flex min-h-20 flex-col rounded-lg border border-border p-2 text-left transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
+                      "h-auto min-h-20 flex-col items-stretch justify-start rounded-lg p-2 text-left font-normal",
                       tone || "hover:bg-keylime",
                       isToday(day) && "ring-2 ring-ring",
                     )}
@@ -333,7 +334,7 @@ function DogCalendarPage() {
                         {dayEntries.length === 1 ? "wpis" : dayEntries.length < 5 ? "wpisy" : "wpisów"}
                       </span>
                     )}
-                  </button>
+                  </Button>
                 );
               })}
             </div>
