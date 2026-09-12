@@ -12,12 +12,12 @@ import { Skeleton } from "@/components/ui/skeleton";
 export const Route = createFileRoute("/psy")({
   head: () => ({
     meta: [
-      { title: "Psy — Dziennik psa" },
+      { title: "Psy — Psiennik" },
       {
         name: "description",
         content: "Lista psów w dzienniku behawioralnym. Dodaj psa lub otwórz jego dziennik.",
       },
-      { property: "og:title", content: "Psy — Dziennik psa" },
+      { property: "og:title", content: "Psy — Psiennik" },
       {
         property: "og:description",
         content: "Lista psów w dzienniku behawioralnym. Dodaj psa lub otwórz jego dziennik.",

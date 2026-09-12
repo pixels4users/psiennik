@@ -16,13 +16,13 @@ import { Skeleton } from "@/components/ui/skeleton";
 export const Route = createFileRoute("/pies/$id/")({
   head: () => ({
     meta: [
-      { title: "Dziennik wydarzeń — Dziennik psa" },
+      { title: "Dziennik wydarzeń — Psiennik" },
       {
         name: "description",
         content:
           "Lista wydarzeń z dziennika behawioralnego psa: aktywności, opisy, oceny i komentarze behawiorysty.",
       },
-      { property: "og:title", content: "Dziennik wydarzeń — Dziennik psa" },
+      { property: "og:title", content: "Dziennik wydarzeń — Psiennik" },
       {
         property: "og:description",
         content:

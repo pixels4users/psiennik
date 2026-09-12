@@ -33,13 +33,13 @@ import { cn } from "@/lib/utils";
 export const Route = createFileRoute("/pies/$id/kalendarz")({
   head: () => ({
     meta: [
-      { title: "Kalendarz i analiza — Dziennik psa" },
+      { title: "Kalendarz i analiza — Psiennik" },
       {
         name: "description",
         content:
           "Tygodniowy kalendarz dziennika behawioralnego psa z podsumowaniem ocen, typów aktywności i powtarzających się tematów.",
       },
-      { property: "og:title", content: "Kalendarz i analiza — Dziennik psa" },
+      { property: "og:title", content: "Kalendarz i analiza — Psiennik" },
       {
         property: "og:description",
         content:

@@ -38,12 +38,12 @@ import {
 export const Route = createFileRoute("/pies/$id/tabela")({
   head: () => ({
     meta: [
-      { title: "Tabela wydarzeń — Dziennik psa" },
+      { title: "Tabela wydarzeń — Psiennik" },
       {
         name: "description",
         content: "Pełna tabela wydarzeń psa z sortowaniem oraz filtrami dat, aktywności, pory dnia i oceny.",
       },
-      { property: "og:title", content: "Tabela wydarzeń — Dziennik psa" },
+      { property: "og:title", content: "Tabela wydarzeń — Psiennik" },
       {
         property: "og:description",
         content: "Pełna tabela wydarzeń psa z sortowaniem oraz filtrami dat, aktywności, pory dnia i oceny.",
