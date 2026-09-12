@@ -1,43 +1,105 @@
 import { Link, useNavigate } from "@tanstack/react-router";
-import { PawPrint } from "lucide-react";
-import { useRole, type Role } from "@/lib/role";
-import { cn } from "@/lib/utils";
-
-const ROLE_LABELS: Record<Role, string> = {
-  owner: "Właściciel",
-  behaviorist: "Behawiorysta",
-};
+import { useQueryClient } from "@tanstack/react-query";
+import { Bell, PawPrint, User } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
+import { useAuth, useProfile, useRole } from "@/lib/auth";
+import { useNews } from "@/lib/notifications";
+import { Button } from "@/components/ui/button";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 export function AppHeader() {
-  const { role, setRole } = useRole();
+  const { user } = useAuth();
+  const { data: profile } = useProfile();
+  const { role } = useRole();
+  const { data: news } = useNews();
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
+
+  const total = (news ?? []).reduce((sum, item) => sum + item.count, 0);
+
+  const signOut = async () => {
+    await queryClient.cancelQueries();
+    queryClient.clear();
+    await supabase.auth.signOut();
+    navigate({ to: "/auth", replace: true });
+  };
 
   return (
     <header className="border-b border-border bg-background">
       <div className="mx-auto flex max-w-5xl flex-wrap items-center justify-between gap-3 px-5 py-4">
-        <Link to="/" className="flex items-center gap-2">
+        <Link to={user ? "/psy" : "/"} className="flex items-center gap-2">
           <PawPrint className="size-5 text-primary" />
           <span className="font-display text-2xl leading-none text-primary">Psiennik</span>
         </Link>
-        {role && (
-          <div className="flex items-center gap-1 rounded-full bg-secondary p-1">
-            {(Object.keys(ROLE_LABELS) as Role[]).map((r) => (
-              <button
-                key={r}
-                type="button"
-                onClick={() => {
-                  setRole(r);
-                  navigate({ to: "/psy" });
-                }}
-                className={cn(
-                  "rounded-full px-3.5 py-1.5 text-sm transition-colors",
-                  role === r ? "bg-primary text-primary-foreground" : "text-secondary-foreground hover:bg-accent/60",
+
+        {user ? (
+          <div className="flex items-center gap-1">
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" size="icon" className="relative" aria-label="Powiadomienia">
+                  <Bell className="size-5" />
+                  {total > 0 && (
+                    <span className="absolute top-1 right-1 flex size-4 items-center justify-center rounded-full bg-primary text-[10px] leading-none text-primary-foreground">
+                      {total > 9 ? "9+" : total}
+                    </span>
+                  )}
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-64">
+                <DropdownMenuLabel>
+                  {role === "owner" ? "Nowe komentarze" : "Nowe wpisy"}
+                </DropdownMenuLabel>
+                <DropdownMenuSeparator />
+                {total === 0 ? (
+                  <div className="px-2 py-3 text-sm text-muted-foreground">Brak nowości</div>
+                ) : (
+                  news!.map((item) => (
+                    <DropdownMenuItem
+                      key={item.dogId}
+                      onClick={() => navigate({ to: "/pies/$id", params: { id: item.dogId } })}
+                    >
+                      <span className="flex-1">{item.dogName}</span>
+                      <span className="text-muted-foreground">{item.count}</span>
+                    </DropdownMenuItem>
+                  ))
                 )}
-              >
-                {ROLE_LABELS[r]}
-              </button>
-            ))}
+              </DropdownMenuContent>
+            </DropdownMenu>
+
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" className="gap-2">
+                  <User className="size-4" />
+                  <span className="max-w-32 truncate">
+                    {profile?.display_name || profile?.email || "Moje konto"}
+                  </span>
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-56">
+                <DropdownMenuLabel className="font-normal text-muted-foreground">
+                  {role === "behaviorist" ? "Behawiorysta" : "Właściciel"}
+                </DropdownMenuLabel>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem onClick={() => navigate({ to: "/psy" })}>Psy</DropdownMenuItem>
+                <DropdownMenuItem onClick={() => navigate({ to: "/profil" })}>
+                  Mój profil
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem onClick={signOut}>Wyloguj się</DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
           </div>
+        ) : (
+          <Button asChild size="sm">
+            <Link to="/auth">Zaloguj się</Link>
+          </Button>
         )}
       </div>
     </header>

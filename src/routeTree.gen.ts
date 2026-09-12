@@ -11,6 +11,8 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
+import { Route as AuthRouteImport } from './routes/auth'
+import { Route as AuthenticatedProfilRouteImport } from './routes/_authenticated/profil'
 import { Route as AuthenticatedPsyRouteImport } from './routes/_authenticated/psy'
 import { Route as AuthenticatedPiesIdRouteImport } from './routes/_authenticated/pies.$id'
 import { Route as AuthenticatedPiesIdIndexRouteImport } from './routes/_authenticated/pies.$id.index'
@@ -26,6 +28,16 @@ const IndexRoute = IndexRouteImport.update({
 const AuthenticatedRouteRoute = AuthenticatedRouteRouteImport.update({
   id: '/_authenticated',
   getParentRoute: () => rootRouteImport,
+} as any)
+const AuthRoute = AuthRouteImport.update({
+  id: '/auth',
+  path: '/auth',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthenticatedProfilRoute = AuthenticatedProfilRouteImport.update({
+  id: '/profil',
+  path: '/profil',
+  getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 const AuthenticatedPsyRoute = AuthenticatedPsyRouteImport.update({
   id: '/psy',
@@ -64,6 +76,8 @@ const AuthenticatedPiesIdTabelaRoute =
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/auth': typeof AuthRoute
+  '/profil': typeof AuthenticatedProfilRoute
   '/psy': typeof AuthenticatedPsyRoute
   '/pies/$id': typeof AuthenticatedPiesIdRouteWithChildren
   '/pies/$id/analiza': typeof AuthenticatedPiesIdAnalizaRoute
@@ -73,6 +87,8 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/auth': typeof AuthRoute
+  '/profil': typeof AuthenticatedProfilRoute
   '/psy': typeof AuthenticatedPsyRoute
   '/pies/$id/analiza': typeof AuthenticatedPiesIdAnalizaRoute
   '/pies/$id/kalendarz': typeof AuthenticatedPiesIdKalendarzRoute
@@ -83,6 +99,8 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
+  '/auth': typeof AuthRoute
+  '/_authenticated/profil': typeof AuthenticatedProfilRoute
   '/_authenticated/psy': typeof AuthenticatedPsyRoute
   '/_authenticated/pies/$id': typeof AuthenticatedPiesIdRouteWithChildren
   '/_authenticated/pies/$id/analiza': typeof AuthenticatedPiesIdAnalizaRoute
@@ -94,6 +112,8 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/auth'
+    | '/profil'
     | '/psy'
     | '/pies/$id'
     | '/pies/$id/analiza'
@@ -103,6 +123,8 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/auth'
+    | '/profil'
     | '/psy'
     | '/pies/$id/analiza'
     | '/pies/$id/kalendarz'
@@ -112,6 +134,8 @@ export interface FileRouteTypes {
     | '__root__'
     | '/'
     | '/_authenticated'
+    | '/auth'
+    | '/_authenticated/profil'
     | '/_authenticated/psy'
     | '/_authenticated/pies/$id'
     | '/_authenticated/pies/$id/analiza'
@@ -123,6 +147,7 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
+  AuthRoute: typeof AuthRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -140,6 +165,20 @@ declare module '@tanstack/react-router' {
       fullPath: '/'
       preLoaderRoute: typeof AuthenticatedRouteRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/auth': {
+      id: '/auth'
+      path: '/auth'
+      fullPath: '/auth'
+      preLoaderRoute: typeof AuthRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_authenticated/profil': {
+      id: '/_authenticated/profil'
+      path: '/profil'
+      fullPath: '/profil'
+      preLoaderRoute: typeof AuthenticatedProfilRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/psy': {
       id: '/_authenticated/psy'
@@ -204,11 +243,13 @@ const AuthenticatedPiesIdRouteWithChildren =
   AuthenticatedPiesIdRoute._addFileChildren(AuthenticatedPiesIdRouteChildren)
 
 interface AuthenticatedRouteRouteChildren {
+  AuthenticatedProfilRoute: typeof AuthenticatedProfilRoute
   AuthenticatedPsyRoute: typeof AuthenticatedPsyRoute
   AuthenticatedPiesIdRoute: typeof AuthenticatedPiesIdRouteWithChildren
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
+  AuthenticatedProfilRoute: AuthenticatedProfilRoute,
   AuthenticatedPsyRoute: AuthenticatedPsyRoute,
   AuthenticatedPiesIdRoute: AuthenticatedPiesIdRouteWithChildren,
 }
@@ -219,6 +260,7 @@ const AuthenticatedRouteRouteWithChildren =
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
+  AuthRoute: AuthRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
