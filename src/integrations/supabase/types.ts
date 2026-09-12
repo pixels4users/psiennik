@@ -249,23 +249,7 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      has_dog_access: {
-        Args: { _dog_id: string; _user_id: string }
-        Returns: boolean
-      }
-      has_role: {
-        Args: {
-          _role: Database["public"]["Enums"]["app_role"]
-          _user_id: string
-        }
-        Returns: boolean
-      }
-      is_dog_owner: {
-        Args: { _dog_id: string; _user_id: string }
-        Returns: boolean
-      }
       redeem_dog_invite: { Args: { _code: string }; Returns: string }
-      shares_dog: { Args: { _a: string; _b: string }; Returns: boolean }
     }
     Enums: {
       app_role: "owner" | "behaviorist"
