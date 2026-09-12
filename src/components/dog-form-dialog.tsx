@@ -77,33 +77,42 @@ export function DogFormDialog({
     }
     setSaving(true);
     try {
-      let photoUrl = dog?.photo_url ?? null;
-      if (photo) photoUrl = await uploadDogPhoto(photo);
-      else if (removePhoto) photoUrl = null;
-
       const values = {
         name: name.trim(),
         age: age.trim() || null,
         breed: breed.trim() || null,
         sex: sex || null,
-        photo_url: photoUrl,
       };
-      const query = dog
-        ? supabase.from("dogs").update(values).eq("id", dog.id)
-        : supabase.from("dogs").insert(values);
-      const { data, error } = await query.select("id").single();
+
+      // Rekord psa powstaje najpierw — ścieżka zdjęcia zawiera jego identyfikator.
+      const { data, error } = await (dog
+        ? supabase.from("dogs").update(values).eq("id", dog.id).select("id").single()
+        : supabase.from("dogs").insert(values).select("id").single());
       if (error) throw error;
 
-      if (dog?.photo_url && dog.photo_url !== photoUrl) {
-        try {
-          await deleteDogPhoto(dog.photo_url);
-        } catch {
-          toast.warning("Dane zapisano, ale nie udało się usunąć poprzedniego zdjęcia");
+      const dogId = data.id;
+      let photoUrl = dog?.photo_url ?? null;
+      if (photo) photoUrl = await uploadDogPhoto(photo, dogId);
+      else if (removePhoto) photoUrl = null;
+
+      if (photoUrl !== (dog?.photo_url ?? null)) {
+        const { error: photoError } = await supabase
+          .from("dogs")
+          .update({ photo_url: photoUrl })
+          .eq("id", dogId);
+        if (photoError) throw photoError;
+
+        if (dog?.photo_url) {
+          try {
+            await deleteDogPhoto(dog.photo_url);
+          } catch {
+            toast.warning("Dane zapisano, ale nie udało się usunąć poprzedniego zdjęcia");
+          }
         }
       }
 
       await queryClient.invalidateQueries({ queryKey: ["dogs"] });
-      await queryClient.invalidateQueries({ queryKey: ["dogs", data.id] });
+      await queryClient.invalidateQueries({ queryKey: ["dogs", dogId] });
       if (dog?.photo_url) {
         await queryClient.invalidateQueries({ queryKey: ["dog-photo", dog.photo_url] });
       }
