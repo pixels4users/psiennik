@@ -14,11 +14,36 @@ export type Database = {
   }
   public: {
     Tables: {
+      behaviorist_links: {
+        Row: {
+          behaviorist_id: string
+          created_at: string
+          id: string
+          invite_code: string
+          is_active: boolean
+        }
+        Insert: {
+          behaviorist_id: string
+          created_at?: string
+          id?: string
+          invite_code: string
+          is_active?: boolean
+        }
+        Update: {
+          behaviorist_id?: string
+          created_at?: string
+          id?: string
+          invite_code?: string
+          is_active?: boolean
+        }
+        Relationships: []
+      }
       dog_access: {
         Row: {
           created_at: string
           dog_id: string
           id: string
+          process_status: string
           role: Database["public"]["Enums"]["app_role"]
           user_id: string
         }
@@ -26,6 +51,7 @@ export type Database = {
           created_at?: string
           dog_id: string
           id?: string
+          process_status?: string
           role: Database["public"]["Enums"]["app_role"]
           user_id: string
         }
@@ -33,6 +59,7 @@ export type Database = {
           created_at?: string
           dog_id?: string
           id?: string
+          process_status?: string
           role?: Database["public"]["Enums"]["app_role"]
           user_id?: string
         }
@@ -54,6 +81,7 @@ export type Database = {
           dog_id: string
           expires_at: string
           id: string
+          role: Database["public"]["Enums"]["app_role"]
           used_at: string | null
           used_by: string | null
         }
@@ -64,6 +92,7 @@ export type Database = {
           dog_id: string
           expires_at?: string
           id?: string
+          role?: Database["public"]["Enums"]["app_role"]
           used_at?: string | null
           used_by?: string | null
         }
@@ -74,6 +103,7 @@ export type Database = {
           dog_id?: string
           expires_at?: string
           id?: string
+          role?: Database["public"]["Enums"]["app_role"]
           used_at?: string | null
           used_by?: string | null
         }
@@ -196,6 +226,27 @@ export type Database = {
           },
         ]
       }
+      owner_behaviorists: {
+        Row: {
+          behaviorist_id: string
+          created_at: string
+          id: string
+          owner_id: string
+        }
+        Insert: {
+          behaviorist_id: string
+          created_at?: string
+          id?: string
+          owner_id: string
+        }
+        Update: {
+          behaviorist_id?: string
+          created_at?: string
+          id?: string
+          owner_id?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           created_at: string
@@ -203,6 +254,8 @@ export type Database = {
           email: string | null
           email_notifications: boolean
           id: string
+          max_active_dogs: number
+          plan_type: string
           updated_at: string
         }
         Insert: {
@@ -211,6 +264,8 @@ export type Database = {
           email?: string | null
           email_notifications?: boolean
           id: string
+          max_active_dogs?: number
+          plan_type?: string
           updated_at?: string
         }
         Update: {
@@ -219,6 +274,8 @@ export type Database = {
           email?: string | null
           email_notifications?: boolean
           id?: string
+          max_active_dogs?: number
+          plan_type?: string
           updated_at?: string
         }
         Relationships: []
@@ -249,13 +306,29 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      redeem_dog_invite: { Args: { _code: string }; Returns: string }
+      complete_behavioral_process: {
+        Args: { p_behaviorist_id: string; p_dog_id: string }
+        Returns: undefined
+      }
+      redeem_dog_invite: {
+        Args: { _code: string }
+        Returns: Database["public"]["CompositeTypes"]["redeem_result"]
+        SetofOptions: {
+          from: "*"
+          to: "redeem_result"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
     }
     Enums: {
       app_role: "owner" | "behaviorist"
     }
     CompositeTypes: {
-      [_ in never]: never
+      redeem_result: {
+        dog_id: string | null
+        behaviorist_id: string | null
+      }
     }
   }
 }
