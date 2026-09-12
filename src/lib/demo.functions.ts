@@ -12,7 +12,7 @@ export const DEMO_PASSWORD = "DemoPsiennik123!";
 export const ensureDemoAccounts = createServerFn({ method: "POST" }).handler(async () => {
   // Konta demo istnieją wyłącznie na potrzeby podglądu deweloperskiego —
   // endpoint używa klucza serwisowego, więc w produkcji jest całkowicie wyłączony.
-  if (process.env.NODE_ENV === "production") {
+  if (process.env["NODE_ENV"] === "production") {
     throw new Error("Konta demo są dostępne tylko w środowisku deweloperskim.");
   }
 
