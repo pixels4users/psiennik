@@ -19,11 +19,16 @@ Skan bezpieczeństwa wykrył dwa błędy poziomu `error`:
    - `uploadDogPhoto(file, dogId)` zapisuje plik pod ścieżką zawierającą `dog_id`.
    - Formularz dodawania psa najpierw tworzy rekord psa, potem uploaduje zdjęcie i aktualizuje `photo_url`.
    - Przy edycji psa używa istniejącego `dog_id`.
-3. Napisać nowe polityki RLS na `storage.objects`:
-   - Usunąć polityki dla roli `anon`.
-   - Dla roli `authenticated` sprawdzać, że ścieżka zaczyna się od `dogs/{dog_id}/` i że użytkownik ma dostęp do tego psa (przez `private.has_dog_access(dog_id, auth.uid())` lub analogiczną funkcję).
-4. Przeprowadzić migrację danych:
-   - Dla istniejących zdjęć o płaskich nazwach (losowy UUID) przenieść obiekty do nowej ścieżki `dogs/{dog_id}/{nazwa}` i zaktualizować `dogs.photo_url`.
+3. Ustawić bucket `dog-photos` jako publiczny i uprościć odczyt:
+   - Odczyt (SELECT) pozostaje całkowicie publiczny, dzięki czemu front renderuje zwykłe adresy obrazków bez podpisanych linków.
+   - `useDogPhotoUrl` przechodzi z `createSignedUrl` na publiczny adres pliku.
+4. Napisać nowe polityki RLS na `storage.objects` wyłącznie dla zapisu:
+   - Blokujemy `INSERT`, `UPDATE` i `DELETE` — każda z nich sprawdza `private.has_dog_access`.
+   - Ścieżka musi mieć postać `dogs/{dog_id}/{nazwa_pliku}`.
+   - Przed rzutowaniem `::uuid` sprawdzamy wyrażeniem regularnym, że `(storage.foldername(name))[1]` jest poprawnym UUID — inaczej niepasujący plik wywoła błąd w Postgresie.
+5. Przeprowadzić migrację starych zdjęć skryptem TypeScript, nie SQL-em:
+   - `UPDATE` na `storage.objects` nie przenosi plików; używamy `supabase.storage.from('dog-photos').move(oldPath, newPath)`.
+   - Po każdym udanym przeniesieniu skrypt aktualizuje `dogs.photo_url` z poziomu kodu.
 5. Przetestować:
    - upload zdjęcia przy tworzeniu psa,
    - podmianę i usunięcie zdjęcia przy edycji,
