@@ -19,6 +19,6 @@
 - [x] Dodać panel szczegółów dnia otwierany z kalendarza
 - [x] Zachować edycję wydarzeń i komentarzy w panelu dnia
 - [x] Zweryfikować panel dnia na komputerze i telefonie
-- [ ] Uprościć Kalendarz i dodać trzy wskaźniki ocen na każdym dniu
-- [ ] Dodać widok Analiza z podsumowaniami i trzema wykresami
-- [ ] Zweryfikować Kalendarz i Analizę na komputerze oraz telefonie
+- [x] Uprościć Kalendarz i dodać trzy wskaźniki ocen na każdym dniu
+- [x] Dodać widok Analiza z podsumowaniami i trzema wykresami
+- [x] Zweryfikować Kalendarz i Analizę na komputerze oraz telefonie
