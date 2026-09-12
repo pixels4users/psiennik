@@ -1,6 +1,6 @@
-# Zarządzanie dostępem: behawiorysta i współwłaściciel
+# Dostęp, współpraca z behawiorystą i limity kont
 
-Dziś zaproszenie można wygenerować tylko z poziomu jednego psa, a pies ma dokładnie jednego właściciela. Dodajemy pełne zarządzanie osobami z dostępem — z poziomu konta i z poziomu psa — oraz rolę współwłaściciela.
+Dziś zaproszenie można wygenerować tylko z poziomu jednego psa, a pies ma dokładnie jednego właściciela. Dodajemy pełne zarządzanie osobami z dostępem (z poziomu konta i psa), rolę współwłaściciela, cykl życia współpracy z behawiorystą (aktywna / zakończona), kod zapraszający po stronie behawiorysty oraz limity darmowego planu.
 
 ## Role i uprawnienia
 
@@ -8,7 +8,8 @@ Dziś zaproszenie można wygenerować tylko z poziomu jednego psa, a pies ma dok
 | --- | --- |
 | Właściciel (główny) | wszystko: psy, wpisy, dodawanie i usuwanie współwłaściciela oraz behawiorysty, usunięcie psa |
 | Współwłaściciel | to samo co właściciel na wpisach i danych psa, zaprasza i usuwa behawiorystę; nie może usunąć głównego właściciela ani dodać kolejnego współwłaściciela, nie usuwa psa |
-| Behawiorysta | podgląd dziennika i komentarze/zalecenia |
+| Behawiorysta | podgląd dziennika, komentarze/zalecenia, zakończenie procesu |
+
 
 Obaj właściciele widzą tę samą listę psów, te same osoby z dostępem i te same aktywne kody zaproszeń.
 
