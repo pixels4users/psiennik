@@ -1,5 +1,6 @@
 import { HeadContent, Outlet, Scripts, createRootRoute } from "@tanstack/react-router";
 import appCss from "../styles.css?url";
+import { QueryClientProvider } from "@tanstack/react-query";
 import { RoleProvider } from "@/lib/role";
 import { AppHeader } from "@/components/app-header";
 import { Toaster } from "@/components/ui/sonner";
@@ -55,15 +56,18 @@ function RootShell({ children }: { children: React.ReactNode }) {
 }
 
 function RootComponent() {
+  const { queryClient } = Route.useRouteContext();
   return (
-    <RoleProvider>
-      <div className="flex min-h-screen flex-col">
-        <AppHeader />
-        <main className="flex-1">
-          <Outlet />
-        </main>
-      </div>
-      <Toaster />
-    </RoleProvider>
+    <QueryClientProvider client={queryClient}>
+      <RoleProvider>
+        <div className="flex min-h-screen flex-col">
+          <AppHeader />
+          <main className="flex-1">
+            <Outlet />
+          </main>
+        </div>
+        <Toaster />
+      </RoleProvider>
+    </QueryClientProvider>
   );
 }
