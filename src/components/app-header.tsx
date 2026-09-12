@@ -2,7 +2,8 @@ import { Link, useNavigate } from "@tanstack/react-router";
 import { useQueryClient } from "@tanstack/react-query";
 import { Bell, PawPrint, User } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
-import { useAuth, useProfile, useRole } from "@/lib/auth";
+import { useAuth, useProfile } from "@/lib/auth";
+import { useIsBehaviorist } from "@/lib/access";
 import { useNews } from "@/lib/notifications";
 import { Button } from "@/components/ui/button";
 import {
@@ -17,7 +18,7 @@ import {
 export function AppHeader() {
   const { user } = useAuth();
   const { data: profile } = useProfile();
-  const { role } = useRole();
+  const { data: isBehaviorist } = useIsBehaviorist();
   const { data: news } = useNews();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
@@ -54,7 +55,7 @@ export function AppHeader() {
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-64">
                 <DropdownMenuLabel>
-                  {role === "owner" ? "Nowe komentarze" : "Nowe wpisy"}
+                  {isBehaviorist ? "Nowe wpisy" : "Nowe komentarze"}
                 </DropdownMenuLabel>
                 <DropdownMenuSeparator />
                 {total === 0 ? (
@@ -84,7 +85,7 @@ export function AppHeader() {
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-56">
                 <DropdownMenuLabel className="font-normal text-muted-foreground">
-                  {role === "behaviorist" ? "Behawiorysta" : "Właściciel"}
+                  {isBehaviorist ? "Behawiorysta" : "Właściciel"}
                 </DropdownMenuLabel>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem onClick={() => navigate({ to: "/psy" })}>Psy</DropdownMenuItem>
