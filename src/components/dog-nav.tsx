@@ -1,7 +1,12 @@
+import { useState } from "react";
 import { Link } from "@tanstack/react-router";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, Pencil } from "lucide-react";
 import { cn } from "@/lib/utils";
 import type { Dog } from "@/lib/dogs";
+import { useRole } from "@/lib/role";
+import { DogAvatar } from "@/components/dog-avatar";
+import { DogFormDialog } from "@/components/dog-form-dialog";
+import { Button } from "@/components/ui/button";
 
 export function DogNav({
   dog,
@@ -10,6 +15,9 @@ export function DogNav({
   dog: Dog;
   active: "lista" | "kalendarz" | "tabela";
 }) {
+  const { role } = useRole();
+  const [editOpen, setEditOpen] = useState(false);
+
   return (
     <div className="grid gap-4">
       <Link
@@ -20,11 +28,21 @@ export function DogNav({
         Wszystkie psy
       </Link>
       <div className="grid min-w-0 gap-4 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-end">
-        <div className="min-w-0">
-          <h1 className="truncate text-4xl">{dog.name}</h1>
-          <p className="mt-1 text-muted-foreground">
-            {[dog.breed, dog.age, dog.sex].filter(Boolean).join(" · ")}
-          </p>
+        <div className="flex min-w-0 items-center gap-4">
+          <DogAvatar dog={dog} className="size-20" />
+          <div className="min-w-0">
+            <div className="flex min-w-0 items-center gap-2">
+              <h1 className="truncate text-4xl">{dog.name}</h1>
+              {role === "owner" && (
+                <Button variant="ghost" size="icon" aria-label="Edytuj psa" onClick={() => setEditOpen(true)}>
+                  <Pencil className="size-4" />
+                </Button>
+              )}
+            </div>
+            <p className="mt-1 truncate text-muted-foreground">
+              {[dog.breed, dog.age, dog.sex].filter(Boolean).join(" · ")}
+            </p>
+          </div>
         </div>
         <div className="flex gap-1 rounded-full bg-secondary p-1">
           <Link
@@ -65,6 +83,7 @@ export function DogNav({
           </Link>
         </div>
       </div>
+      <DogFormDialog dog={dog} open={editOpen} onOpenChange={setEditOpen} />
     </div>
   );
 }

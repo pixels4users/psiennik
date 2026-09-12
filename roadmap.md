@@ -13,3 +13,6 @@
 - [x] Ujednolicić szerokość widoku Lista z Kalendarzem
 - [x] Dodać widok Tabela z sortowaniem i filtrami
 - [x] Zweryfikować nowy widok na komputerze i telefonie
+- [x] Dodać podgląd zdjęcia przy tworzeniu psa
+- [x] Dodać edycję danych oraz zdjęcia istniejącego psa
+- [x] Zweryfikować dodawanie, podmianę i usuwanie zdjęcia
