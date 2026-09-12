@@ -10,7 +10,7 @@ import {
 import { pl } from "date-fns/locale";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { useDog, useEntries, type Entry } from "@/lib/dogs";
-import { useRole } from "@/lib/role";
+import { useRole } from "@/lib/auth";
 import { DogNav } from "@/components/dog-nav";
 import { EntryCard } from "@/components/entry-card";
 import { EntryFormDialog } from "@/components/entry-form-dialog";
@@ -27,7 +27,7 @@ import {
 import { Skeleton } from "@/components/ui/skeleton";
 import { cn } from "@/lib/utils";
 
-export const Route = createFileRoute("/pies/$id/kalendarz")({
+export const Route = createFileRoute("/_authenticated/pies/$id/kalendarz")({
   head: () => ({
     meta: [
       { title: "Kalendarz — Psiennik" },

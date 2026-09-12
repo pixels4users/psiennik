@@ -1,11 +1,12 @@
 import { useState } from "react";
 import { Link } from "@tanstack/react-router";
-import { ArrowLeft, Pencil } from "lucide-react";
+import { ArrowLeft, Pencil, UserPlus } from "lucide-react";
 import { cn } from "@/lib/utils";
 import type { Dog } from "@/lib/dogs";
-import { useRole } from "@/lib/role";
+import { useRole } from "@/lib/auth";
 import { DogAvatar } from "@/components/dog-avatar";
 import { DogFormDialog } from "@/components/dog-form-dialog";
+import { InviteDialog } from "@/components/invite-dialog";
 import { Button } from "@/components/ui/button";
 
 export function DogNav({
@@ -17,6 +18,7 @@ export function DogNav({
 }) {
   const { role } = useRole();
   const [editOpen, setEditOpen] = useState(false);
+  const [inviteOpen, setInviteOpen] = useState(false);
 
   return (
     <div className="grid gap-4">
@@ -34,9 +36,19 @@ export function DogNav({
             <div className="flex min-w-0 items-center gap-2">
               <h1 className="truncate text-4xl">{dog.name}</h1>
               {role === "owner" && (
-                <Button variant="ghost" size="icon" aria-label="Edytuj psa" onClick={() => setEditOpen(true)}>
-                  <Pencil className="size-4" />
-                </Button>
+                <>
+                  <Button variant="ghost" size="icon" aria-label="Edytuj psa" onClick={() => setEditOpen(true)}>
+                    <Pencil className="size-4" />
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    aria-label="Zaproś behawiorystkę"
+                    onClick={() => setInviteOpen(true)}
+                  >
+                    <UserPlus className="size-4" />
+                  </Button>
+                </>
               )}
             </div>
             <p className="mt-1 truncate text-muted-foreground">
@@ -96,6 +108,7 @@ export function DogNav({
         </div>
       </div>
       <DogFormDialog dog={dog} open={editOpen} onOpenChange={setEditOpen} />
+      <InviteDialog dogId={dog.id} open={inviteOpen} onOpenChange={setInviteOpen} />
     </div>
   );
 }

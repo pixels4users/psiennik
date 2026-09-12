@@ -24,7 +24,7 @@ import {
 import { Skeleton } from "@/components/ui/skeleton";
 import { ACTIVITY_TYPES, type Entry, useDog, useEntries } from "@/lib/dogs";
 
-export const Route = createFileRoute("/pies/$id/analiza")({
+export const Route = createFileRoute("/_authenticated/pies/$id/analiza")({
   head: () => ({
     meta: [
       { title: "Analiza zachowania — Psiennik" },

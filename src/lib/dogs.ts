@@ -74,6 +74,24 @@ export function useEntries(dogId: string) {
   });
 }
 
+export type RecentEntry = Entry & { dogs: { name: string } | null };
+
+/** Najnowsze wpisy ze wszystkich psów, do których użytkownik ma dostęp. */
+export function useRecentEntries(limit = 5) {
+  return useQuery({
+    queryKey: ["recent-entries", limit],
+    queryFn: async (): Promise<RecentEntry[]> => {
+      const { data, error } = await supabase
+        .from("entries")
+        .select("*, dogs(name)")
+        .order("created_at", { ascending: false })
+        .limit(limit);
+      if (error) throw error;
+      return data as RecentEntry[];
+    },
+  });
+}
+
 export async function uploadDogPhoto(file: File): Promise<string> {
   const ext = file.name.split(".").pop() ?? "jpg";
   const path = `${crypto.randomUUID()}.${ext}`;

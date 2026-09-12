@@ -35,7 +35,7 @@ import {
   useEntries,
 } from "@/lib/dogs";
 
-export const Route = createFileRoute("/pies/$id/tabela")({
+export const Route = createFileRoute("/_authenticated/pies/$id/tabela")({
   head: () => ({
     meta: [
       { title: "Tabela wydarzeń — Psiennik" },

@@ -22,3 +22,8 @@
 - [x] Uprościć Kalendarz i dodać trzy wskaźniki ocen na każdym dniu
 - [x] Dodać widok Analiza z podsumowaniami i trzema wykresami
 - [x] Zweryfikować Kalendarz i Analizę na komputerze oraz telefonie
+- [x] Konta: logowanie Google/Apple/e-mail, role, RLS per konto
+- [x] Zaproszenia behawiorystki kodem + lista dostępu
+- [x] Powiadomienia w aplikacji (dzwonek, nowe wpisy/komentarze)
+- [x] Profil użytkownika i wylogowanie
+- [x] Konta demo (tylko tryb deweloperski)

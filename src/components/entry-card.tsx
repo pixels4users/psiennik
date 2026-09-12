@@ -1,6 +1,6 @@
 import { Pencil, MessageSquarePlus, MessageSquareText } from "lucide-react";
 import { ACTIVITY_TYPES, TIMES_OF_DAY, labelFor, type Entry } from "@/lib/dogs";
-import type { Role } from "@/lib/role";
+import type { Role } from "@/lib/auth";
 import { RatingBadge } from "@/components/rating-badge";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";

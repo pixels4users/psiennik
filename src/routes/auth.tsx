@@ -1,0 +1,262 @@
+import { useEffect, useState } from "react";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { toast } from "sonner";
+import { supabase } from "@/integrations/supabase/client";
+import { lovable } from "@/integrations/lovable";
+import { useAuth } from "@/lib/auth";
+import { DEMO_BEHAVIORIST_EMAIL, DEMO_OWNER_EMAIL, DEMO_PASSWORD, ensureDemoAccounts } from "@/lib/demo.functions";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+
+export const Route = createFileRoute("/auth")({
+  ssr: false,
+  head: () => ({
+    meta: [
+      { title: "Logowanie — Psiennik" },
+      {
+        name: "description",
+        content: "Zaloguj się lub załóż konto w Psienniku — dzienniku behawioralnym psa.",
+      },
+      { property: "og:title", content: "Logowanie — Psiennik" },
+      {
+        property: "og:description",
+        content: "Zaloguj się lub załóż konto w Psienniku — dzienniku behawioralnym psa.",
+      },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
+    ],
+  }),
+  component: AuthPage,
+});
+
+function AuthPage() {
+  const navigate = useNavigate();
+  const { user, loading } = useAuth();
+  const [busy, setBusy] = useState(false);
+
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [name, setName] = useState("");
+  const [role, setRole] = useState<"owner" | "behaviorist">("owner");
+
+  useEffect(() => {
+    if (!loading && user) navigate({ to: "/psy", replace: true });
+  }, [loading, user, navigate]);
+
+  const oauth = async (provider: "google" | "apple") => {
+    setBusy(true);
+    try {
+      const result = await lovable.auth.signInWithOAuth(provider, {
+        redirect_uri: window.location.origin,
+      });
+      if (result.error) throw result.error;
+      if (!result.redirected) navigate({ to: "/psy", replace: true });
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Nie udało się zalogować");
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  const signIn = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setBusy(true);
+    try {
+      const { error } = await supabase.auth.signInWithPassword({ email, password });
+      if (error) throw error;
+      navigate({ to: "/psy", replace: true });
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Nie udało się zalogować");
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  const signUp = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setBusy(true);
+    try {
+      const { data, error } = await supabase.auth.signUp({
+        email,
+        password,
+        options: {
+          emailRedirectTo: window.location.origin,
+          data: { display_name: name, role },
+        },
+      });
+      if (error) throw error;
+      if (data.session) navigate({ to: "/psy", replace: true });
+      else toast.success("Sprawdź skrzynkę i potwierdź adres e-mail, aby dokończyć rejestrację.");
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Nie udało się założyć konta");
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  const demoLogin = async (which: "owner" | "behaviorist") => {
+    setBusy(true);
+    try {
+      await ensureDemoAccounts();
+      const { error } = await supabase.auth.signInWithPassword({
+        email: which === "owner" ? DEMO_OWNER_EMAIL : DEMO_BEHAVIORIST_EMAIL,
+        password: DEMO_PASSWORD,
+      });
+      if (error) throw error;
+      navigate({ to: "/psy", replace: true });
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Nie udało się wejść na konto demo");
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  return (
+    <div className="mx-auto max-w-md px-5 py-14">
+      <h1 className="text-4xl">Witaj w Psienniku</h1>
+      <p className="mt-2 text-muted-foreground">
+        Zaloguj się, aby prowadzić dziennik behawioralny swojego psa.
+      </p>
+
+      <Card className="mt-8 shadow-none">
+        <CardContent className="grid gap-5 p-6">
+          <div className="grid gap-2">
+            <Button variant="outline" disabled={busy} onClick={() => oauth("google")}>
+              Kontynuuj z Google
+            </Button>
+            <Button variant="outline" disabled={busy} onClick={() => oauth("apple")}>
+              Kontynuuj z Apple
+            </Button>
+          </div>
+
+          <div className="flex items-center gap-3 text-xs tracking-wide text-muted-foreground uppercase">
+            <span className="h-px flex-1 bg-border" />
+            albo e-mailem
+            <span className="h-px flex-1 bg-border" />
+          </div>
+
+          <Tabs defaultValue="login">
+            <TabsList className="w-full">
+              <TabsTrigger value="login" className="flex-1">
+                Logowanie
+              </TabsTrigger>
+              <TabsTrigger value="register" className="flex-1">
+                Rejestracja
+              </TabsTrigger>
+            </TabsList>
+
+            <TabsContent value="login">
+              <form onSubmit={signIn} className="grid gap-4 pt-4">
+                <div className="grid gap-2">
+                  <Label htmlFor="login-email">E-mail</Label>
+                  <Input
+                    id="login-email"
+                    type="email"
+                    required
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                  />
+                </div>
+                <div className="grid gap-2">
+                  <Label htmlFor="login-password">Hasło</Label>
+                  <Input
+                    id="login-password"
+                    type="password"
+                    required
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                  />
+                </div>
+                <Button type="submit" disabled={busy}>
+                  Zaloguj się
+                </Button>
+              </form>
+            </TabsContent>
+
+            <TabsContent value="register">
+              <form onSubmit={signUp} className="grid gap-4 pt-4">
+                <div className="grid gap-2">
+                  <Label htmlFor="reg-name">Imię</Label>
+                  <Input
+                    id="reg-name"
+                    value={name}
+                    onChange={(e) => setName(e.target.value)}
+                    placeholder="np. Miłosz"
+                  />
+                </div>
+                <div className="grid gap-2">
+                  <Label htmlFor="reg-email">E-mail</Label>
+                  <Input
+                    id="reg-email"
+                    type="email"
+                    required
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                  />
+                </div>
+                <div className="grid gap-2">
+                  <Label htmlFor="reg-password">Hasło</Label>
+                  <Input
+                    id="reg-password"
+                    type="password"
+                    required
+                    minLength={8}
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                  />
+                </div>
+                <div className="grid gap-2">
+                  <Label>Jestem</Label>
+                  <RadioGroup
+                    value={role}
+                    onValueChange={(v) => setRole(v as "owner" | "behaviorist")}
+                    className="grid gap-2"
+                  >
+                    <div className="flex items-center gap-2">
+                      <RadioGroupItem value="owner" id="role-owner" />
+                      <Label htmlFor="role-owner" className="font-normal">
+                        Właścicielem psa
+                      </Label>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <RadioGroupItem value="behaviorist" id="role-behaviorist" />
+                      <Label htmlFor="role-behaviorist" className="font-normal">
+                        Behawiorystą
+                      </Label>
+                    </div>
+                  </RadioGroup>
+                </div>
+                <Button type="submit" disabled={busy}>
+                  Załóż konto
+                </Button>
+              </form>
+            </TabsContent>
+          </Tabs>
+        </CardContent>
+      </Card>
+
+      {import.meta.env.DEV && (
+        <div className="mt-6 grid gap-2 rounded-xl bg-keylime p-5">
+          <p className="text-sm text-secondary-foreground">Konta demo (tylko podgląd):</p>
+          <div className="flex flex-wrap gap-2">
+            <Button variant="outline" size="sm" disabled={busy} onClick={() => demoLogin("owner")}>
+              Demo: właściciel
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              disabled={busy}
+              onClick={() => demoLogin("behaviorist")}
+            >
+              Demo: behawiorystka
+            </Button>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
