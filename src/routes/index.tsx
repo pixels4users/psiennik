@@ -5,6 +5,7 @@ import { useAuth } from "@/lib/auth";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import heroAsset from "@/assets/hero.jpg.asset.json";
+import socialProofAsset from "@/assets/social-proof.jpg.asset.json";
 import avatarAsset from "@/assets/avatar.jpg.asset.json";
 
 export const Route = createFileRoute("/")({
