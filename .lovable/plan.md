@@ -29,13 +29,13 @@ Skan bezpieczeństwa wykrył dwa błędy poziomu `error`:
 5. Przeprowadzić migrację starych zdjęć skryptem TypeScript, nie SQL-em:
    - `UPDATE` na `storage.objects` nie przenosi plików; używamy `supabase.storage.from('dog-photos').move(oldPath, newPath)`.
    - Po każdym udanym przeniesieniu skrypt aktualizuje `dogs.photo_url` z poziomu kodu.
-5. Przetestować:
+6. Przetestować:
    - upload zdjęcia przy tworzeniu psa,
    - podmianę i usunięcie zdjęcia przy edycji,
    - podgląd zdjęcia na liście psów i w formularzu,
    - dostęp behawiorysty do psa ze zdjęciem.
-6. Ponownie uruchomić `bunx tsc --noEmit`, `bun run build`, skan bezpieczeństwa i Playwright na desktopie oraz telefonie.
-7. Opublikować aplikację.
+7. Ponownie uruchomić `bunx tsc --noEmit`, `bun run build`, skan bezpieczeństwa i Playwright na desktopie oraz telefonie.
+8. Opublikować aplikację.
 
 ## Szczegóły techniczne
 
