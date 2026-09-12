@@ -5,7 +5,25 @@ import { supabase } from "@/integrations/supabase/client";
 import type { Tables } from "@/integrations/supabase/types";
 
 export type Role = "owner" | "behaviorist";
+export type DogRole = "owner" | "coowner" | "behaviorist";
 export type Profile = Tables<"profiles">;
+
+export type DogRoleResult = {
+  /** Rola użytkownika względem konkretnego psa. */
+  role: DogRole | null;
+  /** Status procesu dla behawiorysty (aktywny/zakończony/oczekujący). */
+  processStatus: string | null;
+  /** Czy może zarządzać psem (właściciel/współwłaściciel). */
+  canManage: boolean;
+  /** Czy może dodawać/edytować wpisy (właściciel/współwłaściciel, gdy proces nie zakończony). */
+  canEditEntries: boolean;
+  /** Czy może dodawać komentarze jako aktywny behawiorysta. */
+  canComment: boolean;
+  /** Czy dziennik jest w trybie tylko do odczytu dla zarządzających. */
+  isReadOnly: boolean;
+  /** Czy użytkownik jest głównym właścicielem psa. */
+  isPrimaryOwner: boolean;
+};
 
 const AuthContext = createContext<{
   session: Session | null;
@@ -78,4 +96,64 @@ export function useRole() {
     },
   });
   return { role: query.data ?? null, isLoading: query.isLoading };
+}
+
+/** Szczegółowa rola i uprawnienia użytkownika dla konkretnego psa. */
+export function useDogRole(dogId: string) {
+  const { user } = useAuth();
+  return useQuery({
+    queryKey: ["dog-role", dogId, user?.id],
+    enabled: !!user && !!dogId,
+    queryFn: async (): Promise<DogRoleResult> => {
+      const [{ data: dog, error: dogError }, { data: accessRows, error: accessError }] =
+        await Promise.all([
+          supabase.from("dogs").select("owner_id").eq("id", dogId).single(),
+          supabase.from("dog_access").select("*").eq("dog_id", dogId),
+        ]);
+      if (dogError) throw dogError;
+      if (accessError) throw accessError;
+
+      const myAccess = accessRows?.find((row) => row.user_id === user!.id);
+      const behaviorists = accessRows?.filter((row) => row.role === "behaviorist") ?? [];
+      const hasActiveBehaviorist = behaviorists.some((row) => row.process_status === "active");
+      const hasBehaviorist = behaviorists.length > 0;
+      const allCompleted = hasBehaviorist && !hasActiveBehaviorist;
+
+      if (!myAccess) {
+        return {
+          role: null,
+          processStatus: null,
+          canManage: false,
+          canEditEntries: false,
+          canComment: false,
+          isReadOnly: false,
+          isPrimaryOwner: false,
+        };
+      }
+
+      if (myAccess.role === "owner") {
+        const isPrimaryOwner = user!.id === dog.owner_id;
+        const canManage = true;
+        return {
+          role: isPrimaryOwner ? "owner" : "coowner",
+          processStatus: null,
+          canManage,
+          canEditEntries: canManage && !allCompleted,
+          canComment: false,
+          isReadOnly: canManage && allCompleted,
+          isPrimaryOwner,
+        };
+      }
+
+      return {
+        role: "behaviorist",
+        processStatus: myAccess.process_status,
+        canManage: false,
+        canEditEntries: false,
+        canComment: myAccess.process_status === "active",
+        isReadOnly: false,
+        isPrimaryOwner: false,
+      };
+    },
+  });
 }
