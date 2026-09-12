@@ -161,18 +161,40 @@ export function useBehavioristLink() {
   });
 }
 
+/** Tworzy lub odnawia kod zapraszający behawiorysty. */
+export function useCreateBehavioristLink() {
+  const queryClient = useQueryClient();
+  const { user } = useAuth();
+  return useMutation({
+    mutationFn: async (): Promise<BehavioristLink> => {
+      if (!user) throw new Error("Musisz być zalogowany");
+      const code = randomCode();
+      const { data, error } = await supabase
+        .from("behaviorist_links")
+        .upsert({ behaviorist_id: user.id, invite_code: code, is_active: true })
+        .select("*")
+        .single();
+      if (error) throw error;
+      return data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["behaviorist-link"] });
+    },
+  });
+}
+
+export type OwnerBehavioristWithProfile = OwnerBehaviorist & {
+  profile: { id: string; display_name: string | null; email: string | null } | null;
+  link: { invite_code: string; is_active: boolean } | null;
+};
+
 /** Lista behawiorystów powiązanych z właścicielem. */
 export function useOwnerBehaviorists() {
   const { user } = useAuth();
   return useQuery({
     queryKey: ["owner-behaviorists", user?.id],
     enabled: !!user,
-    queryFn: async (): Promise<
-      (OwnerBehaviorist & {
-        profile: { display_name: string | null; email: string | null } | null;
-        link: { invite_code: string; is_active: boolean } | null;
-      })[]
-    > => {
+    queryFn: async (): Promise<OwnerBehavioristWithProfile[]> => {
       const { data: rows, error } = await supabase
         .from("owner_behaviorists")
         .select("*")
@@ -201,6 +223,68 @@ export function useOwnerBehaviorists() {
         profile: profiles?.find((p) => p.id === row.behaviorist_id) ?? null,
         link: links?.find((l) => l.behaviorist_id === row.behaviorist_id) ?? null,
       }));
+    },
+  });
+}
+
+/** Lista właścicieli powiązanych z behawiorystą. */
+export function useBehavioristOwners() {
+  const { user } = useAuth();
+  return useQuery({
+    queryKey: ["behaviorist-owners", user?.id],
+    enabled: !!user,
+    queryFn: async (): Promise<OwnerBehavioristWithProfile[]> => {
+      const { data: rows, error } = await supabase
+        .from("owner_behaviorists")
+        .select("*")
+        .eq("behaviorist_id", user!.id)
+        .order("created_at", { ascending: false });
+      if (error) throw error;
+
+      const ownerIds = rows.map((r) => r.owner_id);
+      const [{ data: profiles }, { data: links }] = await Promise.all([
+        ownerIds.length
+          ? supabase
+              .from("profiles")
+              .select("id, display_name, email")
+              .in("id", ownerIds)
+          : { data: [] as { id: string; display_name: string | null; email: string | null }[] },
+        ownerIds.length
+          ? supabase
+              .from("behaviorist_links")
+              .select("behaviorist_id, invite_code, is_active")
+              .in("behaviorist_id", [user!.id])
+          : { data: [] as { behaviorist_id: string; invite_code: string; is_active: boolean }[] },
+      ]);
+
+      return rows.map((row) => ({
+        ...row,
+        profile: profiles?.find((p) => p.id === row.owner_id) ?? null,
+        link: links?.find((l) => l.behaviorist_id === user!.id) ?? null,
+      }));
+    },
+  });
+}
+
+/** Usuwa powiązanie właściciel–behawiorysta. */
+export function useRemoveOwnerBehaviorist() {
+  const queryClient = useQueryClient();
+  const { user } = useAuth();
+  return useMutation({
+    mutationFn: async (otherId: string) => {
+      if (!user) throw new Error("Musisz być zalogowany");
+      const { error } = await supabase
+        .from("owner_behaviorists")
+        .delete()
+        .or(`owner_id.eq.${user.id},behaviorist_id.eq.${user.id}`)
+        .or(`owner_id.eq.${otherId},behaviorist_id.eq.${otherId}`);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["owner-behaviorists"] });
+      queryClient.invalidateQueries({ queryKey: ["behaviorist-owners"] });
+      queryClient.invalidateQueries({ queryKey: ["dogs"] });
+      queryClient.invalidateQueries({ queryKey: ["subscription-limits"] });
     },
   });
 }
