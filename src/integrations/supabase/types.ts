@@ -14,6 +14,105 @@ export type Database = {
   }
   public: {
     Tables: {
+      dog_access: {
+        Row: {
+          created_at: string
+          dog_id: string
+          id: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          dog_id: string
+          id?: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          dog_id?: string
+          id?: string
+          role?: Database["public"]["Enums"]["app_role"]
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "dog_access_dog_id_fkey"
+            columns: ["dog_id"]
+            isOneToOne: false
+            referencedRelation: "dogs"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      dog_invites: {
+        Row: {
+          code: string
+          created_at: string
+          created_by: string
+          dog_id: string
+          expires_at: string
+          id: string
+          used_at: string | null
+          used_by: string | null
+        }
+        Insert: {
+          code: string
+          created_at?: string
+          created_by: string
+          dog_id: string
+          expires_at?: string
+          id?: string
+          used_at?: string | null
+          used_by?: string | null
+        }
+        Update: {
+          code?: string
+          created_at?: string
+          created_by?: string
+          dog_id?: string
+          expires_at?: string
+          id?: string
+          used_at?: string | null
+          used_by?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "dog_invites_dog_id_fkey"
+            columns: ["dog_id"]
+            isOneToOne: false
+            referencedRelation: "dogs"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      dog_views: {
+        Row: {
+          dog_id: string
+          last_seen_at: string
+          user_id: string
+        }
+        Insert: {
+          dog_id: string
+          last_seen_at?: string
+          user_id: string
+        }
+        Update: {
+          dog_id?: string
+          last_seen_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "dog_views_dog_id_fkey"
+            columns: ["dog_id"]
+            isOneToOne: false
+            referencedRelation: "dogs"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       dogs: {
         Row: {
           age: string | null
@@ -21,7 +120,7 @@ export type Database = {
           created_at: string
           id: string
           name: string
-          owner_id: string | null
+          owner_id: string
           photo_url: string | null
           sex: string | null
         }
@@ -31,7 +130,7 @@ export type Database = {
           created_at?: string
           id?: string
           name: string
-          owner_id?: string | null
+          owner_id?: string
           photo_url?: string | null
           sex?: string | null
         }
@@ -41,7 +140,7 @@ export type Database = {
           created_at?: string
           id?: string
           name?: string
-          owner_id?: string | null
+          owner_id?: string
           photo_url?: string | null
           sex?: string | null
         }
@@ -51,6 +150,7 @@ export type Database = {
         Row: {
           activity_type: string
           behaviorist_comment: string | null
+          commented_at: string | null
           created_at: string
           date: string
           description: string | null
@@ -63,6 +163,7 @@ export type Database = {
         Insert: {
           activity_type?: string
           behaviorist_comment?: string | null
+          commented_at?: string | null
           created_at?: string
           date: string
           description?: string | null
@@ -75,6 +176,7 @@ export type Database = {
         Update: {
           activity_type?: string
           behaviorist_comment?: string | null
+          commented_at?: string | null
           created_at?: string
           date?: string
           description?: string | null
@@ -94,15 +196,79 @@ export type Database = {
           },
         ]
       }
+      profiles: {
+        Row: {
+          created_at: string
+          display_name: string | null
+          email: string | null
+          email_notifications: boolean
+          id: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          display_name?: string | null
+          email?: string | null
+          email_notifications?: boolean
+          id: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          display_name?: string | null
+          email?: string | null
+          email_notifications?: boolean
+          id?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      user_roles: {
+        Row: {
+          created_at: string
+          id: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          role?: Database["public"]["Enums"]["app_role"]
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      has_dog_access: {
+        Args: { _dog_id: string; _user_id: string }
+        Returns: boolean
+      }
+      has_role: {
+        Args: {
+          _role: Database["public"]["Enums"]["app_role"]
+          _user_id: string
+        }
+        Returns: boolean
+      }
+      is_dog_owner: {
+        Args: { _dog_id: string; _user_id: string }
+        Returns: boolean
+      }
+      redeem_dog_invite: { Args: { _code: string }; Returns: string }
+      shares_dog: { Args: { _a: string; _b: string }; Returns: boolean }
     }
     Enums: {
-      [_ in never]: never
+      app_role: "owner" | "behaviorist"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -229,6 +395,8 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      app_role: ["owner", "behaviorist"],
+    },
   },
 } as const
