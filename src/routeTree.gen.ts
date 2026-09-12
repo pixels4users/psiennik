@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as PsyRouteImport } from './routes/psy'
 import { Route as PiesIdRouteImport } from './routes/pies.$id'
+import { Route as PiesIdIndexRouteImport } from './routes/pies.$id.index'
 import { Route as PiesIdKalendarzRouteImport } from './routes/pies.$id.kalendarz'
 
 const IndexRoute = IndexRouteImport.update({
@@ -29,6 +30,11 @@ const PiesIdRoute = PiesIdRouteImport.update({
   path: '/pies/$id',
   getParentRoute: () => rootRouteImport,
 } as any)
+const PiesIdIndexRoute = PiesIdIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => PiesIdRoute,
+} as any)
 const PiesIdKalendarzRoute = PiesIdKalendarzRouteImport.update({
   id: '/kalendarz',
   path: '/kalendarz',
@@ -40,12 +46,13 @@ export interface FileRoutesByFullPath {
   '/psy': typeof PsyRoute
   '/pies/$id': typeof PiesIdRouteWithChildren
   '/pies/$id/kalendarz': typeof PiesIdKalendarzRoute
+  '/pies/$id/': typeof PiesIdIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/psy': typeof PsyRoute
-  '/pies/$id': typeof PiesIdRouteWithChildren
   '/pies/$id/kalendarz': typeof PiesIdKalendarzRoute
+  '/pies/$id': typeof PiesIdIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -53,13 +60,20 @@ export interface FileRoutesById {
   '/psy': typeof PsyRoute
   '/pies/$id': typeof PiesIdRouteWithChildren
   '/pies/$id/kalendarz': typeof PiesIdKalendarzRoute
+  '/pies/$id/': typeof PiesIdIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/psy' | '/pies/$id' | '/pies/$id/kalendarz'
+  fullPaths: '/' | '/psy' | '/pies/$id' | '/pies/$id/kalendarz' | '/pies/$id/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/psy' | '/pies/$id' | '/pies/$id/kalendarz'
-  id: '__root__' | '/' | '/psy' | '/pies/$id' | '/pies/$id/kalendarz'
+  to: '/' | '/psy' | '/pies/$id/kalendarz' | '/pies/$id'
+  id:
+    | '__root__'
+    | '/'
+    | '/psy'
+    | '/pies/$id'
+    | '/pies/$id/kalendarz'
+    | '/pies/$id/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -91,6 +105,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PiesIdRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/pies/$id/': {
+      id: '/pies/$id/'
+      path: '/'
+      fullPath: '/pies/$id/'
+      preLoaderRoute: typeof PiesIdIndexRouteImport
+      parentRoute: typeof PiesIdRoute
+    }
     '/pies/$id/kalendarz': {
       id: '/pies/$id/kalendarz'
       path: '/kalendarz'
@@ -103,10 +124,12 @@ declare module '@tanstack/react-router' {
 
 interface PiesIdRouteChildren {
   PiesIdKalendarzRoute: typeof PiesIdKalendarzRoute
+  PiesIdIndexRoute: typeof PiesIdIndexRoute
 }
 
 const PiesIdRouteChildren: PiesIdRouteChildren = {
   PiesIdKalendarzRoute: PiesIdKalendarzRoute,
+  PiesIdIndexRoute: PiesIdIndexRoute,
 }
 
 const PiesIdRouteWithChildren =
