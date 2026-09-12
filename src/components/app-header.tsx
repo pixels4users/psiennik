@@ -98,7 +98,7 @@ export function AppHeader() {
             </DropdownMenu>
           </div>
         ) : (
-          <Button asChild size="sm">
+          <Button asChild variant="default" size="sm">
             <Link to="/auth">Zaloguj się</Link>
           </Button>
         )}
