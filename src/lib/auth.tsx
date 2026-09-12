@@ -79,25 +79,6 @@ export function useProfile() {
   });
 }
 
-export function useRole() {
-  const { user } = useAuth();
-  const query = useQuery({
-    queryKey: ["role", user?.id],
-    enabled: !!user,
-    staleTime: 1000 * 60 * 10,
-    queryFn: async (): Promise<Role | null> => {
-      const { data, error } = await supabase
-        .from("user_roles")
-        .select("role")
-        .eq("user_id", user!.id)
-        .maybeSingle();
-      if (error) throw error;
-      return (data?.role as Role | undefined) ?? null;
-    },
-  });
-  return { role: query.data ?? null, isLoading: query.isLoading };
-}
-
 /** Szczegółowa rola i uprawnienia użytkownika dla konkretnego psa. */
 export function useDogRole(dogId: string) {
   const { user } = useAuth();
