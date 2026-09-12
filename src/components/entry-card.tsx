@@ -1,18 +1,19 @@
 import { Pencil, MessageSquarePlus, MessageSquareText } from "lucide-react";
 import { ACTIVITY_TYPES, TIMES_OF_DAY, labelFor, type Entry } from "@/lib/dogs";
-import type { Role } from "@/lib/auth";
 import { RatingBadge } from "@/components/rating-badge";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 
 export function EntryCard({
   entry,
-  role,
+  canEdit,
+  canComment,
   onEdit,
   onComment,
 }: {
   entry: Entry;
-  role: Role | null;
+  canEdit: boolean;
+  canComment: boolean;
   onEdit?: (entry: Entry) => void;
   onComment?: (entry: Entry) => void;
 }) {
@@ -29,7 +30,7 @@ export function EntryCard({
           </div>
           <div className="flex shrink-0 items-center gap-2">
             <RatingBadge rating={entry.rating} />
-            {role === "owner" && onEdit && (
+            {canEdit && onEdit && (
               <Button
                 variant="ghost"
                 size="icon"
@@ -53,7 +54,7 @@ export function EntryCard({
                 <MessageSquareText className="size-3.5" />
                 Komentarz behawiorysty
               </p>
-              {role === "behaviorist" && onComment && (
+              {canComment && onComment && (
                 <Button variant="ghost" size="sm" onClick={() => onComment(entry)}>
                   Edytuj
                 </Button>
@@ -64,7 +65,7 @@ export function EntryCard({
             </p>
           </div>
         ) : (
-          role === "behaviorist" &&
+          canComment &&
           onComment && (
             <Button
               variant="outline"

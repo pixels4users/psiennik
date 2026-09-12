@@ -3,7 +3,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { format, parseISO } from "date-fns";
 import { pl } from "date-fns/locale";
 import { Plus } from "lucide-react";
-import { useRole } from "@/lib/auth";
+import { useDogRole } from "@/lib/auth";
 import { useDog, useEntries, type Entry } from "@/lib/dogs";
 import { DogNav } from "@/components/dog-nav";
 import { EntryCard } from "@/components/entry-card";
@@ -37,8 +37,8 @@ export const Route = createFileRoute("/_authenticated/pies/$id/")({
 
 function DogListPage() {
   const { id } = Route.useParams();
-  const { role } = useRole();
   const { data: dog } = useDog(id);
+  const { data: role, isLoading: roleLoading } = useDogRole(id);
   const { data: entries, isLoading } = useEntries(id);
 
   const [entryDialogOpen, setEntryDialogOpen] = useState(false);
@@ -69,7 +69,7 @@ function DogListPage() {
     <div className="mx-auto max-w-5xl px-5 py-10">
       <DogNav dog={dog} active="lista" />
 
-      {role === "owner" && (
+      {role?.canEditEntries && (
         <div className="mt-8">
           <Button
             onClick={() => {
@@ -83,7 +83,7 @@ function DogListPage() {
         </div>
       )}
 
-      {isLoading ? (
+      {isLoading || roleLoading ? (
         <div className="mt-8 grid gap-4">
           <Skeleton className="h-8 w-40" />
           {[0, 1].map((i) => (
@@ -100,7 +100,7 @@ function DogListPage() {
         <div className="mt-8 rounded-xl bg-keylime p-12 text-center">
           <h2 className="text-3xl">Brak wpisów</h2>
           <p className="mx-auto mt-2 max-w-md text-muted-foreground">
-            {role === "owner"
+            {role?.canEditEntries
               ? "Dodaj pierwsze wydarzenie, aby zacząć budować historię."
               : "Właściciel nie dodał jeszcze żadnych wydarzeń."}
           </p>
@@ -117,7 +117,8 @@ function DogListPage() {
                   <EntryCard
                     key={entry.id}
                     entry={entry}
-                    role={role}
+                    canEdit={!!role?.canEditEntries}
+                    canComment={!!role?.canComment}
                     onEdit={(e) => {
                       setEditedEntry(e);
                       setEntryDialogOpen(true);

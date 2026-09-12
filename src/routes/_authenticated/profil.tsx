@@ -2,14 +2,25 @@ import { useEffect, useState } from "react";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
+import { Copy, RefreshCw, Trash2, Users, UserCheck } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
-import { useAuth, useProfile, useRole } from "@/lib/auth";
+import { useAuth, useProfile } from "@/lib/auth";
+import {
+  useBehavioristLink,
+  useCreateBehavioristLink,
+  useOwnerBehaviorists,
+  useBehavioristOwners,
+  useRemoveOwnerBehaviorist,
+  useSubscriptionLimits,
+  type OwnerBehavioristWithProfile,
+} from "@/lib/access";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Skeleton } from "@/components/ui/skeleton";
+import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/_authenticated/profil")({
   head: () => ({
@@ -17,12 +28,12 @@ export const Route = createFileRoute("/_authenticated/profil")({
       { title: "Mój profil — Psiennik" },
       {
         name: "description",
-        content: "Ustawienia konta w Psienniku: nazwa, adres e-mail i powiadomienia.",
+        content: "Ustawienia konta w Psienniku: nazwa, adres e-mail, powiadomienia i dostęp.",
       },
       { property: "og:title", content: "Mój profil — Psiennik" },
       {
         property: "og:description",
-        content: "Ustawienia konta w Psienniku: nazwa, adres e-mail i powiadomienia.",
+        content: "Ustawienia konta w Psienniku: nazwa, adres e-mail, powiadomienia i dostęp.",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
@@ -31,10 +42,22 @@ export const Route = createFileRoute("/_authenticated/profil")({
   component: ProfilePage,
 });
 
+const STATUS_LABELS: Record<string, string> = {
+  active: "aktywna",
+  completed: "zakończona",
+  pending: "oczekująca",
+};
+
+function copy(text: string) {
+  navigator.clipboard.writeText(text).then(
+    () => toast.success("Skopiowano"),
+    () => toast.info(`Kod: ${text}`),
+  );
+}
+
 function ProfilePage() {
   const { user } = useAuth();
   const { data: profile, isLoading } = useProfile();
-  const { role } = useRole();
   const queryClient = useQueryClient();
   const navigate = useNavigate();
 
@@ -83,7 +106,7 @@ function ProfilePage() {
     <div className="mx-auto max-w-2xl px-5 py-12">
       <h1 className="text-4xl">Mój profil</h1>
       <p className="mt-2 text-muted-foreground">
-        {role === "behaviorist" ? "Konto behawiorysty" : "Konto właściciela"}
+        Ustawienia konta i zarządzanie dostępem.
       </p>
 
       <Card className="mt-8 shadow-none">
@@ -138,6 +161,189 @@ function ProfilePage() {
           )}
         </CardContent>
       </Card>
+
+      <BehavioristCodeCard />
+      <OwnerBehavioristsCard />
+      <BehavioristOwnersCard />
+    </div>
+  );
+}
+
+function BehavioristCodeCard() {
+  const { data: link, isLoading } = useBehavioristLink();
+  const create = useCreateBehavioristLink();
+
+  return (
+    <Card className="mt-6 shadow-none">
+      <CardHeader>
+        <CardTitle className="text-xl">Kod zapraszający behawiorysty</CardTitle>
+      </CardHeader>
+      <CardContent className="grid gap-4">
+        {isLoading ? (
+          <Skeleton className="h-12 w-full" />
+        ) : link ? (
+          <div className="flex items-center justify-between gap-3 rounded-lg bg-keylime px-4 py-3">
+            <div>
+              <p className="font-display text-3xl tracking-widest text-primary">
+                {link.invite_code}
+              </p>
+              <p className="text-xs text-muted-foreground">
+                Podaj ten kod właścicielom — połączą Cię ze swoim psem.
+              </p>
+            </div>
+            <div className="flex items-center gap-1">
+              <Button variant="ghost" size="icon" aria-label="Kopiuj kod" onClick={() => copy(link.invite_code)}>
+                <Copy className="size-4" />
+              </Button>
+              <Button
+                variant="ghost"
+                size="icon"
+                aria-label="Wygeneruj nowy kod"
+                disabled={create.isPending}
+                onClick={() => create.mutate(undefined, { onSuccess: (l) => copy(l.invite_code) })}
+              >
+                <RefreshCw className={cn("size-4", create.isPending && "animate-spin")} />
+              </Button>
+            </div>
+          </div>
+        ) : (
+          <div className="rounded-lg bg-secondary p-4 text-center">
+            <p className="text-sm text-muted-foreground">
+              Nie masz jeszcze kodu. Wygeneruj go, aby właściciele mogli Cię zaprosić.
+            </p>
+            <Button
+              className="mt-3"
+              disabled={create.isPending}
+              onClick={() => create.mutate(undefined, { onSuccess: (l) => copy(l.invite_code) })}
+            >
+              <RefreshCw className={cn("mr-2 size-4", create.isPending && "animate-spin")} />
+              Wygeneruj kod
+            </Button>
+          </div>
+        )}
+      </CardContent>
+    </Card>
+  );
+}
+
+function OwnerBehavioristsCard() {
+  const { data: rows, isLoading } = useOwnerBehaviorists();
+  const remove = useRemoveOwnerBehaviorist();
+
+  if (isLoading) {
+    return (
+      <Card className="mt-6 shadow-none">
+        <CardHeader>
+          <CardTitle className="text-xl">Twoi behawioryści</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <Skeleton className="h-10 w-full" />
+        </CardContent>
+      </Card>
+    );
+  }
+
+  if (!rows?.length) return null;
+
+  return (
+    <Card className="mt-6 shadow-none">
+      <CardHeader>
+        <CardTitle className="text-xl">Twoi behawioryści</CardTitle>
+      </CardHeader>
+      <CardContent className="grid gap-3">
+        {rows.map((row) => (
+          <BehavioristRow key={row.id} row={row} onRemove={() => remove.mutate(row.behaviorist_id)} />
+        ))}
+      </CardContent>
+    </Card>
+  );
+}
+
+function BehavioristOwnersCard() {
+  const { data: rows, isLoading } = useBehavioristOwners();
+  const limits = useSubscriptionLimits();
+  const remove = useRemoveOwnerBehaviorist();
+
+  if (isLoading) {
+    return (
+      <Card className="mt-6 shadow-none">
+        <CardHeader>
+          <CardTitle className="text-xl">Twoi właściciele</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <Skeleton className="h-10 w-full" />
+        </CardContent>
+      </Card>
+    );
+  }
+
+  if (!rows?.length) return null;
+
+  return (
+    <Card className="mt-6 shadow-none">
+      <CardHeader>
+        <CardTitle className="text-xl">Twoi właściciele</CardTitle>
+      </CardHeader>
+      <CardContent className="grid gap-3">
+        <div className="rounded-lg bg-secondary p-3 text-sm">
+          Aktywne procesy: {limits.active} / {limits.max}
+          {limits.pending > 0 && (
+            <span className="ml-3 text-muted-foreground">(oczekujące: {limits.pending})</span>
+          )}
+        </div>
+        {rows.map((row) => (
+          <OwnerRow key={row.id} row={row} onRemove={() => remove.mutate(row.owner_id)} />
+        ))}
+      </CardContent>
+    </Card>
+  );
+}
+
+function BehavioristRow({
+  row,
+  onRemove,
+}: {
+  row: OwnerBehavioristWithProfile;
+  onRemove: () => void;
+}) {
+  return (
+    <div className="flex items-center justify-between gap-3 rounded-lg border border-border px-4 py-2.5">
+      <div>
+        <p className="text-sm font-medium">
+          {row.profile?.display_name || row.profile?.email || "Behawiorysta"}
+        </p>
+        <p className="text-xs text-muted-foreground">
+          Współpraca {STATUS_LABELS[row.process_status] ?? row.process_status}
+          {row.link && ` · kod ${row.link.invite_code}`}
+        </p>
+      </div>
+      <Button variant="ghost" size="icon" aria-label="Usuń powiązanie" onClick={onRemove}>
+        <Trash2 className="size-4" />
+      </Button>
+    </div>
+  );
+}
+
+function OwnerRow({
+  row,
+  onRemove,
+}: {
+  row: OwnerBehavioristWithProfile;
+  onRemove: () => void;
+}) {
+  return (
+    <div className="flex items-center justify-between gap-3 rounded-lg border border-border px-4 py-2.5">
+      <div>
+        <p className="text-sm font-medium">
+          {row.profile?.display_name || row.profile?.email || "Właściciel"}
+        </p>
+        <p className="text-xs text-muted-foreground">
+          Współpraca {STATUS_LABELS[row.process_status] ?? row.process_status}
+        </p>
+      </div>
+      <Button variant="ghost" size="icon" aria-label="Usuń powiązanie" onClick={onRemove}>
+        <Trash2 className="size-4" />
+      </Button>
     </div>
   );
 }

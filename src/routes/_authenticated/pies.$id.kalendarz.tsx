@@ -10,7 +10,7 @@ import {
 import { pl } from "date-fns/locale";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { useDog, useEntries, type Entry } from "@/lib/dogs";
-import { useRole } from "@/lib/auth";
+import { useDogRole } from "@/lib/auth";
 import { DogNav } from "@/components/dog-nav";
 import { EntryCard } from "@/components/entry-card";
 import { EntryFormDialog } from "@/components/entry-form-dialog";
@@ -69,7 +69,7 @@ function ratingDotSize(count: number) {
 
 function DogCalendarPage() {
   const { id } = Route.useParams();
-  const { role } = useRole();
+  const { data: role } = useDogRole(id);
   const { data: dog } = useDog(id);
   const { data: entries, isLoading } = useEntries(id);
   const [weekStart, setWeekStart] = useState(() =>
@@ -244,7 +244,8 @@ function DogCalendarPage() {
                   <EntryCard
                     key={entry.id}
                     entry={entry}
-                    role={role}
+                    canEdit={!!role?.canEditEntries}
+                    canComment={!!role?.canComment}
                     onEdit={(item) => {
                       setEditedEntry(item);
                       setEntryDialogOpen(true);
