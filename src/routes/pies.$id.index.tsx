@@ -58,7 +58,7 @@ function DogListPage() {
 
   if (!dog) {
     return (
-      <div className="mx-auto max-w-3xl px-5 py-12">
+      <div className="mx-auto max-w-5xl px-5 py-12">
         <Skeleton className="h-10 w-48" />
         <Skeleton className="mt-4 h-32 w-full rounded-xl" />
       </div>
@@ -66,7 +66,7 @@ function DogListPage() {
   }
 
   return (
-    <div className="mx-auto max-w-3xl px-5 py-10">
+    <div className="mx-auto max-w-5xl px-5 py-10">
       <DogNav dog={dog} active="lista" />
 
       {role === "owner" && (

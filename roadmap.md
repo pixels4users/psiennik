@@ -10,6 +10,6 @@
 - [x] Strona `/pies/$id/kalendarz` — widok tygodniowy + analiza
 - [x] Metadata head() na wszystkich stronach
 - [x] Weryfikacja build + preview
-- [ ] Ujednolicić szerokość widoku Lista z Kalendarzem
-- [ ] Dodać widok Tabela z sortowaniem i filtrami
-- [ ] Zweryfikować nowy widok na komputerze i telefonie
+- [x] Ujednolicić szerokość widoku Lista z Kalendarzem
+- [x] Dodać widok Tabela z sortowaniem i filtrami
+- [x] Zweryfikować nowy widok na komputerze i telefonie

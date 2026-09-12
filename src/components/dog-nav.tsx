@@ -3,7 +3,13 @@ import { ArrowLeft } from "lucide-react";
 import { cn } from "@/lib/utils";
 import type { Dog } from "@/lib/dogs";
 
-export function DogNav({ dog, active }: { dog: Dog; active: "lista" | "kalendarz" }) {
+export function DogNav({
+  dog,
+  active,
+}: {
+  dog: Dog;
+  active: "lista" | "kalendarz" | "tabela";
+}) {
   return (
     <div className="grid gap-4">
       <Link
@@ -13,9 +19,9 @@ export function DogNav({ dog, active }: { dog: Dog; active: "lista" | "kalendarz
         <ArrowLeft className="size-4" />
         Wszystkie psy
       </Link>
-      <div className="flex flex-wrap items-end justify-between gap-4">
-        <div>
-          <h1 className="text-4xl">{dog.name}</h1>
+      <div className="grid min-w-0 gap-4 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-end">
+        <div className="min-w-0">
+          <h1 className="truncate text-4xl">{dog.name}</h1>
           <p className="mt-1 text-muted-foreground">
             {[dog.breed, dog.age, dog.sex].filter(Boolean).join(" · ")}
           </p>
@@ -44,6 +50,18 @@ export function DogNav({ dog, active }: { dog: Dog; active: "lista" | "kalendarz
             )}
           >
             Kalendarz
+          </Link>
+          <Link
+            to="/pies/$id/tabela"
+            params={{ id: dog.id }}
+            className={cn(
+              "rounded-full px-4 py-1.5 text-sm transition-colors",
+              active === "tabela"
+                ? "bg-primary text-primary-foreground"
+                : "text-secondary-foreground hover:bg-accent/60",
+            )}
+          >
+            Tabela
           </Link>
         </div>
       </div>
