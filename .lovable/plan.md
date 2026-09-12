@@ -83,7 +83,7 @@ Migracja bazy:
 - Tabela `owner_behaviorists` (`owner_id`, `behaviorist_id`) — trwałe powiązanie właściciela z behawiorystą; `private.handle_new_dog` dopisuje powiązanych behawiorystów do `dog_access` z aktywnym statusem.
 - `redeem_dog_invite` rozpoznaje też kod behawiorysty i zakłada powiązanie zamiast dostępu do konkretnego psa; zwraca informację, którą ścieżkę wykonano.
 - `profiles.plan_type` (text, domyślnie `free`) i `profiles.max_active_dogs` (integer, domyślnie 2).
-- Trigger na `dog_access` (insert oraz zmiana statusu na `active`) liczy aktywne procesy behawiorysty i odrzuca przypisanie po przekroczeniu `max_active_dogs` — z wyjątkiem ścieżki automatycznej: jeśli `private.handle_new_dog` próbuje przypisać behawiorystę do nowo utworzonego psa, a limit jest wykorzystany, funkcja tworzy psa BEZ przypisywania behawiorysty (nie rzuca błędu zatrzymującego dodanie psa). Frontend po udanym dodaniu psa pokazuje właścicielowi ostrzeżenie: „Pies został dodany, ale Twój behawiorysta osiągnął limit aktywnych pacjentów i nie został automatycznie przypisany. Skontaktuj się z nim”. Jawne akcje (użycie kodu, ręczne dodanie) nadal zwracają czytelny błąd o limicie.
+- Trigger na `dog_access` (insert oraz zmiana statusu na `active`) liczy aktywne procesy behawiorysty. Jeśli przy jawnej akcji (użycie kodu, ręczne dodanie) przekroczony zostanie `max_active_dogs`, baza odrzuca akcję z czytelnym błędem o limicie. Jeśli automatyczne przypisanie w `private.handle_new_dog` napotka limit, wiersz trafia ze statusem `pending` zamiast `active` — pies zostaje utworzony, a właściciel widzi ostrzeżenie: „Pies został dodany, ale Twój behawiorysta osiągnął limit aktywnych pacjentów i nie został automatycznie przypisany. Skontaktuj się z nim”.
 
 Frontend:
 
