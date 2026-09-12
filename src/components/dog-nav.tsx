@@ -19,7 +19,7 @@ export function DogNav({
         <ArrowLeft className="size-4" />
         Wszystkie psy
       </Link>
-      <div className="grid grid-cols-[minmax(0,1fr)_auto] items-end gap-4 sm:flex sm:flex-wrap sm:justify-between">
+      <div className="grid min-w-0 gap-4 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-end">
         <div className="min-w-0">
           <h1 className="truncate text-4xl">{dog.name}</h1>
           <p className="mt-1 text-muted-foreground">
