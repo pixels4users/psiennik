@@ -27,7 +27,7 @@ import {
 import { Skeleton } from "@/components/ui/skeleton";
 import { cn } from "@/lib/utils";
 
-export const Route = createFileRoute("/pies/$id/kalendarz")({
+export const Route = createFileRoute("/_authenticated/pies/$id/kalendarz")({
   head: () => ({
     meta: [
       { title: "Kalendarz — Psiennik" },

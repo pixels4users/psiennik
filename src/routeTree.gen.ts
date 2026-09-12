@@ -10,75 +10,79 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
-import { Route as PsyRouteImport } from './routes/psy'
-import { Route as PiesIdRouteImport } from './routes/pies.$id'
-import { Route as PiesIdIndexRouteImport } from './routes/pies.$id.index'
-import { Route as PiesIdAnalizaRouteImport } from './routes/pies.$id.analiza'
-import { Route as PiesIdKalendarzRouteImport } from './routes/pies.$id.kalendarz'
-import { Route as PiesIdTabelaRouteImport } from './routes/pies.$id.tabela'
+import { Route as AuthenticatedPsyRouteImport } from './routes/_authenticated/psy'
+import { Route as AuthenticatedPiesIdRouteImport } from './routes/_authenticated/pies.$id'
+import { Route as AuthenticatedPiesIdIndexRouteImport } from './routes/_authenticated/pies.$id.index'
+import { Route as AuthenticatedPiesIdAnalizaRouteImport } from './routes/_authenticated/pies.$id.analiza'
+import { Route as AuthenticatedPiesIdKalendarzRouteImport } from './routes/_authenticated/pies.$id.kalendarz'
+import { Route as AuthenticatedPiesIdTabelaRouteImport } from './routes/_authenticated/pies.$id.tabela'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
-const PsyRoute = PsyRouteImport.update({
-  id: '/psy',
+const AuthenticatedPsyRoute = AuthenticatedPsyRouteImport.update({
+  id: '/_authenticated/psy',
   path: '/psy',
   getParentRoute: () => rootRouteImport,
 } as any)
-const PiesIdRoute = PiesIdRouteImport.update({
-  id: '/pies/$id',
+const AuthenticatedPiesIdRoute = AuthenticatedPiesIdRouteImport.update({
+  id: '/_authenticated/pies/$id',
   path: '/pies/$id',
   getParentRoute: () => rootRouteImport,
 } as any)
-const PiesIdIndexRoute = PiesIdIndexRouteImport.update({
-  id: '/',
-  path: '/',
-  getParentRoute: () => PiesIdRoute,
-} as any)
-const PiesIdAnalizaRoute = PiesIdAnalizaRouteImport.update({
-  id: '/analiza',
-  path: '/analiza',
-  getParentRoute: () => PiesIdRoute,
-} as any)
-const PiesIdKalendarzRoute = PiesIdKalendarzRouteImport.update({
-  id: '/kalendarz',
-  path: '/kalendarz',
-  getParentRoute: () => PiesIdRoute,
-} as any)
-const PiesIdTabelaRoute = PiesIdTabelaRouteImport.update({
-  id: '/tabela',
-  path: '/tabela',
-  getParentRoute: () => PiesIdRoute,
-} as any)
+const AuthenticatedPiesIdIndexRoute =
+  AuthenticatedPiesIdIndexRouteImport.update({
+    id: '/',
+    path: '/',
+    getParentRoute: () => AuthenticatedPiesIdRoute,
+  } as any)
+const AuthenticatedPiesIdAnalizaRoute =
+  AuthenticatedPiesIdAnalizaRouteImport.update({
+    id: '/analiza',
+    path: '/analiza',
+    getParentRoute: () => AuthenticatedPiesIdRoute,
+  } as any)
+const AuthenticatedPiesIdKalendarzRoute =
+  AuthenticatedPiesIdKalendarzRouteImport.update({
+    id: '/kalendarz',
+    path: '/kalendarz',
+    getParentRoute: () => AuthenticatedPiesIdRoute,
+  } as any)
+const AuthenticatedPiesIdTabelaRoute =
+  AuthenticatedPiesIdTabelaRouteImport.update({
+    id: '/tabela',
+    path: '/tabela',
+    getParentRoute: () => AuthenticatedPiesIdRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
-  '/psy': typeof PsyRoute
-  '/pies/$id': typeof PiesIdRouteWithChildren
-  '/pies/$id/analiza': typeof PiesIdAnalizaRoute
-  '/pies/$id/kalendarz': typeof PiesIdKalendarzRoute
-  '/pies/$id/tabela': typeof PiesIdTabelaRoute
-  '/pies/$id/': typeof PiesIdIndexRoute
+  '/psy': typeof AuthenticatedPsyRoute
+  '/pies/$id': typeof AuthenticatedPiesIdRouteWithChildren
+  '/pies/$id/analiza': typeof AuthenticatedPiesIdAnalizaRoute
+  '/pies/$id/kalendarz': typeof AuthenticatedPiesIdKalendarzRoute
+  '/pies/$id/tabela': typeof AuthenticatedPiesIdTabelaRoute
+  '/pies/$id/': typeof AuthenticatedPiesIdIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
-  '/psy': typeof PsyRoute
-  '/pies/$id/analiza': typeof PiesIdAnalizaRoute
-  '/pies/$id/kalendarz': typeof PiesIdKalendarzRoute
-  '/pies/$id/tabela': typeof PiesIdTabelaRoute
-  '/pies/$id': typeof PiesIdIndexRoute
+  '/psy': typeof AuthenticatedPsyRoute
+  '/pies/$id/analiza': typeof AuthenticatedPiesIdAnalizaRoute
+  '/pies/$id/kalendarz': typeof AuthenticatedPiesIdKalendarzRoute
+  '/pies/$id/tabela': typeof AuthenticatedPiesIdTabelaRoute
+  '/pies/$id': typeof AuthenticatedPiesIdIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
-  '/psy': typeof PsyRoute
-  '/pies/$id': typeof PiesIdRouteWithChildren
-  '/pies/$id/analiza': typeof PiesIdAnalizaRoute
-  '/pies/$id/kalendarz': typeof PiesIdKalendarzRoute
-  '/pies/$id/tabela': typeof PiesIdTabelaRoute
-  '/pies/$id/': typeof PiesIdIndexRoute
+  '/_authenticated/psy': typeof AuthenticatedPsyRoute
+  '/_authenticated/pies/$id': typeof AuthenticatedPiesIdRouteWithChildren
+  '/_authenticated/pies/$id/analiza': typeof AuthenticatedPiesIdAnalizaRoute
+  '/_authenticated/pies/$id/kalendarz': typeof AuthenticatedPiesIdKalendarzRoute
+  '/_authenticated/pies/$id/tabela': typeof AuthenticatedPiesIdTabelaRoute
+  '/_authenticated/pies/$id/': typeof AuthenticatedPiesIdIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -101,18 +105,18 @@ export interface FileRouteTypes {
   id:
     | '__root__'
     | '/'
-    | '/psy'
-    | '/pies/$id'
-    | '/pies/$id/analiza'
-    | '/pies/$id/kalendarz'
-    | '/pies/$id/tabela'
-    | '/pies/$id/'
+    | '/_authenticated/psy'
+    | '/_authenticated/pies/$id'
+    | '/_authenticated/pies/$id/analiza'
+    | '/_authenticated/pies/$id/kalendarz'
+    | '/_authenticated/pies/$id/tabela'
+    | '/_authenticated/pies/$id/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
-  PsyRoute: typeof PsyRoute
-  PiesIdRoute: typeof PiesIdRouteWithChildren
+  AuthenticatedPsyRoute: typeof AuthenticatedPsyRoute
+  AuthenticatedPiesIdRoute: typeof AuthenticatedPiesIdRouteWithChildren
 }
 
 declare module '@tanstack/react-router' {
@@ -124,72 +128,72 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/psy': {
-      id: '/psy'
+    '/_authenticated/psy': {
+      id: '/_authenticated/psy'
       path: '/psy'
       fullPath: '/psy'
-      preLoaderRoute: typeof PsyRouteImport
+      preLoaderRoute: typeof AuthenticatedPsyRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/pies/$id': {
-      id: '/pies/$id'
+    '/_authenticated/pies/$id': {
+      id: '/_authenticated/pies/$id'
       path: '/pies/$id'
       fullPath: '/pies/$id'
-      preLoaderRoute: typeof PiesIdRouteImport
+      preLoaderRoute: typeof AuthenticatedPiesIdRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/pies/$id/': {
-      id: '/pies/$id/'
+    '/_authenticated/pies/$id/': {
+      id: '/_authenticated/pies/$id/'
       path: '/'
       fullPath: '/pies/$id/'
-      preLoaderRoute: typeof PiesIdIndexRouteImport
-      parentRoute: typeof PiesIdRoute
+      preLoaderRoute: typeof AuthenticatedPiesIdIndexRouteImport
+      parentRoute: typeof AuthenticatedPiesIdRoute
     }
-    '/pies/$id/analiza': {
-      id: '/pies/$id/analiza'
+    '/_authenticated/pies/$id/analiza': {
+      id: '/_authenticated/pies/$id/analiza'
       path: '/analiza'
       fullPath: '/pies/$id/analiza'
-      preLoaderRoute: typeof PiesIdAnalizaRouteImport
-      parentRoute: typeof PiesIdRoute
+      preLoaderRoute: typeof AuthenticatedPiesIdAnalizaRouteImport
+      parentRoute: typeof AuthenticatedPiesIdRoute
     }
-    '/pies/$id/kalendarz': {
-      id: '/pies/$id/kalendarz'
+    '/_authenticated/pies/$id/kalendarz': {
+      id: '/_authenticated/pies/$id/kalendarz'
       path: '/kalendarz'
       fullPath: '/pies/$id/kalendarz'
-      preLoaderRoute: typeof PiesIdKalendarzRouteImport
-      parentRoute: typeof PiesIdRoute
+      preLoaderRoute: typeof AuthenticatedPiesIdKalendarzRouteImport
+      parentRoute: typeof AuthenticatedPiesIdRoute
     }
-    '/pies/$id/tabela': {
-      id: '/pies/$id/tabela'
+    '/_authenticated/pies/$id/tabela': {
+      id: '/_authenticated/pies/$id/tabela'
       path: '/tabela'
       fullPath: '/pies/$id/tabela'
-      preLoaderRoute: typeof PiesIdTabelaRouteImport
-      parentRoute: typeof PiesIdRoute
+      preLoaderRoute: typeof AuthenticatedPiesIdTabelaRouteImport
+      parentRoute: typeof AuthenticatedPiesIdRoute
     }
   }
 }
 
-interface PiesIdRouteChildren {
-  PiesIdAnalizaRoute: typeof PiesIdAnalizaRoute
-  PiesIdKalendarzRoute: typeof PiesIdKalendarzRoute
-  PiesIdTabelaRoute: typeof PiesIdTabelaRoute
-  PiesIdIndexRoute: typeof PiesIdIndexRoute
+interface AuthenticatedPiesIdRouteChildren {
+  AuthenticatedPiesIdAnalizaRoute: typeof AuthenticatedPiesIdAnalizaRoute
+  AuthenticatedPiesIdKalendarzRoute: typeof AuthenticatedPiesIdKalendarzRoute
+  AuthenticatedPiesIdTabelaRoute: typeof AuthenticatedPiesIdTabelaRoute
+  AuthenticatedPiesIdIndexRoute: typeof AuthenticatedPiesIdIndexRoute
 }
 
-const PiesIdRouteChildren: PiesIdRouteChildren = {
-  PiesIdAnalizaRoute: PiesIdAnalizaRoute,
-  PiesIdKalendarzRoute: PiesIdKalendarzRoute,
-  PiesIdTabelaRoute: PiesIdTabelaRoute,
-  PiesIdIndexRoute: PiesIdIndexRoute,
+const AuthenticatedPiesIdRouteChildren: AuthenticatedPiesIdRouteChildren = {
+  AuthenticatedPiesIdAnalizaRoute: AuthenticatedPiesIdAnalizaRoute,
+  AuthenticatedPiesIdKalendarzRoute: AuthenticatedPiesIdKalendarzRoute,
+  AuthenticatedPiesIdTabelaRoute: AuthenticatedPiesIdTabelaRoute,
+  AuthenticatedPiesIdIndexRoute: AuthenticatedPiesIdIndexRoute,
 }
 
-const PiesIdRouteWithChildren =
-  PiesIdRoute._addFileChildren(PiesIdRouteChildren)
+const AuthenticatedPiesIdRouteWithChildren =
+  AuthenticatedPiesIdRoute._addFileChildren(AuthenticatedPiesIdRouteChildren)
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
-  PsyRoute: PsyRoute,
-  PiesIdRoute: PiesIdRouteWithChildren,
+  AuthenticatedPsyRoute: AuthenticatedPsyRoute,
+  AuthenticatedPiesIdRoute: AuthenticatedPiesIdRouteWithChildren,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

@@ -9,7 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 
-export const Route = createFileRoute("/psy")({
+export const Route = createFileRoute("/_authenticated/psy")({
   head: () => ({
     meta: [
       { title: "Psy — Psiennik" },

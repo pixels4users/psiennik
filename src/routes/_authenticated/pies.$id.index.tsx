@@ -13,7 +13,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 
-export const Route = createFileRoute("/pies/$id/")({
+export const Route = createFileRoute("/_authenticated/pies/$id/")({
   head: () => ({
     meta: [
       { title: "Dziennik wydarzeń — Psiennik" },
