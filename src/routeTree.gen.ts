@@ -10,6 +10,7 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as AuthenticatedPsyRouteImport } from './routes/_authenticated/psy'
 import { Route as AuthenticatedPiesIdRouteImport } from './routes/_authenticated/pies.$id'
 import { Route as AuthenticatedPiesIdIndexRouteImport } from './routes/_authenticated/pies.$id.index'
@@ -22,15 +23,19 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
-const AuthenticatedPsyRoute = AuthenticatedPsyRouteImport.update({
-  id: '/_authenticated/psy',
-  path: '/psy',
+const AuthenticatedRouteRoute = AuthenticatedRouteRouteImport.update({
+  id: '/_authenticated',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AuthenticatedPsyRoute = AuthenticatedPsyRouteImport.update({
+  id: '/psy',
+  path: '/psy',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const AuthenticatedPiesIdRoute = AuthenticatedPiesIdRouteImport.update({
-  id: '/_authenticated/pies/$id',
+  id: '/pies/$id',
   path: '/pies/$id',
-  getParentRoute: () => rootRouteImport,
+  getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 const AuthenticatedPiesIdIndexRoute =
   AuthenticatedPiesIdIndexRouteImport.update({
@@ -77,6 +82,7 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
   '/_authenticated/psy': typeof AuthenticatedPsyRoute
   '/_authenticated/pies/$id': typeof AuthenticatedPiesIdRouteWithChildren
   '/_authenticated/pies/$id/analiza': typeof AuthenticatedPiesIdAnalizaRoute
@@ -105,6 +111,7 @@ export interface FileRouteTypes {
   id:
     | '__root__'
     | '/'
+    | '/_authenticated'
     | '/_authenticated/psy'
     | '/_authenticated/pies/$id'
     | '/_authenticated/pies/$id/analiza'
@@ -115,8 +122,7 @@ export interface FileRouteTypes {
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
-  AuthenticatedPsyRoute: typeof AuthenticatedPsyRoute
-  AuthenticatedPiesIdRoute: typeof AuthenticatedPiesIdRouteWithChildren
+  AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
 }
 
 declare module '@tanstack/react-router' {
@@ -128,19 +134,26 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_authenticated': {
+      id: '/_authenticated'
+      path: ''
+      fullPath: '/'
+      preLoaderRoute: typeof AuthenticatedRouteRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/_authenticated/psy': {
       id: '/_authenticated/psy'
       path: '/psy'
       fullPath: '/psy'
       preLoaderRoute: typeof AuthenticatedPsyRouteImport
-      parentRoute: typeof rootRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/pies/$id': {
       id: '/_authenticated/pies/$id'
       path: '/pies/$id'
       fullPath: '/pies/$id'
       preLoaderRoute: typeof AuthenticatedPiesIdRouteImport
-      parentRoute: typeof rootRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/pies/$id/': {
       id: '/_authenticated/pies/$id/'
@@ -190,10 +203,22 @@ const AuthenticatedPiesIdRouteChildren: AuthenticatedPiesIdRouteChildren = {
 const AuthenticatedPiesIdRouteWithChildren =
   AuthenticatedPiesIdRoute._addFileChildren(AuthenticatedPiesIdRouteChildren)
 
-const rootRouteChildren: RootRouteChildren = {
-  IndexRoute: IndexRoute,
+interface AuthenticatedRouteRouteChildren {
+  AuthenticatedPsyRoute: typeof AuthenticatedPsyRoute
+  AuthenticatedPiesIdRoute: typeof AuthenticatedPiesIdRouteWithChildren
+}
+
+const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedPsyRoute: AuthenticatedPsyRoute,
   AuthenticatedPiesIdRoute: AuthenticatedPiesIdRouteWithChildren,
+}
+
+const AuthenticatedRouteRouteWithChildren =
+  AuthenticatedRouteRoute._addFileChildren(AuthenticatedRouteRouteChildren)
+
+const rootRouteChildren: RootRouteChildren = {
+  IndexRoute: IndexRoute,
+  AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
