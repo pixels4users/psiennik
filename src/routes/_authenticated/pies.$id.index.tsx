@@ -20,13 +20,13 @@ export const Route = createFileRoute("/_authenticated/pies/$id/")({
       {
         name: "description",
         content:
-          "Lista wydarzeń z dziennika behawioralnego psa: aktywności, opisy, oceny i zalecenia behawiorysty.",
+          "Dziennik wydarzeń z dziennika behawioralnego psa: aktywności, opisy, oceny i zalecenia behawiorysty.",
       },
       { property: "og:title", content: "Dziennik wydarzeń — Psiennik" },
       {
         property: "og:description",
         content:
-          "Lista wydarzeń z dziennika behawioralnego psa: aktywności, opisy, oceny i zalecenia behawiorysty.",
+          "Dziennik wydarzeń z dziennika behawioralnego psa: aktywności, opisy, oceny i zalecenia behawiorysty.",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
@@ -67,7 +67,7 @@ function DogListPage() {
 
   return (
     <div className="mx-auto max-w-5xl px-5 py-10">
-      <DogNav dog={dog} active="lista" />
+      <DogNav dog={dog} active="dziennik" />
 
       {role?.canEditEntries && (
         <div className="mt-8">
