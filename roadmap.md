@@ -34,3 +34,5 @@
 - [x] Limity darmowego planu behawiorysty bez blokowania tworzenia psa
 - [x] Dashboard behawiorysty z aktywnymi/zakończonymi/oczekującymi procesami
 - [x] Galeria przykładowych dzienników psów na stronie głównej
+- [x] Ujednolicić nazwy ocen i określenie „zalecenia” w całej aplikacji
+- [x] Dodać zakładkę zbierającą wszystkie zalecenia behawiorysty
