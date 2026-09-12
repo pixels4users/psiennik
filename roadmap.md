@@ -27,3 +27,9 @@
 - [x] Powiadomienia w aplikacji (dzwonek, nowe wpisy/komentarze)
 - [x] Profil użytkownika i wylogowanie
 - [x] Konta demo (tylko tryb deweloperski)
+- [x] Zarządzanie dostępem z poziomu profilu i psa
+- [x] Rola współwłaściciela i główny właściciel
+- [x] Cykl życia współpracy z behawiorystą (active/completed/pending)
+- [x] Stały kod behawiorysty i relacja owner–behaviorist
+- [x] Limity darmowego planu behawiorysty bez blokowania tworzenia psa
+- [x] Dashboard behawiorysty z aktywnymi/zakończonymi/oczekującymi procesami
