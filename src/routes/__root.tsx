@@ -1,4 +1,5 @@
 import { HeadContent, Outlet, createRootRoute } from "@tanstack/react-router";
+import appCss from "../styles.css?url";
 import { RoleProvider } from "@/lib/role";
 import { AppHeader } from "@/components/app-header";
 import { Toaster } from "@/components/ui/sonner";
