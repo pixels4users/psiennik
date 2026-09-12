@@ -9,4 +9,4 @@
 - [x] Strona `/pies/$id` — lista wydarzeń, dodawanie/edycja, komentarz behawiorysty
 - [x] Strona `/pies/$id/kalendarz` — widok tygodniowy + analiza
 - [x] Metadata head() na wszystkich stronach
-- [ ] Weryfikacja build + preview
+- [x] Weryfikacja build + preview
