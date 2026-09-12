@@ -1,4 +1,4 @@
-# Dostęp, współpraca z behawiorystą i limity kont
+Dostęp, współpraca z behawiorystą i limity kont
 
 Dziś zaproszenie można wygenerować tylko z poziomu jednego psa, a pies ma dokładnie jednego właściciela. Dodajemy pełne zarządzanie osobami z dostępem (z poziomu konta i psa), rolę współwłaściciela, cykl życia współpracy z behawiorystą (aktywna / zakończona), kod zapraszający po stronie behawiorysty oraz limity darmowego planu.
 
@@ -9,7 +9,6 @@ Dziś zaproszenie można wygenerować tylko z poziomu jednego psa, a pies ma dok
 | Właściciel (główny) | wszystko: psy, wpisy, dodawanie i usuwanie współwłaściciela oraz behawiorysty, usunięcie psa |
 | Współwłaściciel | to samo co właściciel na wpisach i danych psa, zaprasza i usuwa behawiorystę; nie może usunąć głównego właściciela ani dodać kolejnego współwłaściciela, nie usuwa psa |
 | Behawiorysta | podgląd dziennika, komentarze/zalecenia, zakończenie procesu |
-
 
 Obaj właściciele widzą tę samą listę psów, te same osoby z dostępem i te same aktywne kody zaproszeń.
 
@@ -32,25 +31,23 @@ Obecne okno przy psie rozbudowujemy: pokazuje osoby mające dostęp do tego psa 
 
 Ekran „Dołącz kodem” działa jak dziś, ale jeden kod może objąć kilka psów naraz i nadać rolę współwłaściciela. Po wpisaniu kodu osoba dostaje dostęp do wszystkich psów z zaproszenia.
 
-## Szczegóły techniczne
+## Szczegóły techniczne – pierwsza część
 
-Migracja bazy:
+### Migracja bazy:
 
-- `dog_invites.role` (app_role, domyślnie `behaviorist`); jeden kod może mieć wiele wierszy — po jednym na psa — dzięki czemu zaproszenie obejmuje kilka psów.
-- nowa funkcja `private.can_manage_dog(dog_id, user_id)` — true, gdy użytkownik ma w `dog_access` rolę `owner` (obejmuje głównego właściciela i współwłaścicieli).
+- `dog_invites.role` (`app_role`, domyślnie `behaviorist`); jeden kod może mieć wiele wierszy — po jednym na psa — dzięki czemu zaproszenie obejmuje kilka psów.
+- nowa funkcja `private.can_manage_dog(dog_id, user_id)` — `true`, gdy użytkownik ma w `dog_access` rolę `owner` (obejmuje głównego właściciela i współwłaścicieli).
 - polityki RLS przechodzą z `is_dog_owner` na `can_manage_dog` dla: `dogs` (update), `entries` (insert/update/delete), `dog_invites` (select/insert/delete), `dog_access` (select/insert/delete). `is_dog_owner` zostaje tam, gdzie liczy się wyłącznie główny właściciel: usunięcie psa, usunięcie lub dodanie wiersza `dog_access` z rolą `owner`.
 - `private.guard_entry_update` używa `can_manage_dog`, żeby współwłaściciel mógł edytować wpisy.
 - `redeem_dog_invite(_code)` obsługuje wiele wierszy jednego kodu: waliduje ważność, zakłada dostęp z rolą z zaproszenia dla każdego psa, oznacza kod jako wykorzystany i zwraca pierwszego psa.
 - polityka `dog_access_delete`: główny właściciel może usunąć każdy wiersz poza swoim, współwłaściciel tylko wiersze behawiorystów, każdy może usunąć własny dostęp.
 
-Frontend:
+### Frontend:
 
 - `src/lib/access.ts` — hooki: lista osób pogrupowana po użytkowniku wraz z psami, tworzenie zaproszenia dla wielu psów i wybranej roli, usunięcie kodu, odebranie dostępu do jednego psa lub do wszystkich.
 - nowy hook `useDogRole(dogId)` — uprawnienia wyliczane z `dog_access` dla konkretnego psa zamiast globalnej roli konta; używają go `entry-card`, `dog-nav`, widoki Lista/Kalendarz/Tabela/Analiza.
 - nowy komponent zarządzania dostępem, używany zarówno w profilu, jak i w oknie przy psie (tryb „wszystkie psy” / „jeden pies”).
 - `src/routes/_authenticated/profil.tsx` — sekcja Osoby z dostępem; `dog-nav.tsx` — informacja o osobach z dostępem i akcja dodania.
-
-Weryfikacja: przepływ zaproszenia współwłaściciela i behawiorysty na kontach demo, sprawdzenie na komputerze i telefonie, kontrola lintera bazy po migracji.
 
 ## Cykl życia współpracy: aktywna i zakończona
 
@@ -63,7 +60,7 @@ Weryfikacja: przepływ zaproszenia współwłaściciela i behawiorysty na kontac
 
 - Każdy behawiorysta ma jeden stały kod (np. `BEH-123-ABC`) widoczny w profilu w sekcji „Mój kod dla klientów”, z przyciskiem kopiowania linku z zaproszeniem (`?code=…`).
 - Właściciel, który wejdzie z linku lub wpisze kod, zostaje trwale powiązany z behawiorystą i widzi komunikat: „Dołączasz pod opiekę behawiorysty: [imię]. Dodaj swojego psa, aby rozpocząć współpracę.”.
-- Każdy nowy pies takiego właściciela automatycznie dostaje tego behawiorystę z aktywnym procesem.
+- Każdy nowy pies takiego właściciela automatycznie dostaje tego behawiorystę z aktywnym statusem (lub oczekującym, jeśli behawiorysta nie ma miejsca).
 - Dotychczasowa ścieżka właściciel → behawiorysta pozostaje bez zmian.
 
 ## Limity planu darmowego
@@ -74,23 +71,22 @@ Weryfikacja: przepływ zaproszenia współwłaściciela i behawiorysty na kontac
 
 ## Szczegóły techniczne — druga część
 
-Migracja bazy:
+### Migracja bazy:
 
 - `dog_access.process_status` (text, domyślnie `active`, wartości `active` / `completed` / `pending`). Status `pending` oznacza, że powiązanie czeka na zwolnienie limitu aktywnych procesów u behawiorysty.
 - `private.can_manage_dog` pozwala na edycję wpisów, gdy pies NIE MA żadnego przypisanego behawiorysty LUB gdy ma przynajmniej jednego ze statusem `active`. Tryb tylko do odczytu dla wpisów (`entries` insert/update/delete) włącza się TYLKO wtedy, gdy pies ma przypisanych behawiorystów, ale wszyscy mają status `completed`. Odczyt i zarządzanie samym psem pozostają bez zmian.
 - RPC `complete_behavioral_process(p_dog_id, p_behaviorist_id)` — zmiana statusu na `completed`, wywoływalna wyłącznie przez przypisanego behawiorystę.
 - Tabela `behaviorist_links` (`id`, `behaviorist_id`, `invite_code` unikalny, `is_active`), z grantami i RLS: odczyt własnego kodu, publiczne rozpoznanie kodu przez RPC. Kod tworzony automatycznie przy rejestracji behawiorysty (rozszerzenie `private.handle_new_user`) oraz uzupełniany dla istniejących kont.
-- Tabela `owner_behaviorists` (`owner_id`, `behaviorist_id`) — trwałe powiązanie właściciela z behawiorystą; `private.handle_new_dog` dopisuje powiązanych behawiorystów do `dog_access` z aktywnym statusem.
+- Tabela `owner_behaviorists` (`owner_id`, `behaviorist_id`) — trwałe powiązanie właściciela z behawiorystą; `private.handle_new_dog` dopisuje powiązanych behawiorystów do `dog_access`.
 - `redeem_dog_invite` rozpoznaje też kod behawiorysty i zakłada powiązanie zamiast dostępu do konkretnego psa; zwraca informację, którą ścieżkę wykonano.
 - `profiles.plan_type` (text, domyślnie `free`) i `profiles.max_active_dogs` (integer, domyślnie 2).
-- Trigger na `dog_access` (insert oraz zmiana statusu na `active`) liczy aktywne procesy behawiorysty. Jeśli przy jawnej akcji (użycie kodu, ręczne dodanie) przekroczony zostanie `max_active_dogs`, baza odrzuca akcję z czytelnym błędem o limicie. Jeśli automatyczne przypisanie w `private.handle_new_dog` napotka limit, wiersz trafia ze statusem `pending` zamiast `active` — pies zostaje utworzony, a właściciel widzi ostrzeżenie: „Pies został dodany, ale Twój behawiorysta osiągnął limit aktywnych pacjentów i nie został automatycznie przypisany. Skontaktuj się z nim”.
+- Trigger na `dog_access` (insert oraz zmiana statusu na `active`) liczy aktywne procesy behawiorysty. Jeśli przy jawnej akcji (użycie kodu, ręczne dodanie przez właściciela psa niepowiązanego trwale z behawiorystą) przekroczony zostanie `max_active_dogs`, baza odrzuca akcję z czytelnym błędem o limicie. Jeśli automatyczne przypisanie w `private.handle_new_dog` napotka limit, wiersz trafia ze statusem `pending` zamiast `active` — pies zostaje utworzony, a właściciel widzi ostrzeżenie: „Pies został dodany, ale Twój behawiorysta osiągnął limit aktywnych pacjentów i nie został automatycznie przypisany. Skontaktuj się z nim”.
 
-Frontend:
+### Frontend:
 
 - `useDogRole` uwzględnia status procesu i zwraca tryb tylko do odczytu; formularze wpisów i komentarzy są wtedy ukryte.
 - Zakładki „Aktywne / Zakończone / Oczekujące” na liście psów behawiorysty, menu „Zakończ proces” z potwierdzeniem, baner w nagłówku psa.
 - Sekcja „Mój kod dla klientów” w profilu behawiorysty i obsługa parametru `?code=` na ekranie logowania i liście psów.
-- Hook `useSubscriptionLimits` — licznik aktywnych procesów i czytelne komunikaty o limicie. Gdy behawiorysta osiągnie limit, nowe powiązanie z psem (np. Reksio) trafia na listę oczekujących (`pending`) zamiast być od razu aktywowane. Behawiorysta widzi osobną zakładkę/listę „Oczekujące” i może aktywować psa dopiero po zakończeniu jednego z aktywnych procesów. Zwolnienie slotu nie aktywuje oczekujących automatycznie — wybór należy do behawiorysty.
+- Hook `useSubscriptionLimits` — licznik aktywnych procesów i czytelne komunikaty o limicie. Gdy behawiorysta osiągnie limit, nowe powiązanie z psem (np. dodanie nowego psa przez powiązanego klienta) trafia na listę oczekujących (`pending`) zamiast być od razu aktywowane. Behawiorysta widzi osobną zakładkę/listę „Oczekujące” i może aktywować psa dopiero po zakończeniu jednego z aktywnych procesów (czyli zmienić status z `pending` na `active`). Zwolnienie slotu nie aktywuje oczekujących automatycznie — wybór należy do behawiorysty.
 
-Weryfikacja drugiej części: zakończenie procesu i tryb tylko do odczytu, dołączenie właściciela kodem behawiorysty z automatycznym przypisaniem nowego psa, blokada trzeciego aktywnego procesu, linter bazy.
-
+Weryfikacja: przepływ zaproszenia współwłaściciela i behawiorysty na kontach demo, zakończenie procesu i tryb tylko do odczytu, dołączenie właściciela kodem behawiorysty z automatycznym przypisaniem nowego psa, blokada trzeciego aktywnego procesu (status `pending` i obsługa ostrzeżeń), sprawdzenie na komputerze i telefonie, kontrola lintera bazy po migracji.
