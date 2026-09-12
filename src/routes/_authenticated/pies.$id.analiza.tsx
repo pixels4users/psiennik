@@ -53,8 +53,8 @@ const STOPWORDS = new Set([
 
 const ratingConfig = {
   green: { label: "Dobrze", color: "var(--color-good)" },
-  amber: { label: "Tak sobie", color: "var(--color-warn)" },
-  red: { label: "Trudne", color: "var(--color-bad)" },
+  amber: { label: "Wyzwanie", color: "var(--color-warn)" },
+  red: { label: "Trudno", color: "var(--color-bad)" },
 } satisfies ChartConfig;
 
 const eventsConfig = {
@@ -174,8 +174,8 @@ function DogAnalysisPage() {
                 <h2 className="text-xl">Ten tydzień</h2>
                 <div className="flex flex-wrap gap-2">
                   <span className="rounded-full bg-good/15 px-3 py-1 text-xs font-medium text-good">{analysis.week.green} dobrze</span>
-                  <span className="rounded-full bg-warn/15 px-3 py-1 text-xs font-medium text-warn">{analysis.week.amber} tak sobie</span>
-                  <span className="rounded-full bg-bad/15 px-3 py-1 text-xs font-medium text-bad">{analysis.week.red} trudne</span>
+                  <span className="rounded-full bg-warn/15 px-3 py-1 text-xs font-medium text-warn">{analysis.week.amber} wyzwania</span>
+                  <span className="rounded-full bg-bad/15 px-3 py-1 text-xs font-medium text-bad">{analysis.week.red} trudno</span>
                 </div>
               </CardContent>
             </Card>

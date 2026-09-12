@@ -17,7 +17,7 @@ export type DogRoleResult = {
   canManage: boolean;
   /** Czy może dodawać/edytować wpisy (właściciel/współwłaściciel, gdy proces nie zakończony). */
   canEditEntries: boolean;
-  /** Czy może dodawać komentarze jako aktywny behawiorysta. */
+  /** Czy może dodawać zalecenia jako aktywny behawiorysta. */
   canComment: boolean;
   /** Czy dziennik jest w trybie tylko do odczytu dla zarządzających. */
   isReadOnly: boolean;

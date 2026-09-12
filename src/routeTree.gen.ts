@@ -19,6 +19,7 @@ import { Route as AuthenticatedPiesIdIndexRouteImport } from './routes/_authenti
 import { Route as AuthenticatedPiesIdAnalizaRouteImport } from './routes/_authenticated/pies.$id.analiza'
 import { Route as AuthenticatedPiesIdKalendarzRouteImport } from './routes/_authenticated/pies.$id.kalendarz'
 import { Route as AuthenticatedPiesIdTabelaRouteImport } from './routes/_authenticated/pies.$id.tabela'
+import { Route as AuthenticatedPiesIdZaleceniaRouteImport } from './routes/_authenticated/pies.$id.zalecenia'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -73,6 +74,12 @@ const AuthenticatedPiesIdTabelaRoute =
     path: '/tabela',
     getParentRoute: () => AuthenticatedPiesIdRoute,
   } as any)
+const AuthenticatedPiesIdZaleceniaRoute =
+  AuthenticatedPiesIdZaleceniaRouteImport.update({
+    id: '/zalecenia',
+    path: '/zalecenia',
+    getParentRoute: () => AuthenticatedPiesIdRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -83,6 +90,7 @@ export interface FileRoutesByFullPath {
   '/pies/$id/analiza': typeof AuthenticatedPiesIdAnalizaRoute
   '/pies/$id/kalendarz': typeof AuthenticatedPiesIdKalendarzRoute
   '/pies/$id/tabela': typeof AuthenticatedPiesIdTabelaRoute
+  '/pies/$id/zalecenia': typeof AuthenticatedPiesIdZaleceniaRoute
   '/pies/$id/': typeof AuthenticatedPiesIdIndexRoute
 }
 export interface FileRoutesByTo {
@@ -93,6 +101,7 @@ export interface FileRoutesByTo {
   '/pies/$id/analiza': typeof AuthenticatedPiesIdAnalizaRoute
   '/pies/$id/kalendarz': typeof AuthenticatedPiesIdKalendarzRoute
   '/pies/$id/tabela': typeof AuthenticatedPiesIdTabelaRoute
+  '/pies/$id/zalecenia': typeof AuthenticatedPiesIdZaleceniaRoute
   '/pies/$id': typeof AuthenticatedPiesIdIndexRoute
 }
 export interface FileRoutesById {
@@ -106,6 +115,7 @@ export interface FileRoutesById {
   '/_authenticated/pies/$id/analiza': typeof AuthenticatedPiesIdAnalizaRoute
   '/_authenticated/pies/$id/kalendarz': typeof AuthenticatedPiesIdKalendarzRoute
   '/_authenticated/pies/$id/tabela': typeof AuthenticatedPiesIdTabelaRoute
+  '/_authenticated/pies/$id/zalecenia': typeof AuthenticatedPiesIdZaleceniaRoute
   '/_authenticated/pies/$id/': typeof AuthenticatedPiesIdIndexRoute
 }
 export interface FileRouteTypes {
@@ -119,6 +129,7 @@ export interface FileRouteTypes {
     | '/pies/$id/analiza'
     | '/pies/$id/kalendarz'
     | '/pies/$id/tabela'
+    | '/pies/$id/zalecenia'
     | '/pies/$id/'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -129,6 +140,7 @@ export interface FileRouteTypes {
     | '/pies/$id/analiza'
     | '/pies/$id/kalendarz'
     | '/pies/$id/tabela'
+    | '/pies/$id/zalecenia'
     | '/pies/$id'
   id:
     | '__root__'
@@ -141,6 +153,7 @@ export interface FileRouteTypes {
     | '/_authenticated/pies/$id/analiza'
     | '/_authenticated/pies/$id/kalendarz'
     | '/_authenticated/pies/$id/tabela'
+    | '/_authenticated/pies/$id/zalecenia'
     | '/_authenticated/pies/$id/'
   fileRoutesById: FileRoutesById
 }
@@ -222,6 +235,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedPiesIdTabelaRouteImport
       parentRoute: typeof AuthenticatedPiesIdRoute
     }
+    '/_authenticated/pies/$id/zalecenia': {
+      id: '/_authenticated/pies/$id/zalecenia'
+      path: '/zalecenia'
+      fullPath: '/pies/$id/zalecenia'
+      preLoaderRoute: typeof AuthenticatedPiesIdZaleceniaRouteImport
+      parentRoute: typeof AuthenticatedPiesIdRoute
+    }
   }
 }
 
@@ -229,6 +249,7 @@ interface AuthenticatedPiesIdRouteChildren {
   AuthenticatedPiesIdAnalizaRoute: typeof AuthenticatedPiesIdAnalizaRoute
   AuthenticatedPiesIdKalendarzRoute: typeof AuthenticatedPiesIdKalendarzRoute
   AuthenticatedPiesIdTabelaRoute: typeof AuthenticatedPiesIdTabelaRoute
+  AuthenticatedPiesIdZaleceniaRoute: typeof AuthenticatedPiesIdZaleceniaRoute
   AuthenticatedPiesIdIndexRoute: typeof AuthenticatedPiesIdIndexRoute
 }
 
@@ -236,6 +257,7 @@ const AuthenticatedPiesIdRouteChildren: AuthenticatedPiesIdRouteChildren = {
   AuthenticatedPiesIdAnalizaRoute: AuthenticatedPiesIdAnalizaRoute,
   AuthenticatedPiesIdKalendarzRoute: AuthenticatedPiesIdKalendarzRoute,
   AuthenticatedPiesIdTabelaRoute: AuthenticatedPiesIdTabelaRoute,
+  AuthenticatedPiesIdZaleceniaRoute: AuthenticatedPiesIdZaleceniaRoute,
   AuthenticatedPiesIdIndexRoute: AuthenticatedPiesIdIndexRoute,
 }
 

@@ -29,4 +29,7 @@
 
 - Zweryfikować brak starych określeń w tekstach aplikacji.
 - Sprawdzić zakładkę, oba kierunki sortowania i pusty stan.
-- Sprawdzić widok na telefonie i komputerze oraz poprawność budowy aplikacji.
+- Sprawdzić widok na telefonie i komputerze oraz poprawność budowy aplikacji.  
+  
+  
+Używaj istniejących komponentów i styli UI. Jesli tworzysz nowy komponent -> dodaj go do design systemu/biblioteki projektu. 

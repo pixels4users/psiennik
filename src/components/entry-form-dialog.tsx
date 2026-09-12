@@ -116,7 +116,7 @@ export function EntryFormDialog({
             {isEdit ? "Edytuj wydarzenie" : "Dodaj wydarzenie"}
           </DialogTitle>
           <DialogDescription>
-            Zapisz aktywność i ocenę dnia — komentarz behawiorysty dodawany jest osobno.
+            Zapisz aktywność i ocenę dnia — zalecenie behawiorysty dodawane jest osobno.
           </DialogDescription>
         </DialogHeader>
         <form onSubmit={handleSubmit} className="grid gap-4">

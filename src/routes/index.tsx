@@ -47,7 +47,7 @@ const FEATURES = [
   {
     icon: MessageSquareText,
     title: "Behawiorysta w zespole",
-    description: "Zaproś behawiorystkę kodem — dopisze komentarze i zalecenia do wydarzeń.",
+    description: "Zaproś behawiorystkę kodem — doda zalecenia do wydarzeń.",
   },
 ];
 
@@ -71,7 +71,7 @@ const JOURNAL_PREVIEWS = [
     description: "Trzy krótkie serie po dwie minuty. Coraz łatwiej wraca na swoje miejsce po przerwie.",
     timeOfDay: "Południe",
     rating: "warn" as const,
-    ratingLabel: "Tak sobie",
+    ratingLabel: "Wyzwanie",
     icon: Brain,
   },
   {

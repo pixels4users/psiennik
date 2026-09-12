@@ -194,7 +194,7 @@ function DogTablePage() {
                   <TableHead className="min-w-28">Pora dnia</TableHead>
                   <TableHead className="min-w-28">Ocena</TableHead>
                   <TableHead className="min-w-64">Opis</TableHead>
-                  <TableHead className="min-w-64 pr-4">Komentarz behawiorysty</TableHead>
+                  <TableHead className="min-w-64 pr-4">Zalecenie behawiorysty</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>

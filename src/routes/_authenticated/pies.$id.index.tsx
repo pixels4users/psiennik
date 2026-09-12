@@ -20,13 +20,13 @@ export const Route = createFileRoute("/_authenticated/pies/$id/")({
       {
         name: "description",
         content:
-          "Lista wydarzeń z dziennika behawioralnego psa: aktywności, opisy, oceny i komentarze behawiorysty.",
+          "Lista wydarzeń z dziennika behawioralnego psa: aktywności, opisy, oceny i zalecenia behawiorysty.",
       },
       { property: "og:title", content: "Dziennik wydarzeń — Psiennik" },
       {
         property: "og:description",
         content:
-          "Lista wydarzeń z dziennika behawioralnego psa: aktywności, opisy, oceny i komentarze behawiorysty.",
+          "Lista wydarzeń z dziennika behawioralnego psa: aktywności, opisy, oceny i zalecenia behawiorysty.",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },

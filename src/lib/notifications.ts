@@ -9,7 +9,7 @@ export type DogNews = {
   count: number;
 };
 
-/** Nowe wpisy (dla behawiorysty) lub nowe komentarze (dla właściciela) od ostatniej wizyty. */
+/** Nowe wpisy (dla behawiorysty) lub nowe zalecenia (dla właściciela) od ostatniej wizyty. */
 export function useNews() {
   const { user } = useAuth();
   const { data: isBehaviorist } = useIsBehaviorist();
