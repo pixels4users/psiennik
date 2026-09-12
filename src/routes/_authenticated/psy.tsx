@@ -146,8 +146,6 @@ function DogsPage() {
   const [dialogOpen, setDialogOpen] = useState(false);
   const [joinOpen, setJoinOpen] = useState(false);
 
-  const roleLabel = isBehaviorist ? "behaviorist" : "owner";
-
   const grouped = useMemo(() => {
     const active: DogWithAccess[] = [];
     const completed: DogWithAccess[] = [];
