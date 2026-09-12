@@ -1,11 +1,15 @@
 import { useEffect } from "react";
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { CalendarRange, MessageSquareText, PawPrint } from "lucide-react";
+import { Brain, CalendarRange, Footprints, MessageSquareText, PawPrint } from "lucide-react";
 import { useAuth } from "@/lib/auth";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
+import { DogJournalPreviewCard } from "@/components/dog-journal-preview-card";
 import heroAsset from "@/assets/hero.jpg.asset.json";
 import socialProofAsset from "@/assets/social-proof.jpg.asset.json";
+import dogProfile1Asset from "@/assets/dog-profile-1.jpg.asset.json";
+import dogProfile2Asset from "@/assets/dog-profile-2.jpg.asset.json";
+import dogProfile3Asset from "@/assets/dog-profile-3.jpg.asset.json";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -44,6 +48,42 @@ const FEATURES = [
     icon: MessageSquareText,
     title: "Behawiorysta w zespole",
     description: "Zaproś behawiorystkę kodem — dopisze komentarze i zalecenia do wydarzeń.",
+  },
+];
+
+const JOURNAL_PREVIEWS = [
+  {
+    name: "Lucy",
+    imageUrl: dogProfile1Asset.url,
+    imageAlt: "Lucy odpoczywająca z głową na poduszce",
+    activity: "Spokojny spacer",
+    description: "Minęłyśmy dwa psy bez szczekania. Pomogło zwiększenie dystansu i spokojna komenda.",
+    timeOfDay: "Rano",
+    rating: "good" as const,
+    ratingLabel: "Dobrze",
+    icon: Footprints,
+  },
+  {
+    name: "Kokos",
+    imageUrl: dogProfile2Asset.url,
+    imageAlt: "Kokos jako czarny szczeniak z białymi łapkami",
+    activity: "Trening zostawania",
+    description: "Trzy krótkie serie po dwie minuty. Coraz łatwiej wraca na swoje miejsce po przerwie.",
+    timeOfDay: "Południe",
+    rating: "warn" as const,
+    ratingLabel: "Tak sobie",
+    icon: Brain,
+  },
+  {
+    name: "Luna",
+    imageUrl: dogProfile3Asset.url,
+    imageAlt: "Luna odpoczywająca na kanapie",
+    activity: "Wyciszenie w domu",
+    description: "Po wizycie gości potrzebowała więcej czasu na odpoczynek, ale samodzielnie wybrała legowisko.",
+    timeOfDay: "Wieczór",
+    rating: "good" as const,
+    ratingLabel: "Dobrze",
+    icon: PawPrint,
   },
 ];
 
@@ -107,6 +147,28 @@ function LandingPage() {
             <p className="max-w-lg text-2xl leading-snug text-primary md:text-3xl lg:text-4xl">
               Aplikacja przetestowana na prawdziwych spacerach i brudnych łapach.
             </p>
+          </div>
+        </div>
+      </section>
+
+      {/* Journal previews */}
+      <section className="border-y bg-background py-16 lg:py-24">
+        <div className="mx-auto max-w-7xl px-5">
+          <div className="mb-10 max-w-2xl lg:mb-14">
+            <p className="mb-3 text-sm font-semibold text-muted-foreground">Dziennik w praktyce</p>
+            <h2 className="text-3xl leading-tight text-primary md:text-4xl lg:text-5xl">
+              Każdy pies ma swoją historię
+            </h2>
+            <p className="mt-4 text-base leading-relaxed text-muted-foreground md:text-lg">
+              Zapisuj wydarzenia, reakcje i postępy. Ty i behawiorysta widzicie ten sam, uporządkowany
+              obraz codzienności psa.
+            </p>
+          </div>
+
+          <div className="grid gap-6 md:grid-cols-3">
+            {JOURNAL_PREVIEWS.map((preview) => (
+              <DogJournalPreviewCard key={preview.name} {...preview} />
+            ))}
           </div>
         </div>
       </section>
