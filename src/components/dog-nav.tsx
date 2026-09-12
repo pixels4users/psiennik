@@ -13,7 +13,7 @@ export function DogNav({
   active,
 }: {
   dog: Dog;
-  active: "lista" | "kalendarz" | "tabela";
+  active: "lista" | "kalendarz" | "tabela" | "analiza";
 }) {
   const { role } = useRole();
   const [editOpen, setEditOpen] = useState(false);
@@ -44,7 +44,7 @@ export function DogNav({
             </p>
           </div>
         </div>
-        <div className="flex gap-1 rounded-full bg-secondary p-1">
+        <div className="flex max-w-full gap-1 overflow-x-auto rounded-full bg-secondary p-1">
           <Link
             to="/pies/$id"
             params={{ id: dog.id }}
@@ -80,6 +80,18 @@ export function DogNav({
             )}
           >
             Tabela
+          </Link>
+          <Link
+            to="/pies/$id/analiza"
+            params={{ id: dog.id }}
+            className={cn(
+              "rounded-full px-4 py-1.5 text-sm transition-colors",
+              active === "analiza"
+                ? "bg-primary text-primary-foreground"
+                : "text-secondary-foreground hover:bg-accent/60",
+            )}
+          >
+            Analiza
           </Link>
         </div>
       </div>

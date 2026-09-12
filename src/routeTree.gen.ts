@@ -13,6 +13,7 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as PsyRouteImport } from './routes/psy'
 import { Route as PiesIdRouteImport } from './routes/pies.$id'
 import { Route as PiesIdIndexRouteImport } from './routes/pies.$id.index'
+import { Route as PiesIdAnalizaRouteImport } from './routes/pies.$id.analiza'
 import { Route as PiesIdKalendarzRouteImport } from './routes/pies.$id.kalendarz'
 import { Route as PiesIdTabelaRouteImport } from './routes/pies.$id.tabela'
 
@@ -36,6 +37,11 @@ const PiesIdIndexRoute = PiesIdIndexRouteImport.update({
   path: '/',
   getParentRoute: () => PiesIdRoute,
 } as any)
+const PiesIdAnalizaRoute = PiesIdAnalizaRouteImport.update({
+  id: '/analiza',
+  path: '/analiza',
+  getParentRoute: () => PiesIdRoute,
+} as any)
 const PiesIdKalendarzRoute = PiesIdKalendarzRouteImport.update({
   id: '/kalendarz',
   path: '/kalendarz',
@@ -51,6 +57,7 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/psy': typeof PsyRoute
   '/pies/$id': typeof PiesIdRouteWithChildren
+  '/pies/$id/analiza': typeof PiesIdAnalizaRoute
   '/pies/$id/kalendarz': typeof PiesIdKalendarzRoute
   '/pies/$id/tabela': typeof PiesIdTabelaRoute
   '/pies/$id/': typeof PiesIdIndexRoute
@@ -58,6 +65,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/psy': typeof PsyRoute
+  '/pies/$id/analiza': typeof PiesIdAnalizaRoute
   '/pies/$id/kalendarz': typeof PiesIdKalendarzRoute
   '/pies/$id/tabela': typeof PiesIdTabelaRoute
   '/pies/$id': typeof PiesIdIndexRoute
@@ -67,6 +75,7 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/psy': typeof PsyRoute
   '/pies/$id': typeof PiesIdRouteWithChildren
+  '/pies/$id/analiza': typeof PiesIdAnalizaRoute
   '/pies/$id/kalendarz': typeof PiesIdKalendarzRoute
   '/pies/$id/tabela': typeof PiesIdTabelaRoute
   '/pies/$id/': typeof PiesIdIndexRoute
@@ -77,16 +86,24 @@ export interface FileRouteTypes {
     | '/'
     | '/psy'
     | '/pies/$id'
+    | '/pies/$id/analiza'
     | '/pies/$id/kalendarz'
     | '/pies/$id/tabela'
     | '/pies/$id/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/psy' | '/pies/$id/kalendarz' | '/pies/$id/tabela' | '/pies/$id'
+  to:
+    | '/'
+    | '/psy'
+    | '/pies/$id/analiza'
+    | '/pies/$id/kalendarz'
+    | '/pies/$id/tabela'
+    | '/pies/$id'
   id:
     | '__root__'
     | '/'
     | '/psy'
     | '/pies/$id'
+    | '/pies/$id/analiza'
     | '/pies/$id/kalendarz'
     | '/pies/$id/tabela'
     | '/pies/$id/'
@@ -128,6 +145,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PiesIdIndexRouteImport
       parentRoute: typeof PiesIdRoute
     }
+    '/pies/$id/analiza': {
+      id: '/pies/$id/analiza'
+      path: '/analiza'
+      fullPath: '/pies/$id/analiza'
+      preLoaderRoute: typeof PiesIdAnalizaRouteImport
+      parentRoute: typeof PiesIdRoute
+    }
     '/pies/$id/kalendarz': {
       id: '/pies/$id/kalendarz'
       path: '/kalendarz'
@@ -146,12 +170,14 @@ declare module '@tanstack/react-router' {
 }
 
 interface PiesIdRouteChildren {
+  PiesIdAnalizaRoute: typeof PiesIdAnalizaRoute
   PiesIdKalendarzRoute: typeof PiesIdKalendarzRoute
   PiesIdTabelaRoute: typeof PiesIdTabelaRoute
   PiesIdIndexRoute: typeof PiesIdIndexRoute
 }
 
 const PiesIdRouteChildren: PiesIdRouteChildren = {
+  PiesIdAnalizaRoute: PiesIdAnalizaRoute,
   PiesIdKalendarzRoute: PiesIdKalendarzRoute,
   PiesIdTabelaRoute: PiesIdTabelaRoute,
   PiesIdIndexRoute: PiesIdIndexRoute,

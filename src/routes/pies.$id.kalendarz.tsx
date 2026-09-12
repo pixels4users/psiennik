@@ -5,20 +5,17 @@ import {
   addWeeks,
   format,
   isToday,
-
   startOfWeek,
 } from "date-fns";
 import { pl } from "date-fns/locale";
 import { ChevronLeft, ChevronRight } from "lucide-react";
-import { useDog, useEntries, ACTIVITY_TYPES, type Entry } from "@/lib/dogs";
+import { useDog, useEntries, type Entry } from "@/lib/dogs";
 import { useRole } from "@/lib/role";
 import { DogNav } from "@/components/dog-nav";
 import { EntryCard } from "@/components/entry-card";
 import { EntryFormDialog } from "@/components/entry-form-dialog";
 import { CommentDialog } from "@/components/comment-dialog";
-import { ratingToneClass } from "@/components/rating-badge";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import {
   Sheet,
@@ -33,17 +30,17 @@ import { cn } from "@/lib/utils";
 export const Route = createFileRoute("/pies/$id/kalendarz")({
   head: () => ({
     meta: [
-      { title: "Kalendarz i analiza — Psiennik" },
+      { title: "Kalendarz — Psiennik" },
       {
         name: "description",
         content:
-          "Tygodniowy kalendarz dziennika behawioralnego psa z podsumowaniem ocen, typów aktywności i powtarzających się tematów.",
+          "Tygodniowy kalendarz wydarzeń psa z szybkim porównaniem ocen każdego dnia.",
       },
-      { property: "og:title", content: "Kalendarz i analiza — Psiennik" },
+      { property: "og:title", content: "Kalendarz — Psiennik" },
       {
         property: "og:description",
         content:
-          "Tygodniowy kalendarz dziennika behawioralnego psa z podsumowaniem ocen, typów aktywności i powtarzających się tematów.",
+          "Tygodniowy kalendarz wydarzeń psa z szybkim porównaniem ocen każdego dnia.",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
@@ -54,33 +51,20 @@ export const Route = createFileRoute("/pies/$id/kalendarz")({
 
 const WEEKDAY_LABELS = ["Pon", "Wt", "Śr", "Czw", "Pt", "Sob", "Nd"];
 
-const STOPWORDS = new Set([
-  "i", "oraz", "a", "ale", "na", "w", "we", "z", "ze", "do", "od", "po", "za",
-  "nie", "tak", "to", "się", "był", "była", "było", "jest", "być", "the",
-  "jak", "przy", "przez", "dla", "bez", "pod", "nad", "o", "u", "że",
-  "lucy", "psa", "pies", "suka", "tego", "tym", "tej", "bardzo", "trochę",
-]);
+const RATING_DOTS = [
+  { rating: "green", label: "dobrych", className: "bg-good" },
+  { rating: "amber", label: "takich sobie", className: "bg-warn" },
+  { rating: "red", label: "trudnych", className: "bg-bad" },
+] as const;
 
-const RATING_ORDER = ["red", "amber", "green"] as const;
-
-function worstRating(dayEntries: Entry[]): string | null {
-  for (const r of RATING_ORDER) {
-    if (dayEntries.some((e) => e.rating === r)) return r;
-  }
-  return null;
+function ratingCount(entries: Entry[], rating: string) {
+  return entries.filter((entry) => entry.rating === rating).length;
 }
 
-function keywordCounts(entries: Entry[]): [string, number][] {
-  const counts = new Map<string, number>();
-  for (const e of entries) {
-    if (e.rating === "green" || !e.description) continue;
-    const words = e.description
-      .toLowerCase()
-      .split(/[^a-ząćęłńóśźż]+/u)
-      .filter((w) => w.length > 3 && !STOPWORDS.has(w));
-    for (const w of words) counts.set(w, (counts.get(w) ?? 0) + 1);
-  }
-  return [...counts.entries()].sort((a, b) => b[1] - a[1]).slice(0, 8);
+function ratingDotSize(count: number) {
+  if (count === 0) return "size-1.5 opacity-20";
+  if (count === 1) return "size-2.5";
+  return "size-4";
 }
 
 function DogCalendarPage() {
@@ -112,40 +96,6 @@ function DogCalendarPage() {
     [weekStart],
   );
 
-  const analysis = useMemo(() => {
-    const all = entries ?? [];
-    const weekKey = (d: Date) => format(d, "yyyy-MM-dd");
-    const weekEntries = all.filter((e) =>
-      weekDays.some((d) => weekKey(d) === e.date),
-    );
-    const count = (list: Entry[], rating: string) =>
-      list.filter((e) => e.rating === rating).length;
-    const activityStats = ACTIVITY_TYPES.map((type) => {
-      const ofType = all.filter((e) => e.activity_type === type.value);
-      const good = ofType.filter((e) => e.rating === "green").length;
-      return {
-        label: type.label,
-        total: ofType.length,
-        goodPct: ofType.length ? Math.round((good / ofType.length) * 100) : null,
-      };
-    }).filter((s) => s.total > 0);
-    return {
-      week: {
-        green: count(weekEntries, "green"),
-        amber: count(weekEntries, "amber"),
-        red: count(weekEntries, "red"),
-      },
-      total: {
-        green: count(all, "green"),
-        amber: count(all, "amber"),
-        red: count(all, "red"),
-        all: all.length,
-      },
-      activityStats,
-      keywords: keywordCounts(all),
-    };
-  }, [entries, weekDays]);
-
   if (!dog) {
     return (
       <div className="mx-auto max-w-5xl px-5 py-12">
@@ -155,14 +105,8 @@ function DogCalendarPage() {
     );
   }
 
-  const totalCount = analysis.total.all;
   const selectedDateKey = selectedDate ? format(selectedDate, "yyyy-MM-dd") : null;
   const selectedDayEntries = selectedDateKey ? (byDate.get(selectedDateKey) ?? []) : [];
-  const barSegments = [
-    { key: "green", className: "bg-good", count: analysis.total.green },
-    { key: "amber", className: "bg-warn", count: analysis.total.amber },
-    { key: "red", className: "bg-bad", count: analysis.total.red },
-  ];
 
   return (
     <div className="mx-auto max-w-5xl px-5 py-10">
@@ -174,92 +118,6 @@ function DogCalendarPage() {
           <Skeleton className="h-64 w-full rounded-xl" />
         </div>
       ) : (
-        <>
-          <section className="mt-8 grid gap-5 sm:grid-cols-3">
-            <Card className="shadow-none">
-              <CardContent className="grid gap-3 p-6">
-                <h2 className="text-xl">Ten tydzień</h2>
-                <div className="flex gap-2">
-                  <span className="rounded-full bg-good/15 px-3 py-1 text-xs font-medium text-good">
-                    {analysis.week.green} dobrze
-                  </span>
-                  <span className="rounded-full bg-warn/15 px-3 py-1 text-xs font-medium text-warn">
-                    {analysis.week.amber} tak sobie
-                  </span>
-                  <span className="rounded-full bg-bad/15 px-3 py-1 text-xs font-medium text-bad">
-                    {analysis.week.red} trudne
-                  </span>
-                </div>
-              </CardContent>
-            </Card>
-            <Card className="shadow-none">
-              <CardContent className="grid gap-3 p-6">
-                <h2 className="text-xl">Bilans ogólny</h2>
-                {totalCount === 0 ? (
-                  <p className="text-sm text-muted-foreground">Brak wpisów.</p>
-                ) : (
-                  <>
-                    <div className="flex h-3 overflow-hidden rounded-full bg-muted">
-                      {barSegments.map(
-                        (s) =>
-                          s.count > 0 && (
-                            <div
-                              key={s.key}
-                              className={s.className}
-                              style={{ width: `${(s.count / totalCount) * 100}%` }}
-                            />
-                          ),
-                      )}
-                    </div>
-                    <p className="text-sm text-muted-foreground">
-                      {analysis.total.green} zielonych · {analysis.total.amber} pomarańczowych ·{" "}
-                      {analysis.total.red} czerwonych z {totalCount} wpisów
-                    </p>
-                  </>
-                )}
-              </CardContent>
-            </Card>
-            <Card className="shadow-none">
-              <CardContent className="grid gap-3 p-6">
-                <h2 className="text-xl">Powtarzające się tematy</h2>
-                {analysis.keywords.length === 0 ? (
-                  <p className="text-sm text-muted-foreground">
-                    Brak trudnych sytuacji do przeanalizowania.
-                  </p>
-                ) : (
-                  <div className="flex flex-wrap gap-1.5">
-                    {analysis.keywords.map(([word, count]) => (
-                      <span
-                        key={word}
-                        className="rounded-full bg-secondary px-3 py-1 text-xs text-secondary-foreground"
-                      >
-                        {word} · {count}
-                      </span>
-                    ))}
-                  </div>
-                )}
-              </CardContent>
-            </Card>
-          </section>
-
-          {analysis.activityStats.length > 0 && (
-            <Card className="mt-5 shadow-none">
-              <CardContent className="grid gap-3 p-6">
-                <h2 className="text-xl">Aktywności</h2>
-                <div className="flex flex-wrap gap-2">
-                  {analysis.activityStats.map((s) => (
-                    <span
-                      key={s.label}
-                      className="rounded-full bg-mint px-3.5 py-1.5 text-xs text-primary"
-                    >
-                      {s.label}: {s.total}× · {s.goodPct}% zielonych
-                    </span>
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
-          )}
-
           <section className="mt-10">
             <div className="flex flex-wrap items-center justify-between gap-3">
               <h2 className="text-2xl capitalize">
@@ -304,8 +162,8 @@ function DogCalendarPage() {
               {weekDays.map((day) => {
                 const key = format(day, "yyyy-MM-dd");
                 const dayEntries = byDate.get(key) ?? [];
-                const tone = ratingToneClass(
-                  dayEntries.length ? worstRating(dayEntries) : null,
+                const counts = Object.fromEntries(
+                  RATING_DOTS.map(({ rating }) => [rating, ratingCount(dayEntries, rating)]),
                 );
                 return (
                   <Button
@@ -316,7 +174,7 @@ function DogCalendarPage() {
                     aria-label={`Pokaż wydarzenia z ${format(day, "d MMMM yyyy", { locale: pl })}`}
                     className={cn(
                       "h-auto min-h-20 flex-col items-stretch justify-start rounded-lg p-2 text-left font-normal",
-                      tone || "hover:bg-keylime",
+                      "hover:bg-keylime",
                       isToday(day) && "ring-2 ring-ring",
                     )}
                   >
@@ -328,22 +186,30 @@ function DogCalendarPage() {
                     >
                       {format(day, "d")}
                     </span>
-                    {dayEntries.length > 0 && (
-                      <span className="mt-auto text-xs text-muted-foreground">
-                        {dayEntries.length}{" "}
-                        {dayEntries.length === 1 ? "wpis" : dayEntries.length < 5 ? "wpisy" : "wpisów"}
-                      </span>
-                    )}
+                    <span className="mt-auto flex h-4 items-center justify-center gap-1.5" aria-hidden="true">
+                      {RATING_DOTS.map(({ rating, label, className }) => {
+                        const count = counts[rating] ?? 0;
+                        return (
+                          <span
+                            key={rating}
+                            title={`${count} ocen ${label}`}
+                            className={cn("shrink-0 rounded-full transition-[width,height,opacity]", className, ratingDotSize(count))}
+                          />
+                        );
+                      })}
+                    </span>
+                    <span className="sr-only">
+                      {RATING_DOTS.map(({ rating, label }) => `${counts[rating] ?? 0} ocen ${label}`).join(", ")}
+                    </span>
                   </Button>
                 );
               })}
             </div>
             <p className="mt-3 text-xs text-muted-foreground">
-              Kolor dnia pokazuje najtrudniejszą ocenę z wpisów. Kliknij dzień, aby otworzyć
-              jego szczegóły.
+              Wielkość kropek pokazuje liczbę ocen: brak, jedna lub co najmniej dwie. Kliknij
+              dzień, aby otworzyć jego szczegóły.
             </p>
           </section>
-        </>
       )}
 
       <Sheet open={selectedDate !== null} onOpenChange={(open) => !open && setSelectedDate(null)}>
