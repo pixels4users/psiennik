@@ -1,12 +1,12 @@
 import { useState } from "react";
 import { Link } from "@tanstack/react-router";
-import { ArrowLeft, Pencil, UserPlus } from "lucide-react";
+import { ArrowLeft, Pencil, Users, AlertCircle } from "lucide-react";
 import { cn } from "@/lib/utils";
 import type { Dog } from "@/lib/dogs";
-import { useRole } from "@/lib/auth";
+import { useDogRole } from "@/lib/auth";
 import { DogAvatar } from "@/components/dog-avatar";
 import { DogFormDialog } from "@/components/dog-form-dialog";
-import { InviteDialog } from "@/components/invite-dialog";
+import { AccessDialog } from "@/components/invite-dialog";
 import { Button } from "@/components/ui/button";
 
 export function DogNav({
@@ -16,9 +16,9 @@ export function DogNav({
   dog: Dog;
   active: "lista" | "kalendarz" | "tabela" | "analiza";
 }) {
-  const { role } = useRole();
+  const { data: role, isLoading } = useDogRole(dog.id);
   const [editOpen, setEditOpen] = useState(false);
-  const [inviteOpen, setInviteOpen] = useState(false);
+  const [accessOpen, setAccessOpen] = useState(false);
 
   return (
     <div className="grid gap-4">
@@ -35,18 +35,23 @@ export function DogNav({
           <div className="min-w-0">
             <div className="flex min-w-0 items-center gap-2">
               <h1 className="truncate text-4xl">{dog.name}</h1>
-              {role === "owner" && (
+              {!isLoading && role?.canManage && (
                 <>
-                  <Button variant="ghost" size="icon" aria-label="Edytuj psa" onClick={() => setEditOpen(true)}>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    aria-label="Edytuj psa"
+                    onClick={() => setEditOpen(true)}
+                  >
                     <Pencil className="size-4" />
                   </Button>
                   <Button
                     variant="ghost"
                     size="icon"
-                    aria-label="Zaproś behawiorystkę"
-                    onClick={() => setInviteOpen(true)}
+                    aria-label="Zarządzaj dostępem"
+                    onClick={() => setAccessOpen(true)}
                   >
-                    <UserPlus className="size-4" />
+                    <Users className="size-4" />
                   </Button>
                 </>
               )}
@@ -107,8 +112,16 @@ export function DogNav({
           </Link>
         </div>
       </div>
+
+      {role?.isReadOnly && (
+        <div className="flex items-center gap-2 rounded-lg bg-warn/10 px-4 py-3 text-sm text-warn">
+          <AlertCircle className="size-4 shrink-0" />
+          Współpraca z behawiorystą została zakończona — dziennik jest w trybie tylko do odczytu.
+        </div>
+      )}
+
       <DogFormDialog dog={dog} open={editOpen} onOpenChange={setEditOpen} />
-      <InviteDialog dogId={dog.id} open={inviteOpen} onOpenChange={setInviteOpen} />
+      <AccessDialog dog={dog} open={accessOpen} onOpenChange={setAccessOpen} />
     </div>
   );
 }
