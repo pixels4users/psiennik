@@ -172,6 +172,9 @@ function ProfilePage() {
 function BehavioristCodeCard() {
   const { data: link, isLoading } = useBehavioristLink();
   const create = useCreateBehavioristLink();
+  const { data: isBehaviorist, isLoading: roleLoading } = useIsBehaviorist();
+
+  if (!roleLoading && !isBehaviorist) return null;
 
   return (
     <Card className="mt-6 shadow-none">
