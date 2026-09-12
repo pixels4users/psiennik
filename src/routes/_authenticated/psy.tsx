@@ -2,9 +2,9 @@ import { useMemo, useState } from "react";
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { format, parseISO } from "date-fns";
 import { pl } from "date-fns/locale";
-import { CheckCircle, Clock, PawPrint, Plus, Ticket } from "lucide-react";
+import { Clock, PawPrint, Plus, Ticket } from "lucide-react";
 import { toast } from "sonner";
-import { useDogs, useRecentEntries } from "@/lib/dogs";
+import { useDogs, useRecentEntries, type DogWithAccess } from "@/lib/dogs";
 import {
   useIsOwner,
   useIsBehaviorist,
