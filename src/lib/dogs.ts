@@ -33,16 +33,20 @@ export function labelFor(
   return list.find((item) => item.value === value)?.label ?? value ?? "—";
 }
 
+export type DogWithAccess = Dog & {
+  dog_access: { process_status: string; role: string }[] | null;
+};
+
 export function useDogs() {
   return useQuery({
     queryKey: ["dogs"],
-    queryFn: async (): Promise<Dog[]> => {
+    queryFn: async (): Promise<DogWithAccess[]> => {
       const { data, error } = await supabase
         .from("dogs")
-        .select("*")
+        .select("*, dog_access(process_status, role)")
         .order("created_at", { ascending: true });
       if (error) throw error;
-      return data;
+      return data ?? [];
     },
   });
 }
