@@ -17,6 +17,10 @@ export const Route = createRootRoute({
         content:
           "Wspólny dziennik behawioralny psa dla właścicieli i behawiorystów: wydarzenia, oceny i zalecenia.",
       },
+      {
+        name: "viewport",
+        content: "width=device-width, initial-scale=1",
+      },
     ],
     links: [
       {
