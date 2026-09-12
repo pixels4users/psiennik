@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "@tanstack/react-router";
 import { useQueryClient } from "@tanstack/react-query";
 import { ImagePlus, Trash2 } from "lucide-react";
@@ -42,7 +42,7 @@ export function DogFormDialog({
   const [removePhoto, setRemovePhoto] = useState(false);
   const [saving, setSaving] = useState(false);
   const { data: currentPhotoUrl } = useDogPhotoUrl(dog?.photo_url ?? null);
-  const photoPreview = photo ? URL.createObjectURL(photo) : null;
+  const photoPreview = useMemo(() => (photo ? URL.createObjectURL(photo) : null), [photo]);
 
   useEffect(() => {
     if (!open) return;
@@ -192,7 +192,18 @@ export function DogFormDialog({
                   type="file"
                   accept="image/*"
                   onChange={(e) => {
-                    setPhoto(e.target.files?.[0] ?? null);
+                    const file = e.target.files?.[0] ?? null;
+                    if (file && !file.type.startsWith("image/")) {
+                      toast.error("Wybierz plik graficzny");
+                      e.target.value = "";
+                      return;
+                    }
+                    if (file && file.size > 10 * 1024 * 1024) {
+                      toast.error("Zdjęcie może mieć maksymalnie 10 MB");
+                      e.target.value = "";
+                      return;
+                    }
+                    setPhoto(file);
                     setRemovePhoto(false);
                   }}
                 />
