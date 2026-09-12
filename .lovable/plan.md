@@ -90,7 +90,7 @@ Frontend:
 - `useDogRole` uwzględnia status procesu i zwraca tryb tylko do odczytu; formularze wpisów i komentarzy są wtedy ukryte.
 - Zakładki „Aktywne / Zakończone” na liście psów behawiorysty, menu „Zakończ proces” z potwierdzeniem, baner w nagłówku psa.
 - Sekcja „Mój kod dla klientów” w profilu behawiorysty i obsługa parametru `?code=` na ekranie logowania i liście psów.
-- Hook `useSubscriptionLimits` — licznik aktywnych procesów i czytelne komunikaty o limicie.
+- Hook `useSubscriptionLimits` — licznik aktywnych procesów i czytelne komunikaty o limicie. Gdy behawiorysta osiągnie limit, nowe powiązanie z psem (np. Reksio) trafia na listę oczekujących (`pending`) zamiast być od razu aktywowane. Behawiorysta widzi osobną zakładkę/listę „Oczekujące” i może aktywować psa dopiero po zakończeniu jednego z aktywnych procesów. Zwolnienie slotu nie aktywuje oczekujących automatycznie — wybór należy do behawiorysty.
 
 Weryfikacja drugiej części: zakończenie procesu i tryb tylko do odczytu, dołączenie właściciela kodem behawiorysty z automatycznym przypisaniem nowego psa, blokada trzeciego aktywnego procesu, linter bazy.
 
