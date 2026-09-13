@@ -172,17 +172,25 @@ function DogsPage() {
               : "Wybierz psa, aby zobaczyć jego dziennik, albo dodaj nowego."}
           </p>
         </div>
-        {isBehaviorist ? (
-          <Button variant="outline" onClick={() => setJoinOpen(true)}>
-            <Ticket className="size-4" />
-            Dołącz kodem
-          </Button>
-        ) : (
-          <Button onClick={() => setDialogOpen(true)}>
-            <Plus className="size-4" />
-            Dodaj psa
-          </Button>
-        )}
+        <div className="flex flex-wrap gap-2">
+          {isOwner && (
+            <Button variant="outline" onClick={() => setJoinOpen(true)}>
+              <Ticket className="size-4" />
+              Dołącz kodem
+            </Button>
+          )}
+          {isBehaviorist ? (
+            <Button variant="outline" onClick={() => setJoinOpen(true)}>
+              <Ticket className="size-4" />
+              Dołącz kodem
+            </Button>
+          ) : (
+            <Button onClick={() => setDialogOpen(true)}>
+              <Plus className="size-4" />
+              Dodaj psa
+            </Button>
+          )}
+        </div>
       </div>
 
       {isBehaviorist && (

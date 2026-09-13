@@ -2,13 +2,15 @@ import { useMemo, useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
 import { format, parseISO } from "date-fns";
 import { pl } from "date-fns/locale";
-import { Plus } from "lucide-react";
+import { Plus, UserPlus, Users } from "lucide-react";
 import { useDogRole } from "@/lib/auth";
+import { useDogAccess } from "@/lib/access";
 import { useDog, useEntries, type Entry } from "@/lib/dogs";
 import { DogNav } from "@/components/dog-nav";
 import { EntryCard } from "@/components/entry-card";
 import { EntryFormDialog } from "@/components/entry-form-dialog";
 import { CommentDialog } from "@/components/comment-dialog";
+import { AccessDialog } from "@/components/invite-dialog";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -40,11 +42,17 @@ function DogListPage() {
   const { data: dog } = useDog(id);
   const { data: role, isLoading: roleLoading } = useDogRole(id);
   const { data: entries, isLoading } = useEntries(id);
+  const { data: access } = useDogAccess(id);
 
   const [entryDialogOpen, setEntryDialogOpen] = useState(false);
   const [editedEntry, setEditedEntry] = useState<Entry | null>(null);
   const [commentedEntry, setCommentedEntry] = useState<Entry | null>(null);
   const [commentDialogOpen, setCommentDialogOpen] = useState(false);
+  const [accessOpen, setAccessOpen] = useState(false);
+
+  const hasCoOwner =
+    access?.some((row) => row.role === "owner" && row.user_id !== dog?.owner_id) ?? false;
+  const hasBehaviorist = access?.some((row) => row.role === "behaviorist") ?? false;
 
   const grouped = useMemo(() => {
     const map = new Map<string, Entry[]>();
@@ -69,17 +77,31 @@ function DogListPage() {
     <div className="mx-auto max-w-5xl px-5 py-10">
       <DogNav dog={dog} active="dziennik" />
 
-      {role?.canEditEntries && (
-        <div className="mt-8">
-          <Button
-            onClick={() => {
-              setEditedEntry(null);
-              setEntryDialogOpen(true);
-            }}
-          >
-            <Plus className="size-4" />
-            Dodaj wydarzenie
-          </Button>
+      {role?.canManage && (
+        <div className="mt-8 flex flex-wrap gap-2">
+          {role?.canEditEntries && (
+            <Button
+              onClick={() => {
+                setEditedEntry(null);
+                setEntryDialogOpen(true);
+              }}
+            >
+              <Plus className="size-4" />
+              Dodaj wydarzenie
+            </Button>
+          )}
+          {role?.isPrimaryOwner && !hasCoOwner && (
+            <Button variant="outline" onClick={() => setAccessOpen(true)}>
+              <Users className="size-4" />
+              Dodaj współwłaściciela
+            </Button>
+          )}
+          {!hasBehaviorist && (
+            <Button variant="outline" onClick={() => setAccessOpen(true)}>
+              <UserPlus className="size-4" />
+              Dodaj behawiorystę
+            </Button>
+          )}
         </div>
       )}
 
@@ -146,6 +168,7 @@ function DogListPage() {
         open={commentDialogOpen}
         onOpenChange={setCommentDialogOpen}
       />
+      <AccessDialog dog={dog} open={accessOpen} onOpenChange={setAccessOpen} />
     </div>
   );
 }
