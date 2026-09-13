@@ -77,17 +77,31 @@ function DogListPage() {
     <div className="mx-auto max-w-5xl px-5 py-10">
       <DogNav dog={dog} active="dziennik" />
 
-      {role?.canEditEntries && (
-        <div className="mt-8">
-          <Button
-            onClick={() => {
-              setEditedEntry(null);
-              setEntryDialogOpen(true);
-            }}
-          >
-            <Plus className="size-4" />
-            Dodaj wydarzenie
-          </Button>
+      {role?.canManage && (
+        <div className="mt-8 flex flex-wrap gap-2">
+          {role?.canEditEntries && (
+            <Button
+              onClick={() => {
+                setEditedEntry(null);
+                setEntryDialogOpen(true);
+              }}
+            >
+              <Plus className="size-4" />
+              Dodaj wydarzenie
+            </Button>
+          )}
+          {role?.isPrimaryOwner && !hasCoOwner && (
+            <Button variant="outline" onClick={() => setAccessOpen(true)}>
+              <Users className="size-4" />
+              Dodaj współwłaściciela
+            </Button>
+          )}
+          {!hasBehaviorist && (
+            <Button variant="outline" onClick={() => setAccessOpen(true)}>
+              <UserPlus className="size-4" />
+              Dodaj behawiorystę
+            </Button>
+          )}
         </div>
       )}
 
