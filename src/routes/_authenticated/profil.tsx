@@ -177,6 +177,13 @@ function BehavioristCodeCard() {
 
   if (!roleLoading && !isBehaviorist) return null;
 
+  const copyLinkUrl = (url: string) => {
+    navigator.clipboard.writeText(url).then(
+      () => toast.success("Link skopiowany"),
+      () => toast.info(`Link: ${url}`),
+    );
+  };
+
   return (
     <Card className="mt-6 shadow-none">
       <CardHeader>
@@ -186,29 +193,47 @@ function BehavioristCodeCard() {
         {isLoading ? (
           <Skeleton className="h-12 w-full" />
         ) : link ? (
-          <div className="flex items-center justify-between gap-3 rounded-lg bg-keylime px-4 py-3">
-            <div>
-              <p className="font-display text-3xl tracking-widest text-primary">
-                {link.invite_code}
-              </p>
-              <p className="text-xs text-muted-foreground">
-                Podaj ten kod właścicielom — połączą Cię ze swoim psem.
-              </p>
+          <div className="grid gap-2 rounded-lg bg-keylime px-4 py-3">
+            <div className="flex items-center justify-between gap-3">
+              <div>
+                <p className="font-display text-3xl tracking-widest text-primary">
+                  {link.invite_code}
+                </p>
+                <p className="text-xs text-muted-foreground">
+                  Podaj ten kod właścicielom — połączą Cię ze swoim psem.
+                </p>
+              </div>
+              <div className="flex items-center gap-1">
+                <Button variant="ghost" size="icon" aria-label="Kopiuj kod" onClick={() => copy(link.invite_code)}>
+                  <Copy className="size-4" />
+                </Button>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  aria-label="Kopiuj link"
+                  onClick={() =>
+                    copyLinkUrl(`${window.location.origin}/auth?code=${encodeURIComponent(link.invite_code)}`)
+                  }
+                >
+                  <Link className="size-4" />
+                </Button>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  aria-label="Wygeneruj nowy kod"
+                  disabled={create.isPending}
+                  onClick={() => create.mutate(undefined, { onSuccess: (l) => copy(l.invite_code) })}
+                >
+                  <RefreshCw className={cn("size-4", create.isPending && "animate-spin")} />
+                </Button>
+              </div>
             </div>
-            <div className="flex items-center gap-1">
-              <Button variant="ghost" size="icon" aria-label="Kopiuj kod" onClick={() => copy(link.invite_code)}>
-                <Copy className="size-4" />
-              </Button>
-              <Button
-                variant="ghost"
-                size="icon"
-                aria-label="Wygeneruj nowy kod"
-                disabled={create.isPending}
-                onClick={() => create.mutate(undefined, { onSuccess: (l) => copy(l.invite_code) })}
-              >
-                <RefreshCw className={cn("size-4", create.isPending && "animate-spin")} />
-              </Button>
-            </div>
+            <p className="text-xs leading-relaxed text-muted-foreground">
+              Wyślij ten link właścicielowi. Po zalogowaniu lub rejestracji zostanie automatycznie połączony z Tobą i nowe psy będą trafiały pod Twoją opiekę.
+            </p>
+            <p className="truncate text-xs text-primary">
+              {`${window.location.origin}/auth?code=${encodeURIComponent(link.invite_code)}`}
+            </p>
           </div>
         ) : (
           <div className="rounded-lg bg-secondary p-4 text-center">
