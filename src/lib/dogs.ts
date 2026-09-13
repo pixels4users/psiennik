@@ -11,6 +11,9 @@ export const ACTIVITY_TYPES = [
   { value: "socjalizacja", label: "Socjalizacja" },
   { value: "goscie", label: "Goście / wizyta" },
   { value: "wypoczynek", label: "Wypoczynek" },
+  { value: "podroz", label: "Podróż" },
+  { value: "jedzenie", label: "Jedzenie" },
+  { value: "czystosc", label: "Czystość" },
   { value: "inne", label: "Inne" },
 ] as const;
 
