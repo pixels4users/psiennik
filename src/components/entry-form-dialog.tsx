@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { format, parseISO } from "date-fns";
 import { pl } from "date-fns/locale";
-import { CalendarIcon } from "lucide-react";
+import { CalendarIcon, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import {
@@ -22,6 +22,16 @@ import {
   DialogTitle,
   DialogDescription,
 } from "@/components/ui/dialog";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -57,6 +67,8 @@ export function EntryFormDialog({
   const [description, setDescription] = useState("");
   const [rating, setRating] = useState<string>("green");
   const [saving, setSaving] = useState(false);
+  const [deleting, setDeleting] = useState(false);
+  const [confirmDeleteOpen, setConfirmDeleteOpen] = useState(false);
 
   useEffect(() => {
     if (!open) return;
@@ -125,7 +137,48 @@ export function EntryFormDialog({
     }
   };
 
+  const handleDelete = async () => {
+    if (!entry) return;
+    setDeleting(true);
+    try {
+      const { error } = await supabase.from("entries").delete().eq("id", entry.id);
+      if (error) throw error;
+      await queryClient.invalidateQueries({ queryKey: ["entries", dogId] });
+      toast.success("Wydarzenie usunięte");
+      setConfirmDeleteOpen(false);
+      onOpenChange(false);
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Nie udało się usunąć wydarzenia");
+    } finally {
+      setDeleting(false);
+    }
+  };
+
   return (
+    <>
+    <AlertDialog open={confirmDeleteOpen} onOpenChange={setConfirmDeleteOpen}>
+      <AlertDialogContent>
+        <AlertDialogHeader>
+          <AlertDialogTitle>Usunąć to wydarzenie?</AlertDialogTitle>
+          <AlertDialogDescription>
+            „{entry?.title}" zostanie trwale usunięte wraz z zaleceniami behawiorysty.
+          </AlertDialogDescription>
+        </AlertDialogHeader>
+        <AlertDialogFooter>
+          <AlertDialogCancel disabled={deleting}>Anuluj</AlertDialogCancel>
+          <AlertDialogAction
+            onClick={(e) => {
+              e.preventDefault();
+              void handleDelete();
+            }}
+            disabled={deleting}
+            className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+          >
+            {deleting ? "Usuwanie…" : "Usuń"}
+          </AlertDialogAction>
+        </AlertDialogFooter>
+      </AlertDialogContent>
+    </AlertDialog>
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-lg">
         <DialogHeader>
@@ -245,16 +298,36 @@ export function EntryFormDialog({
               ))}
             </div>
           </div>
-          <div className="flex justify-end gap-2 pt-2">
-            <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
-              Anuluj
-            </Button>
-            <Button type="submit" disabled={saving}>
-              {saving ? "Zapisywanie…" : isEdit ? "Zapisz zmiany" : "Dodaj"}
-            </Button>
+          <div className={cn("flex gap-2 pt-2", isEdit ? "justify-between" : "justify-end")}>
+            {isEdit && (
+              <Button
+                type="button"
+                variant="ghost"
+                className="text-destructive hover:bg-destructive/10 hover:text-destructive"
+                disabled={saving || deleting}
+                onClick={() => setConfirmDeleteOpen(true)}
+              >
+                <Trash2 className="mr-2 size-4" />
+                Usuń wydarzenie
+              </Button>
+            )}
+            <div className="flex gap-2">
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => onOpenChange(false)}
+                disabled={deleting}
+              >
+                Anuluj
+              </Button>
+              <Button type="submit" disabled={saving || deleting}>
+                {saving ? "Zapisywanie…" : isEdit ? "Zapisz zmiany" : "Dodaj"}
+              </Button>
+            </div>
           </div>
         </form>
       </DialogContent>
     </Dialog>
+    </>
   );
 }
