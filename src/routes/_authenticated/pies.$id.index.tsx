@@ -168,6 +168,7 @@ function DogListPage() {
         open={commentDialogOpen}
         onOpenChange={setCommentDialogOpen}
       />
+      <AccessDialog dog={dog} open={accessOpen} onOpenChange={setAccessOpen} />
     </div>
   );
 }
