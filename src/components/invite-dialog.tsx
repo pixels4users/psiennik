@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { format, parseISO } from "date-fns";
 import { pl } from "date-fns/locale";
 import { Copy, Link, Trash2, RefreshCw, UserPlus, Users } from "lucide-react";
@@ -35,6 +35,51 @@ const STATUS_LABELS: Record<string, string> = {
   pending: "oczekująca",
 };
 
+function InviteCard({
+  invite,
+  roleLabel,
+}: {
+  invite: { id: string; code: string; role: "owner" | "behaviorist"; expires_at: string };
+  roleLabel: string;
+}) {
+  const inviteUrl = `${window.location.origin}/auth?code=${encodeURIComponent(invite.code)}`;
+
+  const copy = async (text: string, label: string) => {
+    try {
+      await navigator.clipboard.writeText(text);
+      toast.success(`${label} skopiowany`);
+    } catch {
+      toast.info(`${label}: ${text}`);
+    }
+  };
+
+  return (
+    <div className="grid gap-2 rounded-lg bg-keylime px-4 py-3">
+      <div className="flex items-center justify-between gap-3">
+        <div>
+          <p className="font-display text-2xl tracking-widest text-primary">{invite.code}</p>
+          <p className="text-xs text-muted-foreground">
+            {roleLabel} · ważny do{" "}
+            {format(parseISO(invite.expires_at), "d MMMM yyyy", { locale: pl })}
+          </p>
+        </div>
+        <div className="flex shrink-0 items-center gap-1">
+          <Button variant="ghost" size="icon" aria-label="Kopiuj kod" onClick={() => copy(invite.code, "Kod")}>
+            <Copy className="size-4" />
+          </Button>
+          <Button variant="ghost" size="icon" aria-label="Kopiuj link" onClick={() => copy(inviteUrl, "Link")}>
+            <Link className="size-4" />
+          </Button>
+        </div>
+      </div>
+      <p className="text-xs leading-relaxed text-muted-foreground">
+        Wyślij ten link osobie, którą zapraszasz. Po zalogowaniu lub rejestracji zostanie automatycznie dodana do psa.
+      </p>
+      <p className="truncate text-xs text-primary">{inviteUrl}</p>
+    </div>
+  );
+}
+
 export function AccessDialog({
   dog,
   open,
@@ -51,39 +96,38 @@ export function AccessDialog({
   const createInvite = useCreateInvite(dog.id);
   const revoke = useRevokeAccess(dog.id);
   const complete = useCompleteProcess(dog.id);
-  const [pendingRole, setPendingRole] = useState<"owner" | "behaviorist" | null>(null);
 
-  const canInviteBehaviorist = role?.canManage;
-  const canInviteCoOwner = role?.isPrimaryOwner;
+  const [coOwnerOpen, setCoOwnerOpen] = useState(false);
+  const [behavioristOpen, setBehavioristOpen] = useState(false);
 
-  const copy = async (code: string) => {
-    try {
-      await navigator.clipboard.writeText(code);
-      toast.success("Kod skopiowany");
-    } catch {
-      toast.info(`Kod: ${code}`);
-    }
-  };
+  const coOwnerRow = access?.find((row) => row.role === "owner" && row.user_id !== dog.owner_id);
+  const behavioristRow = access?.find((row) => row.role === "behaviorist");
 
-  const copyLink = async (url: string) => {
-    try {
-      await navigator.clipboard.writeText(url);
-      toast.success("Link skopiowany");
-    } catch {
-      toast.info(`Link: ${url}`);
-    }
-  };
+  const ownerInvites = invites?.filter((invite) => invite.role === "owner") ?? [];
+  const behavioristInvites = invites?.filter((invite) => invite.role === "behaviorist") ?? [];
+
+  const canInviteCoOwner = role?.isPrimaryOwner && !coOwnerRow;
+  const canInviteBehaviorist = role?.canManage && !behavioristRow;
+
+  useEffect(() => {
+    if (coOwnerRow || ownerInvites.length > 0) setCoOwnerOpen(true);
+  }, [coOwnerRow, ownerInvites.length]);
+
+  useEffect(() => {
+    if (behavioristRow || behavioristInvites.length > 0) setBehavioristOpen(true);
+  }, [behavioristRow, behavioristInvites.length]);
 
   const generate = (roleType: "owner" | "behaviorist") => {
-    setPendingRole(roleType);
     createInvite.mutate(roleType, {
       onSuccess: (invite) => {
-        setPendingRole(null);
         toast.success(`Kod dla ${ROLE_LABELS[roleType === "owner" ? "coowner" : "behaviorist"]} został utworzony`);
-        copy(invite.code);
+        try {
+          navigator.clipboard.writeText(invite.code);
+        } catch {
+          toast.info(`Kod: ${invite.code}`);
+        }
       },
       onError: (err) => {
-        setPendingRole(null);
         toast.error(err instanceof Error ? err.message : "Nie udało się utworzyć kodu");
       },
     });
@@ -91,7 +135,7 @@ export function AccessDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-md">
+      <DialogContent className="sm:max-w-lg">
         <DialogHeader>
           <DialogTitle className="font-display text-2xl font-light text-primary">
             Osoby z dostępem
@@ -101,96 +145,103 @@ export function AccessDialog({
           </DialogDescription>
         </DialogHeader>
 
-        <div className="grid gap-5">
-          {(canInviteBehaviorist || canInviteCoOwner) && (
-            <div className="grid gap-2">
-              <p className="text-xs font-medium tracking-wide text-muted-foreground uppercase">
-                Nowe zaproszenie
-              </p>
-              <div className="flex gap-2">
-                {canInviteCoOwner && (
+        <div className="grid max-h-[65vh] gap-4 overflow-y-auto pr-1">
+          {/* Współwłaściciel */}
+          <section className="rounded-xl border border-border p-4">
+            <div className="flex items-start justify-between gap-3">
+              <div className="min-w-0">
+                <h3 className="text-lg font-medium text-foreground">Współwłaściciel</h3>
+                <p className="text-sm text-muted-foreground">
+                  {coOwnerRow
+                    ? (coOwnerRow.profile?.display_name || coOwnerRow.profile?.email || "Użytkownik")
+                    : "nie ma współwłaściciela"}
+                </p>
+              </div>
+              {canInviteCoOwner && (
+                <Button
+                  variant="outline"
+                  size="sm"
+                  disabled={createInvite.isPending}
+                  onClick={() => setCoOwnerOpen(true)}
+                >
+                  <Users className="mr-2 size-4" />
+                  Dodaj
+                </Button>
+              )}
+            </div>
+            {coOwnerOpen && (
+              <div className="mt-4 grid gap-3">
+                {!coOwnerRow && (
+                  <p className="text-sm text-muted-foreground">
+                    Współwłaściciel ma takie same uprawnienia jak właściciel, ale nie może usunąć głównego właściciela.
+                  </p>
+                )}
+                {ownerInvites.length === 0 && !coOwnerRow && (
                   <Button
-                    variant="outline"
-                    className="flex-1"
+                    variant="secondary"
                     disabled={createInvite.isPending}
                     onClick={() => generate("owner")}
                   >
                     <Users className="mr-2 size-4" />
-                    Współwłaściciel
+                    Wygeneruj kod dla współwłaściciela
                   </Button>
                 )}
-                {canInviteBehaviorist && (
+                {ownerInvites.map((invite) => (
+                  <InviteCard key={invite.id} invite={invite} roleLabel="Współwłaściciel" />
+                ))}
+              </div>
+            )}
+          </section>
+
+          {/* Behawiorysta */}
+          <section className="rounded-xl border border-border p-4">
+            <div className="flex items-start justify-between gap-3">
+              <div className="min-w-0">
+                <h3 className="text-lg font-medium text-foreground">Behawiorysta</h3>
+                <p className="text-sm text-muted-foreground">
+                  {behavioristRow
+                    ? `${behavioristRow.profile?.display_name || behavioristRow.profile?.email || "Behawiorysta"} · proces ${STATUS_LABELS[behavioristRow.process_status] ?? behavioristRow.process_status}`
+                    : "nie ma behawiorysty"}
+                </p>
+              </div>
+              {canInviteBehaviorist && (
+                <Button
+                  variant="outline"
+                  size="sm"
+                  disabled={createInvite.isPending}
+                  onClick={() => setBehavioristOpen(true)}
+                >
+                  <UserPlus className="mr-2 size-4" />
+                  Dodaj
+                </Button>
+              )}
+            </div>
+            {behavioristOpen && (
+              <div className="mt-4 grid gap-3">
+                {!behavioristRow && (
+                  <p className="text-sm text-muted-foreground">
+                    Behawiorysta widzi wpisy i może dodawać zalecenia, ale nie edytuje wydarzeń.
+                  </p>
+                )}
+                {behavioristInvites.length === 0 && !behavioristRow && (
                   <Button
-                    variant="outline"
-                    className="flex-1"
+                    variant="secondary"
                     disabled={createInvite.isPending}
                     onClick={() => generate("behaviorist")}
                   >
                     <UserPlus className="mr-2 size-4" />
-                    Behawiorysta
+                    Wygeneruj kod dla behawiorysty
                   </Button>
                 )}
+                {behavioristInvites.map((invite) => (
+                  <InviteCard key={invite.id} invite={invite} roleLabel="Behawiorysta" />
+                ))}
               </div>
-              {pendingRole && (
-                <p className="text-xs text-muted-foreground">
-                  Tworzenie kodu dla {ROLE_LABELS[pendingRole === "owner" ? "coowner" : "behaviorist"]}…
-                </p>
-              )}
-            </div>
-          )}
+            )}
+          </section>
 
-          {invites && invites.length > 0 && (
-            <div className="grid gap-2">
-              <p className="text-xs font-medium tracking-wide text-muted-foreground uppercase">
-                Aktywne kody
-              </p>
-              {invites.map((invite) => {
-                const inviteUrl = `${window.location.origin}/auth?code=${encodeURIComponent(invite.code)}`;
-                return (
-                  <div
-                    key={invite.id}
-                    className="grid gap-2 rounded-lg bg-keylime px-4 py-3"
-                  >
-                    <div className="flex items-center justify-between gap-3">
-                      <div>
-                        <p className="font-display text-2xl tracking-widest text-primary">
-                          {invite.code}
-                        </p>
-                        <p className="text-xs text-muted-foreground">
-                          {invite.role === "owner" ? "Współwłaściciel" : "Behawiorysta"} · ważny do{" "}
-                          {format(parseISO(invite.expires_at), "d MMMM yyyy", { locale: pl })}
-                        </p>
-                      </div>
-                      <div className="flex shrink-0 items-center gap-1">
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          aria-label="Kopiuj kod"
-                          onClick={() => copy(invite.code)}
-                        >
-                          <Copy className="size-4" />
-                        </Button>
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          aria-label="Kopiuj link"
-                          onClick={() => copyLink(inviteUrl)}
-                        >
-                          <Link className="size-4" />
-                        </Button>
-                      </div>
-                    </div>
-                    <p className="text-xs leading-relaxed text-muted-foreground">
-                      Wyślij ten link osobie, którą zapraszasz. Po zalogowaniu lub rejestracji zostanie automatycznie dodana do psa.
-                    </p>
-                    <p className="truncate text-xs text-primary">{inviteUrl}</p>
-                  </div>
-                );
-              })}
-            </div>
-          )}
-
-          <div className="grid gap-2">
+          {/* Osoby z dostępem */}
+          <section className="grid gap-2">
             <p className="text-xs font-medium tracking-wide text-muted-foreground uppercase">
               Dostęp do psa
             </p>
@@ -262,7 +313,7 @@ export function AccessDialog({
                 );
               })
             )}
-          </div>
+          </section>
         </div>
       </DialogContent>
     </Dialog>

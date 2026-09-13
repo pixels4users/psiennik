@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { createFileRoute, useNavigate, useSearch } from "@tanstack/react-router";
 import { CircleCheckBig, Mail } from "lucide-react";
 import { toast } from "sonner";
@@ -51,17 +51,21 @@ function AuthPage() {
   const { code } = useSearch({ from: "/auth" });
   const redeem = useRedeemInvite();
   const [busy, setBusy] = useState(false);
+  const redeemedRef = useRef(false);
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [name, setName] = useState("");
   const [registeredEmail, setRegisteredEmail] = useState<string | null>(null);
 
+  const searchCode = code?.trim();
+
   useEffect(() => {
     if (loading || !user) return;
 
-    if (code?.trim()) {
-      redeem.mutate(code.trim(), {
+    if (searchCode && !redeemedRef.current) {
+      redeemedRef.current = true;
+      redeem.mutate(searchCode, {
         onSuccess: ({ dogId, behavioristId }) => {
           toast.success("Kod został użyty");
           if (dogId) {
@@ -77,16 +81,16 @@ function AuthPage() {
           navigate({ to: "/psy", replace: true });
         },
       });
-    } else {
+    } else if (!searchCode) {
       navigate({ to: "/psy", replace: true });
     }
-  }, [loading, user, code, navigate, redeem]);
+  }, [loading, user, searchCode, navigate, redeem]);
 
   const oauth = async (provider: "google" | "apple") => {
     setBusy(true);
     try {
-      const redirectTo = code
-        ? `${window.location.origin}/auth?code=${encodeURIComponent(code)}`
+      const redirectTo = searchCode
+        ? `${window.location.origin}/auth?code=${encodeURIComponent(searchCode)}`
         : window.location.origin;
       const result = await lovable.auth.signInWithOAuth(provider, {
         redirect_uri: redirectTo,
@@ -106,7 +110,7 @@ function AuthPage() {
     try {
       const { error } = await supabase.auth.signInWithPassword({ email, password });
       if (error) throw error;
-      // redirect handled by useEffect with code
+      // redirect handled by useEffect
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Nie udało się zalogować");
     } finally {
@@ -122,15 +126,15 @@ function AuthPage() {
         email,
         password,
         options: {
-          emailRedirectTo: code
-            ? `${window.location.origin}/auth?code=${encodeURIComponent(code)}`
+          emailRedirectTo: searchCode
+            ? `${window.location.origin}/auth?code=${encodeURIComponent(searchCode)}`
             : window.location.origin,
           data: { display_name: name },
         },
       });
       if (error) throw error;
       if (data.session) {
-        // redirect handled by useEffect with code
+        // redirect handled by useEffect
       } else {
         setRegisteredEmail(email.trim());
       }
@@ -189,12 +193,12 @@ function AuthPage() {
         Zaloguj się, aby prowadzić dziennik behawioralny swojego psa.
       </p>
 
-      {code && (
+      {searchCode && (
         <div className="mt-6 rounded-lg bg-keylime p-4 text-center text-sm">
           <p className="font-medium text-foreground">Masz zaproszenie</p>
           <p className="mt-1 text-muted-foreground">
             Zaloguj się lub załóż konto, a kod{" "}
-            <span className="font-display text-lg tracking-widest text-primary">{code}</span>{" "}
+            <span className="font-display text-lg tracking-widest text-primary">{searchCode}</span>{" "}
             zostanie automatycznie użyty.
           </p>
         </div>
