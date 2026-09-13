@@ -26,25 +26,17 @@ import {
 } from "@/components/ui/sheet";
 import { Skeleton } from "@/components/ui/skeleton";
 import { cn } from "@/lib/utils";
+import { socialMeta } from "@/lib/seo";
 
 export const Route = createFileRoute("/_authenticated/pies/$id/kalendarz")({
-  head: () => ({
-    meta: [
-      { title: "Kalendarz — Psiennik" },
-      {
-        name: "description",
-        content:
-          "Tygodniowy kalendarz wydarzeń psa z szybkim porównaniem ocen każdego dnia.",
-      },
-      { property: "og:title", content: "Kalendarz — Psiennik" },
-      {
-        property: "og:description",
-        content:
-          "Tygodniowy kalendarz wydarzeń psa z szybkim porównaniem ocen każdego dnia.",
-      },
-      { property: "og:type", content: "website" },
-      { name: "twitter:card", content: "summary" },
-    ],
+  head: ({ params }) => ({
+    meta: socialMeta({
+      title: "Kalendarz — Psiennik",
+      description: "Tygodniowy kalendarz wydarzeń psa z szybkim porównaniem ocen każdego dnia.",
+      path: `/pies/${params.id}/kalendarz`,
+      image: "app",
+      privatePage: true,
+    }),
   }),
   component: DogCalendarPage,
 });

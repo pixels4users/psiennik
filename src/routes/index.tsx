@@ -10,25 +10,18 @@ import socialProofAsset from "@/assets/social-proof.jpg.asset.json";
 import dogProfile1Asset from "@/assets/dog-profile-1.jpg.asset.json";
 import dogProfile2Asset from "@/assets/dog-profile-2.jpg.asset.json";
 import dogProfile3Asset from "@/assets/dog-profile-3.jpg.asset.json";
+import { SITE_URL, socialMeta } from "@/lib/seo";
 
 export const Route = createFileRoute("/")({
   head: () => ({
-    meta: [
-      { title: "Psiennik — dziennik behawioralny psa" },
-      {
-        name: "description",
-        content:
-          "Wspólny dziennik behawioralny psa dla właścicieli i behawiorystów: wydarzenia dnia, oceny, kalendarz i zalecenia.",
-      },
-      { property: "og:title", content: "Psiennik — dziennik behawioralny psa" },
-      {
-        property: "og:description",
-        content:
-          "Wspólny dziennik behawioralny psa dla właścicieli i behawiorystów: wydarzenia dnia, oceny, kalendarz i zalecenia.",
-      },
-      { property: "og:type", content: "website" },
-      { name: "twitter:card", content: "summary" },
-    ],
+    meta: socialMeta({
+      title: "Psiennik — dziennik behawioralny psa",
+      description:
+        "Wspólny dziennik behawioralny psa dla właścicieli i behawiorystów: wydarzenia dnia, oceny, kalendarz i zalecenia.",
+      path: "/",
+      image: "homepage",
+    }),
+    links: [{ rel: "canonical", href: `${SITE_URL}/` }],
   }),
   component: LandingPage,
 });

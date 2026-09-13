@@ -20,6 +20,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { socialMeta } from "@/lib/seo";
 import {
   Dialog,
   DialogContent,
@@ -30,20 +31,13 @@ import {
 
 export const Route = createFileRoute("/_authenticated/psy")({
   head: () => ({
-    meta: [
-      { title: "Psy — Psiennik" },
-      {
-        name: "description",
-        content: "Lista psów w dzienniku behawioralnym. Dodaj psa lub otwórz jego dziennik.",
-      },
-      { property: "og:title", content: "Psy — Psiennik" },
-      {
-        property: "og:description",
-        content: "Lista psów w dzienniku behawioralnym. Dodaj psa lub otwórz jego dziennik.",
-      },
-      { property: "og:type", content: "website" },
-      { name: "twitter:card", content: "summary" },
-    ],
+    meta: socialMeta({
+      title: "Twoje psy — Psiennik",
+      description: "Lista psów i szybki dostęp do ich dzienników behawioralnych.",
+      path: "/psy",
+      image: "app",
+      privatePage: true,
+    }),
   }),
   component: DogsPage,
 });

@@ -23,23 +23,17 @@ import {
 } from "@/components/ui/chart";
 import { Skeleton } from "@/components/ui/skeleton";
 import { ACTIVITY_TYPES, type Entry, useDog, useEntries } from "@/lib/dogs";
+import { socialMeta } from "@/lib/seo";
 
 export const Route = createFileRoute("/_authenticated/pies/$id/analiza")({
-  head: () => ({
-    meta: [
-      { title: "Analiza zachowania — Psiennik" },
-      {
-        name: "description",
-        content: "Podsumowania i wykresy wydarzeń, ocen, aktywności oraz pór dnia psa.",
-      },
-      { property: "og:title", content: "Analiza zachowania — Psiennik" },
-      {
-        property: "og:description",
-        content: "Podsumowania i wykresy wydarzeń, ocen, aktywności oraz pór dnia psa.",
-      },
-      { property: "og:type", content: "website" },
-      { name: "twitter:card", content: "summary" },
-    ],
+  head: ({ params }) => ({
+    meta: socialMeta({
+      title: "Analiza zachowania — Psiennik",
+      description: "Podsumowania i wykresy wydarzeń, ocen, aktywności oraz pór dnia psa.",
+      path: `/pies/${params.id}/analiza`,
+      image: "app",
+      privatePage: true,
+    }),
   }),
   component: DogAnalysisPage,
 });

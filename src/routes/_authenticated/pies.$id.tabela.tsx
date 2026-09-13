@@ -34,23 +34,17 @@ import {
   useDog,
   useEntries,
 } from "@/lib/dogs";
+import { socialMeta } from "@/lib/seo";
 
 export const Route = createFileRoute("/_authenticated/pies/$id/tabela")({
-  head: () => ({
-    meta: [
-      { title: "Tabela wydarzeń — Psiennik" },
-      {
-        name: "description",
-        content: "Pełna tabela wydarzeń psa z sortowaniem oraz filtrami dat, aktywności, pory dnia i oceny.",
-      },
-      { property: "og:title", content: "Tabela wydarzeń — Psiennik" },
-      {
-        property: "og:description",
-        content: "Pełna tabela wydarzeń psa z sortowaniem oraz filtrami dat, aktywności, pory dnia i oceny.",
-      },
-      { property: "og:type", content: "website" },
-      { name: "twitter:card", content: "summary" },
-    ],
+  head: ({ params }) => ({
+    meta: socialMeta({
+      title: "Tabela wydarzeń — Psiennik",
+      description: "Tabela wydarzeń psa z sortowaniem oraz filtrami dat, aktywności, pory dnia i oceny.",
+      path: `/pies/${params.id}/tabela`,
+      image: "app",
+      privatePage: true,
+    }),
   }),
   component: DogTablePage,
 });
