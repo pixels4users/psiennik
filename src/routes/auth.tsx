@@ -89,8 +89,8 @@ function AuthPage() {
   const oauth = async (provider: "google" | "apple") => {
     setBusy(true);
     try {
-      const redirectTo = effectiveCode
-        ? `${window.location.origin}/auth?code=${encodeURIComponent(effectiveCode)}`
+      const redirectTo = searchCode
+        ? `${window.location.origin}/auth?code=${encodeURIComponent(searchCode)}`
         : window.location.origin;
       const result = await lovable.auth.signInWithOAuth(provider, {
         redirect_uri: redirectTo,
@@ -110,7 +110,7 @@ function AuthPage() {
     try {
       const { error } = await supabase.auth.signInWithPassword({ email, password });
       if (error) throw error;
-      // redirect handled by useEffect with code
+      // redirect handled by useEffect
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Nie udało się zalogować");
     } finally {
@@ -126,15 +126,15 @@ function AuthPage() {
         email,
         password,
         options: {
-          emailRedirectTo: effectiveCode
-            ? `${window.location.origin}/auth?code=${encodeURIComponent(effectiveCode)}`
+          emailRedirectTo: searchCode
+            ? `${window.location.origin}/auth?code=${encodeURIComponent(searchCode)}`
             : window.location.origin,
           data: { display_name: name },
         },
       });
       if (error) throw error;
       if (data.session) {
-        // redirect handled by useEffect with code
+        // redirect handled by useEffect
       } else {
         setRegisteredEmail(email.trim());
       }
