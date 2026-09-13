@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { createFileRoute, useNavigate, useSearch } from "@tanstack/react-router";
 import { CircleCheckBig, Mail } from "lucide-react";
 import { toast } from "sonner";
@@ -22,6 +22,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 const searchSchema = z.object({
   code: z.string().optional(),
 });
+
+const INVITE_STORAGE_KEY = "psiennik-invite-code";
 
 export const Route = createFileRoute("/auth")({
   ssr: false,
@@ -51,42 +53,58 @@ function AuthPage() {
   const { code } = useSearch({ from: "/auth" });
   const redeem = useRedeemInvite();
   const [busy, setBusy] = useState(false);
+  const redeemedRef = useRef(false);
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [name, setName] = useState("");
   const [registeredEmail, setRegisteredEmail] = useState<string | null>(null);
+  const [storedCode, setStoredCode] = useState<string | null>(null);
+
+  const searchCode = code?.trim();
 
   useEffect(() => {
-    if (loading || !user) return;
-
-    if (code?.trim()) {
-      redeem.mutate(code.trim(), {
-        onSuccess: ({ dogId, behavioristId }) => {
-          toast.success("Kod został użyty");
-          if (dogId) {
-            navigate({ to: "/pies/$id", params: { id: dogId }, replace: true });
-          } else if (behavioristId) {
-            navigate({ to: "/psy", replace: true });
-          } else {
-            navigate({ to: "/psy", replace: true });
-          }
-        },
-        onError: (err) => {
-          toast.error(err instanceof Error ? err.message : "Nie udało się użyć kodu");
-          navigate({ to: "/psy", replace: true });
-        },
-      });
+    if (typeof window === "undefined") return;
+    if (searchCode) {
+      sessionStorage.setItem(INVITE_STORAGE_KEY, searchCode);
+      setStoredCode(searchCode);
     } else {
-      navigate({ to: "/psy", replace: true });
+      const saved = sessionStorage.getItem(INVITE_STORAGE_KEY);
+      if (saved) setStoredCode(saved);
     }
-  }, [loading, user, code, navigate, redeem]);
+  }, [searchCode]);
+
+  const effectiveCode = searchCode || storedCode;
+
+  useEffect(() => {
+    if (loading || !user || !effectiveCode || redeemedRef.current) return;
+
+    redeemedRef.current = true;
+    redeem.mutate(effectiveCode, {
+      onSuccess: ({ dogId, behavioristId }) => {
+        sessionStorage.removeItem(INVITE_STORAGE_KEY);
+        toast.success("Kod został użyty");
+        if (dogId) {
+          navigate({ to: "/pies/$id", params: { id: dogId }, replace: true });
+        } else if (behavioristId) {
+          navigate({ to: "/psy", replace: true });
+        } else {
+          navigate({ to: "/psy", replace: true });
+        }
+      },
+      onError: (err) => {
+        sessionStorage.removeItem(INVITE_STORAGE_KEY);
+        toast.error(err instanceof Error ? err.message : "Nie udało się użyć kodu");
+        navigate({ to: "/psy", replace: true });
+      },
+    });
+  }, [loading, user, effectiveCode, navigate, redeem]);
 
   const oauth = async (provider: "google" | "apple") => {
     setBusy(true);
     try {
-      const redirectTo = code
-        ? `${window.location.origin}/auth?code=${encodeURIComponent(code)}`
+      const redirectTo = effectiveCode
+        ? `${window.location.origin}/auth?code=${encodeURIComponent(effectiveCode)}`
         : window.location.origin;
       const result = await lovable.auth.signInWithOAuth(provider, {
         redirect_uri: redirectTo,
@@ -122,8 +140,8 @@ function AuthPage() {
         email,
         password,
         options: {
-          emailRedirectTo: code
-            ? `${window.location.origin}/auth?code=${encodeURIComponent(code)}`
+          emailRedirectTo: effectiveCode
+            ? `${window.location.origin}/auth?code=${encodeURIComponent(effectiveCode)}`
             : window.location.origin,
           data: { display_name: name },
         },
@@ -189,12 +207,12 @@ function AuthPage() {
         Zaloguj się, aby prowadzić dziennik behawioralny swojego psa.
       </p>
 
-      {code && (
+      {effectiveCode && (
         <div className="mt-6 rounded-lg bg-keylime p-4 text-center text-sm">
           <p className="font-medium text-foreground">Masz zaproszenie</p>
           <p className="mt-1 text-muted-foreground">
             Zaloguj się lub załóż konto, a kod{" "}
-            <span className="font-display text-lg tracking-widest text-primary">{code}</span>{" "}
+            <span className="font-display text-lg tracking-widest text-primary">{effectiveCode}</span>{" "}
             zostanie automatycznie użyty.
           </p>
         </div>
