@@ -179,6 +179,7 @@ export type Database = {
       entries: {
         Row: {
           activity_type: string
+          activity_types: string[]
           behaviorist_comment: string | null
           commented_at: string | null
           created_at: string
@@ -188,10 +189,12 @@ export type Database = {
           id: string
           rating: string
           time_of_day: string
+          times_of_day: string[]
           title: string
         }
         Insert: {
           activity_type?: string
+          activity_types?: string[]
           behaviorist_comment?: string | null
           commented_at?: string | null
           created_at?: string
@@ -201,10 +204,12 @@ export type Database = {
           id?: string
           rating?: string
           time_of_day?: string
+          times_of_day?: string[]
           title: string
         }
         Update: {
           activity_type?: string
+          activity_types?: string[]
           behaviorist_comment?: string | null
           commented_at?: string | null
           created_at?: string
@@ -214,6 +219,7 @@ export type Database = {
           id?: string
           rating?: string
           time_of_day?: string
+          times_of_day?: string[]
           title?: string
         }
         Relationships: [
