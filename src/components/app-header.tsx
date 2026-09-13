@@ -1,6 +1,7 @@
 import { Link, useNavigate } from "@tanstack/react-router";
 import { useQueryClient } from "@tanstack/react-query";
-import { Bell, PawPrint, User } from "lucide-react";
+import { Bell, User } from "lucide-react";
+import logo from "@/assets/logo.png";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth, useProfile } from "@/lib/auth";
 import { useIsBehaviorist } from "@/lib/access";
@@ -36,7 +37,7 @@ export function AppHeader() {
     <header className="border-b border-border bg-background">
       <div className="mx-auto flex max-w-5xl flex-wrap items-center justify-between gap-3 px-5 py-4">
         <Link to={user ? "/psy" : "/"} className="flex items-center gap-2">
-          <PawPrint className="size-5 text-primary" />
+          <img src={logo} alt="Logo Psiennik" width={28} height={28} className="size-7" />
           <span className="font-display text-2xl leading-none text-primary">Psiennik</span>
         </Link>
 
