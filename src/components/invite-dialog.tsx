@@ -65,6 +65,15 @@ export function AccessDialog({
     }
   };
 
+  const copyLink = async (url: string) => {
+    try {
+      await navigator.clipboard.writeText(url);
+      toast.success("Link skopiowany");
+    } catch {
+      toast.info(`Link: ${url}`);
+    }
+  };
+
   const generate = (roleType: "owner" | "behaviorist") => {
     setPendingRole(roleType);
     createInvite.mutate(roleType, {
