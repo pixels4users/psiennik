@@ -90,13 +90,29 @@ export function EntryFormDialog({
       toast.error("Podaj krótki tytuł wydarzenia");
       return;
     }
+    if (activityTypes.length === 0) {
+      toast.error("Wybierz przynajmniej jeden typ aktywności");
+      return;
+    }
+    if (timesOfDay.length === 0) {
+      toast.error("Wybierz przynajmniej jedną porę dnia");
+      return;
+    }
     setSaving(true);
     try {
+      const orderedTimes = TIMES_OF_DAY.filter((t) => timesOfDay.includes(t.value)).map(
+        (t) => t.value,
+      );
+      const orderedActivities = ACTIVITY_TYPES.filter((t) =>
+        activityTypes.includes(t.value),
+      ).map((t) => t.value);
       const payload = {
         dog_id: dogId,
         date: format(date, "yyyy-MM-dd"),
-        time_of_day: timeOfDay,
-        activity_type: activityType,
+        times_of_day: orderedTimes,
+        activity_types: orderedActivities,
+        time_of_day: orderedTimes[0],
+        activity_type: orderedActivities[0],
         title: title.trim(),
         description: description.trim() || null,
         rating,
