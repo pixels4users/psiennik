@@ -14,25 +14,18 @@ import { AccessDialog } from "@/components/invite-dialog";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
+import { socialMeta } from "@/lib/seo";
 
 export const Route = createFileRoute("/_authenticated/pies/$id/")({
-  head: () => ({
-    meta: [
-      { title: "Dziennik wydarzeń — Psiennik" },
-      {
-        name: "description",
-        content:
-          "Dziennik wydarzeń z dziennika behawioralnego psa: aktywności, opisy, oceny i zalecenia behawiorysty.",
-      },
-      { property: "og:title", content: "Dziennik wydarzeń — Psiennik" },
-      {
-        property: "og:description",
-        content:
-          "Dziennik wydarzeń z dziennika behawioralnego psa: aktywności, opisy, oceny i zalecenia behawiorysty.",
-      },
-      { property: "og:type", content: "website" },
-      { name: "twitter:card", content: "summary" },
-    ],
+  head: ({ params }) => ({
+    meta: socialMeta({
+      title: "Dziennik wydarzeń — Psiennik",
+      description:
+        "Dziennik wydarzeń psa: aktywności, opisy, oceny i zalecenia behawiorysty.",
+      path: `/pies/${params.id}`,
+      image: "app",
+      privatePage: true,
+    }),
   }),
   component: DogListPage,
 });

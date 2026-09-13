@@ -14,23 +14,17 @@ import {
 } from "@/components/ui/select";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useDog, useEntries } from "@/lib/dogs";
+import { socialMeta } from "@/lib/seo";
 
 export const Route = createFileRoute("/_authenticated/pies/$id/zalecenia")({
-  head: () => ({
-    meta: [
-      { title: "Zalecenia behawiorysty — Psiennik" },
-      {
-        name: "description",
-        content: "Wszystkie zalecenia behawiorysty dla psa, uporządkowane w jednym miejscu.",
-      },
-      { property: "og:title", content: "Zalecenia behawiorysty — Psiennik" },
-      {
-        property: "og:description",
-        content: "Wszystkie zalecenia behawiorysty dla psa, uporządkowane w jednym miejscu.",
-      },
-      { property: "og:type", content: "website" },
-      { name: "twitter:card", content: "summary" },
-    ],
+  head: ({ params }) => ({
+    meta: socialMeta({
+      title: "Zalecenia behawiorysty — Psiennik",
+      description: "Wszystkie zalecenia behawiorysty dla psa, uporządkowane w jednym miejscu.",
+      path: `/pies/${params.id}/zalecenia`,
+      image: "app",
+      privatePage: true,
+    }),
   }),
   component: DogRecommendationsPage,
 });
