@@ -22,7 +22,14 @@ import {
   type ChartConfig,
 } from "@/components/ui/chart";
 import { Skeleton } from "@/components/ui/skeleton";
-import { ACTIVITY_TYPES, type Entry, useDog, useEntries } from "@/lib/dogs";
+import {
+  ACTIVITY_TYPES,
+  entryActivities,
+  entryTimes,
+  type Entry,
+  useDog,
+  useEntries,
+} from "@/lib/dogs";
 import { socialMeta } from "@/lib/seo";
 
 export const Route = createFileRoute("/_authenticated/pies/$id/analiza")({
@@ -126,12 +133,17 @@ function DogAnalysisPage() {
           label: format(parseISO(week), "d MMM", { locale: pl }),
           ...balance,
         })),
-      activityByTime: ACTIVITY_TYPES.map((activity) => ({
-        activity: activity.label,
-        rano: all.filter((entry) => entry.activity_type === activity.value && entry.time_of_day === "rano").length,
-        poludnie: all.filter((entry) => entry.activity_type === activity.value && entry.time_of_day === "poludnie").length,
-        wieczor: all.filter((entry) => entry.activity_type === activity.value && entry.time_of_day === "wieczor").length,
-      })).filter((row) => row.rano + row.poludnie + row.wieczor > 0),
+      activityByTime: ACTIVITY_TYPES.map((activity) => {
+        const matching = all.filter((entry) => entryActivities(entry).includes(activity.value));
+        const countTime = (time: string) =>
+          matching.filter((entry) => entryTimes(entry).includes(time)).length;
+        return {
+          activity: activity.label,
+          rano: countTime("rano"),
+          poludnie: countTime("poludnie"),
+          wieczor: countTime("wieczor"),
+        };
+      }).filter((row) => row.rano + row.poludnie + row.wieczor > 0),
     };
   }, [entries]);
 
