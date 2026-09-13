@@ -30,7 +30,10 @@ import {
   ACTIVITY_TYPES,
   RATINGS,
   TIMES_OF_DAY,
-  labelFor,
+  labelsFor,
+  entryActivities,
+  entryTimes,
+  timesLabel,
   useDog,
   useEntries,
 } from "@/lib/dogs";
@@ -66,8 +69,8 @@ function DogTablePage() {
       const date = parseISO(entry.date);
       if (dateRange?.from && date < dateRange.from) return false;
       if (dateRange?.to && date > dateRange.to) return false;
-      if (activity !== "all" && entry.activity_type !== activity) return false;
-      if (timeOfDay !== "all" && entry.time_of_day !== timeOfDay) return false;
+      if (activity !== "all" && !entryActivities(entry).includes(activity)) return false;
+      if (timeOfDay !== "all" && !entryTimes(entry).includes(timeOfDay)) return false;
       if (rating !== "all" && entry.rating !== rating) return false;
       return true;
     });
@@ -198,8 +201,8 @@ function DogTablePage() {
                       {format(parseISO(entry.date), "d MMM yyyy", { locale: pl })}
                     </TableCell>
                     <TableCell className="align-top font-medium">{entry.title}</TableCell>
-                    <TableCell className="align-top">{labelFor(ACTIVITY_TYPES, entry.activity_type)}</TableCell>
-                    <TableCell className="align-top">{labelFor(TIMES_OF_DAY, entry.time_of_day)}</TableCell>
+                    <TableCell className="align-top">{labelsFor(ACTIVITY_TYPES, entryActivities(entry))}</TableCell>
+                    <TableCell className="align-top">{timesLabel(entryTimes(entry))}</TableCell>
                     <TableCell className="align-top"><RatingBadge rating={entry.rating} /></TableCell>
                     <TableCell className="align-top text-foreground/80">{entry.description || "—"}</TableCell>
                     <TableCell className="pr-4 align-top text-foreground/80">{entry.behaviorist_comment || "—"}</TableCell>

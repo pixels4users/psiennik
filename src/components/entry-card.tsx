@@ -1,5 +1,12 @@
 import { Pencil, MessageSquarePlus, MessageSquareText } from "lucide-react";
-import { ACTIVITY_TYPES, TIMES_OF_DAY, labelFor, type Entry } from "@/lib/dogs";
+import {
+  ACTIVITY_TYPES,
+  labelsFor,
+  entryActivities,
+  entryTimes,
+  timesLabel,
+  type Entry,
+} from "@/lib/dogs";
 import { RatingBadge } from "@/components/rating-badge";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -24,8 +31,8 @@ export function EntryCard({
           <div className="grid gap-1.5">
             <h3 className="font-display text-xl leading-tight">{entry.title}</h3>
             <p className="text-sm text-muted-foreground">
-              {labelFor(ACTIVITY_TYPES, entry.activity_type)} ·{" "}
-              {labelFor(TIMES_OF_DAY, entry.time_of_day)}
+              {labelsFor(ACTIVITY_TYPES, entryActivities(entry))} ·{" "}
+              {timesLabel(entryTimes(entry))}
             </p>
           </div>
           <div className="flex shrink-0 items-center gap-2">

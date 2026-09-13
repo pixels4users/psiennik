@@ -5,7 +5,15 @@ import { pl } from "date-fns/locale";
 import { CalendarIcon } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
-import { ACTIVITY_TYPES, TIMES_OF_DAY, RATINGS, type Entry } from "@/lib/dogs";
+import {
+  ACTIVITY_TYPES,
+  TIMES_OF_DAY,
+  RATINGS,
+  entryActivities,
+  entryTimes,
+  type Entry,
+} from "@/lib/dogs";
+import { MultiToggle } from "@/components/multi-toggle";
 import { cn } from "@/lib/utils";
 import {
   Dialog,
@@ -20,13 +28,6 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 
 const RATING_BUTTON_STYLES: Record<string, string> = {
   green: "border-good/40 data-[active=true]:bg-good/15 data-[active=true]:text-good data-[active=true]:border-good",
@@ -50,8 +51,8 @@ export function EntryFormDialog({
 
   const [date, setDate] = useState<Date>(new Date());
   const [calendarOpen, setCalendarOpen] = useState(false);
-  const [timeOfDay, setTimeOfDay] = useState<string>("rano");
-  const [activityType, setActivityType] = useState<string>("spacer");
+  const [timesOfDay, setTimesOfDay] = useState<string[]>(["rano"]);
+  const [activityTypes, setActivityTypes] = useState<string[]>(["spacer"]);
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [rating, setRating] = useState<string>("green");
@@ -61,15 +62,15 @@ export function EntryFormDialog({
     if (!open) return;
     if (entry) {
       setDate(parseISO(entry.date));
-      setTimeOfDay(entry.time_of_day);
-      setActivityType(entry.activity_type);
+      setTimesOfDay(entryTimes(entry));
+      setActivityTypes(entryActivities(entry));
       setTitle(entry.title);
       setDescription(entry.description ?? "");
       setRating(entry.rating);
     } else {
       setDate(new Date());
-      setTimeOfDay("rano");
-      setActivityType("spacer");
+      setTimesOfDay(["rano"]);
+      setActivityTypes(["spacer"]);
       setTitle("");
       setDescription("");
       setRating("green");
@@ -82,13 +83,29 @@ export function EntryFormDialog({
       toast.error("Podaj krótki tytuł wydarzenia");
       return;
     }
+    if (activityTypes.length === 0) {
+      toast.error("Wybierz przynajmniej jeden typ aktywności");
+      return;
+    }
+    if (timesOfDay.length === 0) {
+      toast.error("Wybierz przynajmniej jedną porę dnia");
+      return;
+    }
     setSaving(true);
     try {
+      const orderedTimes = TIMES_OF_DAY.filter((t) => timesOfDay.includes(t.value)).map(
+        (t) => t.value,
+      );
+      const orderedActivities = ACTIVITY_TYPES.filter((t) =>
+        activityTypes.includes(t.value),
+      ).map((t) => t.value);
       const payload = {
         dog_id: dogId,
         date: format(date, "yyyy-MM-dd"),
-        time_of_day: timeOfDay,
-        activity_type: activityType,
+        times_of_day: orderedTimes,
+        activity_types: orderedActivities,
+        time_of_day: orderedTimes[0] ?? "rano",
+        activity_type: orderedActivities[0] ?? "inne",
         title: title.trim(),
         description: description.trim() || null,
         rating,
@@ -120,7 +137,7 @@ export function EntryFormDialog({
           </DialogDescription>
         </DialogHeader>
         <form onSubmit={handleSubmit} className="grid gap-4">
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid gap-4">
             <div className="grid gap-2">
               <Label>Data</Label>
               <Popover open={calendarOpen} onOpenChange={setCalendarOpen}>
@@ -152,34 +169,43 @@ export function EntryFormDialog({
             </div>
             <div className="grid gap-2">
               <Label>Pora dnia</Label>
-              <Select value={timeOfDay} onValueChange={setTimeOfDay}>
-                <SelectTrigger>
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  {TIMES_OF_DAY.map((t) => (
-                    <SelectItem key={t.value} value={t.value}>
-                      {t.label}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+              <div className="flex flex-wrap items-center gap-2">
+                <MultiToggle
+                  options={TIMES_OF_DAY}
+                  values={timesOfDay}
+                  onChange={setTimesOfDay}
+                  ariaLabel="Pora dnia"
+                />
+                <button
+                  type="button"
+                  aria-pressed={timesOfDay.length === TIMES_OF_DAY.length}
+                  onClick={() =>
+                    setTimesOfDay(
+                      timesOfDay.length === TIMES_OF_DAY.length
+                        ? []
+                        : TIMES_OF_DAY.map((t) => t.value),
+                    )
+                  }
+                  className={cn(
+                    "rounded-full border px-3 py-1.5 text-sm transition-colors",
+                    timesOfDay.length === TIMES_OF_DAY.length
+                      ? "border-primary bg-primary text-primary-foreground"
+                      : "border-border bg-background text-foreground hover:bg-muted",
+                  )}
+                >
+                  Cały dzień
+                </button>
+              </div>
             </div>
           </div>
           <div className="grid gap-2">
             <Label>Typ aktywności</Label>
-            <Select value={activityType} onValueChange={setActivityType}>
-              <SelectTrigger>
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                {ACTIVITY_TYPES.map((t) => (
-                  <SelectItem key={t.value} value={t.value}>
-                    {t.label}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+            <MultiToggle
+              options={ACTIVITY_TYPES}
+              values={activityTypes}
+              onChange={setActivityTypes}
+              ariaLabel="Typ aktywności"
+            />
           </div>
           <div className="grid gap-2">
             <Label htmlFor="entry-title">Tytuł</Label>

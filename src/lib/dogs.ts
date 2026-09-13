@@ -36,6 +36,33 @@ export function labelFor(
   return list.find((item) => item.value === value)?.label ?? value ?? "—";
 }
 
+/** Etykiety dla listy wartości, np. "Spacer, Socjalizacja". */
+export function labelsFor(
+  list: readonly { value: string; label: string }[],
+  values: string[] | null | undefined,
+): string {
+  if (!values || values.length === 0) return "—";
+  return values.map((value) => labelFor(list, value)).join(", ");
+}
+
+/** Typy aktywności wpisu (z fallbackiem na starą pojedynczą kolumnę). */
+export function entryActivities(entry: Entry): string[] {
+  const list = entry.activity_types ?? [];
+  return list.length > 0 ? list : [entry.activity_type];
+}
+
+/** Pory dnia wpisu (z fallbackiem na starą pojedynczą kolumnę). */
+export function entryTimes(entry: Entry): string[] {
+  const list = entry.times_of_day ?? [];
+  return list.length > 0 ? list : [entry.time_of_day];
+}
+
+/** "Cały dzień" gdy zaznaczono wszystkie pory, inaczej lista etykiet. */
+export function timesLabel(values: string[]): string {
+  if (values.length === TIMES_OF_DAY.length) return "Cały dzień";
+  return labelsFor(TIMES_OF_DAY, values);
+}
+
 export type DogWithAccess = Dog & {
   dog_access: { process_status: string; role: string }[] | null;
 };
