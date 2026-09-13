@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { format, parseISO } from "date-fns";
 import { pl } from "date-fns/locale";
-import { Copy, Trash2, RefreshCw, UserPlus, Users } from "lucide-react";
+import { Copy, Link, Trash2, RefreshCw, UserPlus, Users } from "lucide-react";
 import { toast } from "sonner";
 import { useAuth, useDogRole } from "@/lib/auth";
 import {
