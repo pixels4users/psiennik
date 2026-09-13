@@ -23,8 +23,6 @@ const searchSchema = z.object({
   code: z.string().optional(),
 });
 
-const INVITE_STORAGE_KEY = "psiennik-invite-code";
-
 export const Route = createFileRoute("/auth")({
   ssr: false,
   validateSearch: searchSchema,
