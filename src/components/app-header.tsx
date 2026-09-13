@@ -1,7 +1,7 @@
 import { Link, useNavigate } from "@tanstack/react-router";
 import { useQueryClient } from "@tanstack/react-query";
 import { Bell, User } from "lucide-react";
-import logoAsset from "@/assets/psiennik-logo.png.asset.json";
+import logoAsset from "@/assets/psiennik-logo-3.webp.asset.json";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth, useProfile } from "@/lib/auth";
 import { useIsBehaviorist } from "@/lib/access";
@@ -40,9 +40,9 @@ export function AppHeader() {
           <img
             src={logoAsset.url}
             alt="Psiennik"
-            width={148}
-            height={29}
-            className="h-8 w-auto"
+            width={152}
+            height={56}
+            className="h-10 w-auto"
           />
         </Link>
 

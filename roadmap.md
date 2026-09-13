@@ -37,4 +37,4 @@
 - [x] Ujednolicić nazwy ocen i określenie „zalecenia” w całej aplikacji
 - [x] Dodać zakładkę zbierającą wszystkie zalecenia behawiorysty
 - [x] Dodać indywidualne podglądy linków i wyłączyć prywatne strony z indeksowania
-- [ ] Podmienić logo, ikonę i faviconę na nowe materiały oraz odświeżyć podglądy stron
+- [x] Podmienić logo, ikonę i faviconę na nowe materiały oraz odświeżyć podglądy stron
