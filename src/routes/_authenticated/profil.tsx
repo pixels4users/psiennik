@@ -22,23 +22,17 @@ import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Skeleton } from "@/components/ui/skeleton";
 import { cn } from "@/lib/utils";
+import { socialMeta } from "@/lib/seo";
 
 export const Route = createFileRoute("/_authenticated/profil")({
   head: () => ({
-    meta: [
-      { title: "Mój profil — Psiennik" },
-      {
-        name: "description",
-        content: "Ustawienia konta w Psienniku: nazwa, adres e-mail, powiadomienia i dostęp.",
-      },
-      { property: "og:title", content: "Mój profil — Psiennik" },
-      {
-        property: "og:description",
-        content: "Ustawienia konta w Psienniku: nazwa, adres e-mail, powiadomienia i dostęp.",
-      },
-      { property: "og:type", content: "website" },
-      { name: "twitter:card", content: "summary" },
-    ],
+    meta: socialMeta({
+      title: "Mój profil — Psiennik",
+      description: "Ustawienia konta w Psienniku: nazwa, adres e-mail, powiadomienia i dostęp.",
+      path: "/profil",
+      image: "app",
+      privatePage: true,
+    }),
   }),
   component: ProfilePage,
 });

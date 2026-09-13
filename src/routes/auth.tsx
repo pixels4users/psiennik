@@ -18,6 +18,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { socialMeta } from "@/lib/seo";
 
 const searchSchema = z.object({
   code: z.string().optional(),
@@ -27,20 +28,13 @@ export const Route = createFileRoute("/auth")({
   ssr: false,
   validateSearch: searchSchema,
   head: () => ({
-    meta: [
-      { title: "Logowanie — Psiennik" },
-      {
-        name: "description",
-        content: "Zaloguj się lub załóż konto w Psienniku — dzienniku behawioralnym psa.",
-      },
-      { property: "og:title", content: "Logowanie — Psiennik" },
-      {
-        property: "og:description",
-        content: "Zaloguj się lub załóż konto w Psienniku — dzienniku behawioralnym psa.",
-      },
-      { property: "og:type", content: "website" },
-      { name: "twitter:card", content: "summary" },
-    ],
+    meta: socialMeta({
+      title: "Logowanie i rejestracja — Psiennik",
+      description: "Zaloguj się lub załóż konto w Psienniku — dzienniku behawioralnym psa.",
+      path: "/auth",
+      image: "auth",
+      privatePage: true,
+    }),
   }),
   component: AuthPage,
 });
