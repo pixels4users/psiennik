@@ -23,7 +23,7 @@ export const Route = createRootRoute({
       },
       {
         name: "google-site-verification",
-        content: "bfvW1o_78Vmx93fcFzvwNICywK7mavgXOdkCeBiBZuw",
+        content: "NZIoqrU_btcbC0UqH5splKxTI7iJW5n2jZoDizw8-iE",
       },
     ],
     links: [
