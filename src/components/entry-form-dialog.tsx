@@ -5,7 +5,15 @@ import { pl } from "date-fns/locale";
 import { CalendarIcon } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
-import { ACTIVITY_TYPES, TIMES_OF_DAY, RATINGS, type Entry } from "@/lib/dogs";
+import {
+  ACTIVITY_TYPES,
+  TIMES_OF_DAY,
+  RATINGS,
+  entryActivities,
+  entryTimes,
+  type Entry,
+} from "@/lib/dogs";
+import { MultiToggle } from "@/components/multi-toggle";
 import { cn } from "@/lib/utils";
 import {
   Dialog,
@@ -50,8 +58,8 @@ export function EntryFormDialog({
 
   const [date, setDate] = useState<Date>(new Date());
   const [calendarOpen, setCalendarOpen] = useState(false);
-  const [timeOfDay, setTimeOfDay] = useState<string>("rano");
-  const [activityType, setActivityType] = useState<string>("spacer");
+  const [timesOfDay, setTimesOfDay] = useState<string[]>(["rano"]);
+  const [activityTypes, setActivityTypes] = useState<string[]>(["spacer"]);
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [rating, setRating] = useState<string>("green");
@@ -61,15 +69,15 @@ export function EntryFormDialog({
     if (!open) return;
     if (entry) {
       setDate(parseISO(entry.date));
-      setTimeOfDay(entry.time_of_day);
-      setActivityType(entry.activity_type);
+      setTimesOfDay(entryTimes(entry));
+      setActivityTypes(entryActivities(entry));
       setTitle(entry.title);
       setDescription(entry.description ?? "");
       setRating(entry.rating);
     } else {
       setDate(new Date());
-      setTimeOfDay("rano");
-      setActivityType("spacer");
+      setTimesOfDay(["rano"]);
+      setActivityTypes(["spacer"]);
       setTitle("");
       setDescription("");
       setRating("green");
