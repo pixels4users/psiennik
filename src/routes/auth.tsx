@@ -193,12 +193,12 @@ function AuthPage() {
         Zaloguj się, aby prowadzić dziennik behawioralny swojego psa.
       </p>
 
-      {effectiveCode && (
+      {searchCode && (
         <div className="mt-6 rounded-lg bg-keylime p-4 text-center text-sm">
           <p className="font-medium text-foreground">Masz zaproszenie</p>
           <p className="mt-1 text-muted-foreground">
             Zaloguj się lub załóż konto, a kod{" "}
-            <span className="font-display text-lg tracking-widest text-primary">{effectiveCode}</span>{" "}
+            <span className="font-display text-lg tracking-widest text-primary">{searchCode}</span>{" "}
             zostanie automatycznie użyty.
           </p>
         </div>
