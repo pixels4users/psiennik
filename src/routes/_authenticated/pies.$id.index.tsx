@@ -42,11 +42,17 @@ function DogListPage() {
   const { data: dog } = useDog(id);
   const { data: role, isLoading: roleLoading } = useDogRole(id);
   const { data: entries, isLoading } = useEntries(id);
+  const { data: access } = useDogAccess(id);
 
   const [entryDialogOpen, setEntryDialogOpen] = useState(false);
   const [editedEntry, setEditedEntry] = useState<Entry | null>(null);
   const [commentedEntry, setCommentedEntry] = useState<Entry | null>(null);
   const [commentDialogOpen, setCommentDialogOpen] = useState(false);
+  const [accessOpen, setAccessOpen] = useState(false);
+
+  const hasCoOwner =
+    access?.some((row) => row.role === "owner" && row.user_id !== dog?.owner_id) ?? false;
+  const hasBehaviorist = access?.some((row) => row.role === "behaviorist") ?? false;
 
   const grouped = useMemo(() => {
     const map = new Map<string, Entry[]>();
