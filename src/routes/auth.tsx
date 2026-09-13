@@ -57,46 +57,34 @@ function AuthPage() {
   const [password, setPassword] = useState("");
   const [name, setName] = useState("");
   const [registeredEmail, setRegisteredEmail] = useState<string | null>(null);
-  const [storedCode, setStoredCode] = useState<string | null>(null);
 
   const searchCode = code?.trim();
 
   useEffect(() => {
-    if (typeof window === "undefined") return;
-    if (searchCode) {
-      sessionStorage.setItem(INVITE_STORAGE_KEY, searchCode);
-      setStoredCode(searchCode);
-    } else {
-      const saved = sessionStorage.getItem(INVITE_STORAGE_KEY);
-      if (saved) setStoredCode(saved);
+    if (loading || !user) return;
+
+    if (searchCode && !redeemedRef.current) {
+      redeemedRef.current = true;
+      redeem.mutate(searchCode, {
+        onSuccess: ({ dogId, behavioristId }) => {
+          toast.success("Kod został użyty");
+          if (dogId) {
+            navigate({ to: "/pies/$id", params: { id: dogId }, replace: true });
+          } else if (behavioristId) {
+            navigate({ to: "/psy", replace: true });
+          } else {
+            navigate({ to: "/psy", replace: true });
+          }
+        },
+        onError: (err) => {
+          toast.error(err instanceof Error ? err.message : "Nie udało się użyć kodu");
+          navigate({ to: "/psy", replace: true });
+        },
+      });
+    } else if (!searchCode) {
+      navigate({ to: "/psy", replace: true });
     }
-  }, [searchCode]);
-
-  const effectiveCode = searchCode || storedCode;
-
-  useEffect(() => {
-    if (loading || !user || !effectiveCode || redeemedRef.current) return;
-
-    redeemedRef.current = true;
-    redeem.mutate(effectiveCode, {
-      onSuccess: ({ dogId, behavioristId }) => {
-        sessionStorage.removeItem(INVITE_STORAGE_KEY);
-        toast.success("Kod został użyty");
-        if (dogId) {
-          navigate({ to: "/pies/$id", params: { id: dogId }, replace: true });
-        } else if (behavioristId) {
-          navigate({ to: "/psy", replace: true });
-        } else {
-          navigate({ to: "/psy", replace: true });
-        }
-      },
-      onError: (err) => {
-        sessionStorage.removeItem(INVITE_STORAGE_KEY);
-        toast.error(err instanceof Error ? err.message : "Nie udało się użyć kodu");
-        navigate({ to: "/psy", replace: true });
-      },
-    });
-  }, [loading, user, effectiveCode, navigate, redeem]);
+  }, [loading, user, searchCode, navigate, redeem]);
 
   const oauth = async (provider: "google" | "apple") => {
     setBusy(true);
