@@ -144,30 +144,49 @@ export function AccessDialog({
               <p className="text-xs font-medium tracking-wide text-muted-foreground uppercase">
                 Aktywne kody
               </p>
-              {invites.map((invite) => (
-                <div
-                  key={invite.id}
-                  className="flex items-center justify-between gap-3 rounded-lg bg-keylime px-4 py-3"
-                >
-                  <div>
-                    <p className="font-display text-2xl tracking-widest text-primary">
-                      {invite.code}
-                    </p>
-                    <p className="text-xs text-muted-foreground">
-                      {invite.role === "owner" ? "Współwłaściciel" : "Behawiorysta"} · ważny do{" "}
-                      {format(parseISO(invite.expires_at), "d MMMM yyyy", { locale: pl })}
-                    </p>
-                  </div>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    aria-label="Kopiuj kod"
-                    onClick={() => copy(invite.code)}
+              {invites.map((invite) => {
+                const inviteUrl = `${window.location.origin}/auth?code=${encodeURIComponent(invite.code)}`;
+                return (
+                  <div
+                    key={invite.id}
+                    className="grid gap-2 rounded-lg bg-keylime px-4 py-3"
                   >
-                    <Copy className="size-4" />
-                  </Button>
-                </div>
-              ))}
+                    <div className="flex items-center justify-between gap-3">
+                      <div>
+                        <p className="font-display text-2xl tracking-widest text-primary">
+                          {invite.code}
+                        </p>
+                        <p className="text-xs text-muted-foreground">
+                          {invite.role === "owner" ? "Współwłaściciel" : "Behawiorysta"} · ważny do{" "}
+                          {format(parseISO(invite.expires_at), "d MMMM yyyy", { locale: pl })}
+                        </p>
+                      </div>
+                      <div className="flex shrink-0 items-center gap-1">
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          aria-label="Kopiuj kod"
+                          onClick={() => copy(invite.code)}
+                        >
+                          <Copy className="size-4" />
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          aria-label="Kopiuj link"
+                          onClick={() => copyLink(inviteUrl)}
+                        >
+                          <Link className="size-4" />
+                        </Button>
+                      </div>
+                    </div>
+                    <p className="text-xs leading-relaxed text-muted-foreground">
+                      Wyślij ten link osobie, którą zapraszasz. Po zalogowaniu lub rejestracji zostanie automatycznie dodana do psa.
+                    </p>
+                    <p className="truncate text-xs text-primary">{inviteUrl}</p>
+                  </div>
+                );
+              })}
             </div>
           )}
 
