@@ -255,6 +255,10 @@ function DogAnalysisPage() {
             </AnalysisCard>
 
             <AnalysisCard title="Aktywności według pory dnia" empty={analysis.activityByTime.length === 0} className="lg:col-span-2">
+              <p className="mb-3 text-sm text-muted-foreground">
+                Wydarzenie z kilkoma typami lub porami liczy się w każdym z nich, więc suma może
+                być wyższa niż liczba wpisów.
+              </p>
               <ChartContainer config={timeConfig} className="h-80 w-full">
                 <BarChart accessibilityLayer data={analysis.activityByTime} margin={{ left: 4, right: 12 }}>
                   <CartesianGrid vertical={false} />
