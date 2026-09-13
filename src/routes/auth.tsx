@@ -191,7 +191,12 @@ function AuthPage() {
 
       {code && (
         <div className="mt-6 rounded-lg bg-keylime p-4 text-center text-sm">
-          Po zalogowaniu użyjemy kodu <span className="font-display text-lg tracking-widest">{code}</span>
+          <p className="font-medium text-foreground">Masz zaproszenie</p>
+          <p className="mt-1 text-muted-foreground">
+            Zaloguj się lub załóż konto, a kod{" "}
+            <span className="font-display text-lg tracking-widest text-primary">{code}</span>{" "}
+            zostanie automatycznie użyty.
+          </p>
         </div>
       )}
 
