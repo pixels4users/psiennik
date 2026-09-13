@@ -144,7 +144,7 @@ export function EntryFormDialog({
           </DialogDescription>
         </DialogHeader>
         <form onSubmit={handleSubmit} className="grid gap-4">
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid gap-4">
             <div className="grid gap-2">
               <Label>Data</Label>
               <Popover open={calendarOpen} onOpenChange={setCalendarOpen}>
@@ -176,34 +176,43 @@ export function EntryFormDialog({
             </div>
             <div className="grid gap-2">
               <Label>Pora dnia</Label>
-              <Select value={timeOfDay} onValueChange={setTimeOfDay}>
-                <SelectTrigger>
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  {TIMES_OF_DAY.map((t) => (
-                    <SelectItem key={t.value} value={t.value}>
-                      {t.label}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+              <div className="flex flex-wrap items-center gap-2">
+                <MultiToggle
+                  options={TIMES_OF_DAY}
+                  values={timesOfDay}
+                  onChange={setTimesOfDay}
+                  ariaLabel="Pora dnia"
+                />
+                <button
+                  type="button"
+                  aria-pressed={timesOfDay.length === TIMES_OF_DAY.length}
+                  onClick={() =>
+                    setTimesOfDay(
+                      timesOfDay.length === TIMES_OF_DAY.length
+                        ? []
+                        : TIMES_OF_DAY.map((t) => t.value),
+                    )
+                  }
+                  className={cn(
+                    "rounded-full border px-3 py-1.5 text-sm transition-colors",
+                    timesOfDay.length === TIMES_OF_DAY.length
+                      ? "border-primary bg-primary text-primary-foreground"
+                      : "border-border bg-background text-foreground hover:bg-muted",
+                  )}
+                >
+                  Cały dzień
+                </button>
+              </div>
             </div>
           </div>
           <div className="grid gap-2">
             <Label>Typ aktywności</Label>
-            <Select value={activityType} onValueChange={setActivityType}>
-              <SelectTrigger>
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                {ACTIVITY_TYPES.map((t) => (
-                  <SelectItem key={t.value} value={t.value}>
-                    {t.label}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+            <MultiToggle
+              options={ACTIVITY_TYPES}
+              values={activityTypes}
+              onChange={setActivityTypes}
+              ariaLabel="Typ aktywności"
+            />
           </div>
           <div className="grid gap-2">
             <Label htmlFor="entry-title">Tytuł</Label>
