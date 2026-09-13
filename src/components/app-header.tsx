@@ -1,6 +1,7 @@
 import { Link, useNavigate } from "@tanstack/react-router";
 import { useQueryClient } from "@tanstack/react-query";
-import { Bell, PawPrint, User } from "lucide-react";
+import { Bell, User } from "lucide-react";
+import logo from "@/assets/logo.png";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth, useProfile } from "@/lib/auth";
 import { useIsBehaviorist } from "@/lib/access";
