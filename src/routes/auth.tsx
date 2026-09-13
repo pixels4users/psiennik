@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { createFileRoute, useNavigate, useSearch } from "@tanstack/react-router";
+import { CircleCheckBig, Mail } from "lucide-react";
 import { toast } from "sonner";
 import { z } from "zod";
 import { supabase } from "@/integrations/supabase/client";
@@ -54,6 +55,7 @@ function AuthPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [name, setName] = useState("");
+  const [registeredEmail, setRegisteredEmail] = useState<string | null>(null);
 
   useEffect(() => {
     if (loading || !user) return;
@@ -130,7 +132,7 @@ function AuthPage() {
       if (data.session) {
         // redirect handled by useEffect with code
       } else {
-        toast.success("Sprawdź skrzynkę i potwierdź adres e-mail, aby dokończyć rejestrację.");
+        setRegisteredEmail(email.trim());
       }
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Nie udało się założyć konta");
@@ -155,6 +157,30 @@ function AuthPage() {
       setBusy(false);
     }
   };
+
+  if (registeredEmail) {
+    return (
+      <main className="mx-auto flex min-h-[calc(100vh-5rem)] max-w-xl items-center px-5 py-12 text-center">
+        <div className="w-full">
+          <div className="mx-auto flex size-16 items-center justify-center rounded-full bg-keylime text-primary">
+            <CircleCheckBig className="size-8" aria-hidden="true" />
+          </div>
+          <h1 className="mt-6 text-4xl">Konto zostało utworzone</h1>
+          <p className="mt-4 text-lg text-muted-foreground">
+            Wysłaliśmy wiadomość z linkiem potwierdzającym na adres:
+          </p>
+          <p className="mt-2 break-words font-semibold text-foreground">{registeredEmail}</p>
+          <div className="mt-8 flex items-start gap-3 rounded-lg bg-muted p-5 text-left">
+            <Mail className="mt-0.5 size-5 shrink-0 text-primary" aria-hidden="true" />
+            <p className="text-sm leading-relaxed text-muted-foreground">
+              Otwórz wiadomość i kliknij link, aby potwierdzić adres e-mail i dokończyć rejestrację.
+              Jeśli jej nie widzisz, sprawdź folder spam.
+            </p>
+          </div>
+        </div>
+      </main>
+    );
+  }
 
   return (
     <div className="mx-auto max-w-md px-5 py-14">
@@ -232,7 +258,6 @@ function AuthPage() {
                     id="reg-name"
                     value={name}
                     onChange={(e) => setName(e.target.value)}
-                    placeholder="np. Miłosz"
                   />
                 </div>
                 <div className="grid gap-2">
