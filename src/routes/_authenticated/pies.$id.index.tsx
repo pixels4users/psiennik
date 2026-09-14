@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { format, parseISO } from "date-fns";
 import { pl } from "date-fns/locale";
@@ -27,11 +27,15 @@ export const Route = createFileRoute("/_authenticated/pies/$id/")({
       privatePage: true,
     }),
   }),
+  validateSearch: (search: Record<string, unknown>): { wpis?: string } => ({
+    wpis: typeof search.wpis === "string" ? search.wpis : undefined,
+  }),
   component: DogListPage,
 });
 
 function DogListPage() {
   const { id } = Route.useParams();
+  const { wpis } = Route.useSearch();
   const { data: dog } = useDog(id);
   const { data: role, isLoading: roleLoading } = useDogRole(id);
   const { data: entries, isLoading } = useEntries(id);
