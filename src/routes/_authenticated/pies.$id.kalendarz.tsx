@@ -237,10 +237,13 @@ function DogCalendarPage() {
                     entry={entry}
                     canEdit={!!role?.canEditEntries}
                     canComment={!!role?.canComment}
-                    onEdit={(item) => {
-                      setEditedEntry(item);
-                      setEntryDialogOpen(true);
-                    }}
+                    onEdit={(item) =>
+                      navigate({
+                        to: "/pies/$id/wydarzenie/$entryId",
+                        params: { id, entryId: item.id },
+                        search: { wroc: "kalendarz" },
+                      })
+                    }
                     onComment={(item) => {
                       setCommentedEntry(item);
                       setCommentDialogOpen(true);
@@ -253,12 +256,6 @@ function DogCalendarPage() {
         </SheetContent>
       </Sheet>
 
-      <EntryFormDialog
-        dogId={id}
-        open={entryDialogOpen}
-        onOpenChange={setEntryDialogOpen}
-        entry={editedEntry}
-      />
       <CommentDialog
         entry={commentedEntry}
         open={commentDialogOpen}
