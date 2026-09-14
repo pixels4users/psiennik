@@ -43,17 +43,17 @@ Bez obietnicy „natychmiast i nieodwracalnie". Rozdzielam trzy warstwy: aplikac
 | Zdjęcia psów | Usuwane razem z psem |
 | Kopie zapasowe | Dane znikają wraz z rotacją kopii — okres wpisany dopiero po odpowiedzi Lovable |
 | Psy udostępnione przez kogoś innego | Zostają u właściciela; znika tylko Twój dostęp |
-| Zalecenia w cudzym dzienniku | Do decyzji — patrz niżej |
+| Zalecenia w cudzym dzienniku | Treść zostaje przy wpisie właściciela, powiązanie z kontem zerwane |
 | Konto nieużywane | Bez automatycznego kasowania, ale z corocznym przeglądem zasadności przechowywania (przypomnienie po 24 miesiącach bezczynności, potem decyzja) |
-| Rejestr akceptacji | Dane ograniczone do minimum (identyfikator konta, wersja, data, sposób), cel: dowód zawarcia umowy; okres i uzasadnienie do potwierdzenia razem z Tobą |
+| Rejestr akceptacji | Minimalny zakres (identyfikator konta, wersja, data, sposób); okres i uzasadnienie ustalamy przed wdrożeniem |
 
-Wymagające Twojej decyzji:
-1. **Zalecenia behawiorysty po usunięciu jego konta** — proponuję: treść zalecenia zostaje przy wpisie właściciela, ale zastępujemy dane osobowe behawiorysty opisem „behawiorysta (konto usunięte)"; w bazie zrywamy powiązanie z jego identyfikatorem. Alternatywa: usunięcie także treści zaleceń.
-2. **Rejestr akceptacji po usunięciu konta** — przechowywanie dowodu w profilu jest sprzeczne z jego usunięciem. Proponuję: wiersze rejestru zostają, ale bez e-maila i imienia, z samym identyfikatorem konta; okres i cel opisujemy w polityce. Jeśli wolisz pełne usunięcie — rejestr znika razem z kontem i rezygnujemy z dowodu.
-3. **Współwłaściciele** — usunięcie konta głównego właściciela odbiera im dzienniki. Przed potwierdzeniem pokazujemy to wprost, z listą psów i liczbą osób, które stracą dostęp.
-4. **Eksport przed usunięciem** — proponuję prosty przycisk „Pobierz moje dane" (plik z wpisami i listą psów) obok usuwania konta oraz mailową procedurę dostępu i eksportu opisaną w polityce.
+Twoje decyzje, które wdrażam:
+1. **Zalecenia po usunięciu konta behawiorysty** — treść zostaje przy dzienniku, powiązanie z kontem usuwamy, przy zaleceniu pokazujemy „Behawiorysta — konto usunięte". Nie nazywamy tego anonimizacją: treść może zawierać podpis lub inne dane. W polityce opisujemy cel dalszego przechowywania (dokumentacja pracy z psem prowadzona przez właściciela) i tryb obsługi żądań dotyczących takich treści — zgłoszenie na `kontakt@psiennik.pl`, ocena indywidualna, usunięcie fragmentu gdy nie ma podstaw do zachowania.
+2. **Historia akceptacji po usunięciu konta** — zachowujemy minimalny, faktycznie użyteczny dowód: identyfikator konta, rodzaj dokumentu, wersja, data, sposób. Bez e-maila i imienia. Okresu nie wybieram arbitralnie — proponuję ustalić go razem przed wdrożeniem, na podstawie tego, przed jakim roszczeniem ten dowód ma chronić; do tego czasu nie wpisuję żadnej liczby do dokumentów.
+3. **Dzienniki współwłaścicieli** — na MVP usuwane razem z kontem głównego właściciela. Ekran potwierdzenia wymienia psy i liczbę osób, które stracą dostęp, i proponuje eksport przed usunięciem.
+4. **Eksport** — przycisk „Pobierz moje dane" w profilu. Zakres: psy, wpisy i zalecenia w pliku JSON plus czytelny plik tekstowy; zdjęcia pobierane osobno linkami ważnymi czasowo (albo w paczce ZIP, jeśli wolisz). Eksport działa na uprawnieniach zalogowanego konta — obejmuje wyłącznie psy, do których ma dostęp, i nie zawiera danych innych kont poza tym, co i tak widać w aplikacji (imię autora zalecenia).
 
-Dopóki tych punktów nie ustalimy, nie zmieniam treści dokumentów o retencji.
+Do domknięcia przed wdrożeniem dokumentów: okres przechowywania rejestru akceptacji (punkt 2) i format zdjęć w eksporcie (punkt 4).
 
 ## 6. Wiek i status użytkownika
 
