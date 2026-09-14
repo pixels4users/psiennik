@@ -290,7 +290,29 @@ function AuthPage() {
 
             <TabsContent value="register">
               <form onSubmit={signUp} className="grid gap-4 pt-4">
+                <fieldset className="grid gap-2">
+                  <legend className="mb-2 text-sm font-medium">Zakładam konto jako</legend>
+                  <div className="grid grid-cols-2 gap-2">
+                    <Button
+                      type="button"
+                      variant={role === "owner" ? "default" : "outline"}
+                      aria-pressed={role === "owner"}
+                      onClick={() => setRole("owner")}
+                    >
+                      Właściciel psa
+                    </Button>
+                    <Button
+                      type="button"
+                      variant={role === "behaviorist" ? "default" : "outline"}
+                      aria-pressed={role === "behaviorist"}
+                      onClick={() => setRole("behaviorist")}
+                    >
+                      Behawiorysta
+                    </Button>
+                  </div>
+                </fieldset>
                 <div className="grid gap-2">
+
                   <Label htmlFor="reg-name">Imię</Label>
                   <Input
                     id="reg-name"
