@@ -73,10 +73,9 @@ function DogListPage() {
         <div className="mt-8 flex flex-wrap gap-2">
           {role?.canEditEntries && (
             <Button
-              onClick={() => {
-                setEditedEntry(null);
-                setEntryDialogOpen(true);
-              }}
+              onClick={() =>
+                navigate({ to: "/pies/$id/wydarzenie/nowe", params: { id } })
+              }
             >
               <Plus className="size-4" />
               Dodaj wydarzenie
@@ -133,10 +132,12 @@ function DogListPage() {
                     entry={entry}
                     canEdit={!!role?.canEditEntries}
                     canComment={!!role?.canComment}
-                    onEdit={(e) => {
-                      setEditedEntry(e);
-                      setEntryDialogOpen(true);
-                    }}
+                    onEdit={(e) =>
+                      navigate({
+                        to: "/pies/$id/wydarzenie/$entryId",
+                        params: { id, entryId: e.id },
+                      })
+                    }
                     onComment={(e) => {
                       setCommentedEntry(e);
                       setCommentDialogOpen(true);
@@ -149,12 +150,6 @@ function DogListPage() {
         </div>
       )}
 
-      <EntryFormDialog
-        dogId={id}
-        open={entryDialogOpen}
-        onOpenChange={setEntryDialogOpen}
-        entry={editedEntry}
-      />
       <CommentDialog
         entry={commentedEntry}
         open={commentDialogOpen}
