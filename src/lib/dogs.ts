@@ -42,6 +42,10 @@ export const ACTIVITY_ICONS: Record<string, LucideIcon> = {
   inne: Shapes,
 };
 
+export function activityIcon(value: string): LucideIcon {
+  return ACTIVITY_ICONS[value] ?? Shapes;
+}
+
 export const TIMES_OF_DAY = [
   { value: "rano", label: "Rano" },
   { value: "poludnie", label: "Południe" },

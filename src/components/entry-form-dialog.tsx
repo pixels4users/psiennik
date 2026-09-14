@@ -7,6 +7,7 @@ import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import {
   ACTIVITY_TYPES,
+  ACTIVITY_ICONS,
   TIMES_OF_DAY,
   RATINGS,
   entryActivities,

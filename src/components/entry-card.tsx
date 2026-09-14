@@ -2,6 +2,7 @@ import { Pencil, MessageSquarePlus, MessageSquareText, Clock3 } from "lucide-rea
 import {
   ACTIVITY_TYPES,
   ACTIVITY_ICONS,
+  activityIcon,
   labelFor,
   entryActivities,
   entryTimes,
@@ -27,7 +28,7 @@ export function EntryCard({
 }) {
   const activities = entryActivities(entry);
   const times = entryTimes(entry);
-  const PrimaryIcon = ACTIVITY_ICONS[activities[0]];
+  const PrimaryIcon = activityIcon(activities[0] ?? "inne");
 
   return (
     <Card className="shadow-none">
