@@ -111,7 +111,12 @@ function DogListPage() {
               Dodaj współwłaściciela
             </Button>
           )}
-          {!hasBehaviorist && (
+          {hasBehaviorist ? (
+            <span className="inline-flex items-center gap-2 rounded-lg bg-secondary px-3 py-2 text-sm text-primary">
+              <UserPlus className="size-4" aria-hidden="true" />
+              Behawiorysta: {behavioristName}
+            </span>
+          ) : (
             <Button variant="outline" onClick={() => setAccessOpen(true)}>
               <UserPlus className="size-4" />
               Dodaj behawiorystę
