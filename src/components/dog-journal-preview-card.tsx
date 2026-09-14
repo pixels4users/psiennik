@@ -1,4 +1,3 @@
-import type { LucideIcon } from "lucide-react";
 import { Clock3 } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
@@ -20,7 +19,6 @@ type DogJournalPreviewCardProps = {
   timeOfDay: string;
   rating: JournalRating;
   ratingLabel: string;
-  icon: LucideIcon;
 };
 
 export function DogJournalPreviewCard({
@@ -32,7 +30,6 @@ export function DogJournalPreviewCard({
   timeOfDay,
   rating,
   ratingLabel,
-  icon: Icon,
 }: DogJournalPreviewCardProps) {
   return (
     <Card className="h-full overflow-hidden border bg-card shadow-none">
@@ -50,12 +47,7 @@ export function DogJournalPreviewCard({
 
       <CardContent className="grid gap-4 p-6">
         <div className="flex items-start justify-between gap-4">
-          <div className="flex min-w-0 items-center gap-2.5">
-            <span className="flex size-9 shrink-0 items-center justify-center rounded-full bg-secondary text-primary">
-              <Icon className="size-4" aria-hidden="true" />
-            </span>
-            <h3 className="text-xl leading-tight text-primary">{activity}</h3>
-          </div>
+          <h3 className="min-w-0 text-xl font-semibold leading-tight text-primary">{activity}</h3>
           <span className="flex shrink-0 items-center gap-1.5 text-xs text-muted-foreground">
             <Clock3 className="size-3.5" aria-hidden="true" />
             {timeOfDay}
