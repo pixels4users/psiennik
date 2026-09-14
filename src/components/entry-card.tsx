@@ -2,7 +2,6 @@ import { Pencil, MessageSquarePlus, MessageSquareText, Clock3 } from "lucide-rea
 import {
   ACTIVITY_TYPES,
   ACTIVITY_ICONS,
-  activityIcon,
   labelFor,
   entryActivities,
   entryTimes,
@@ -28,34 +27,28 @@ export function EntryCard({
 }) {
   const activities = entryActivities(entry);
   const times = entryTimes(entry);
-  const PrimaryIcon = activityIcon(activities[0] ?? "inne");
 
   return (
     <Card className="shadow-none">
       <CardContent className="grid gap-3 p-5">
         <div className="flex items-start justify-between gap-3">
-          <div className="flex min-w-0 items-start gap-3">
-            {PrimaryIcon && (
-              <span className="flex size-10 shrink-0 items-center justify-center rounded-full bg-secondary text-primary">
-                <PrimaryIcon className="size-5" aria-hidden="true" />
-              </span>
-            )}
-            <div className="grid gap-1.5">
-              <h3 className="font-display text-xl leading-tight">{entry.title}</h3>
-              <div className="flex flex-wrap items-center gap-2">
-                {activities.map((value) => {
-                  const Icon = ACTIVITY_ICONS[value];
-                  return (
-                    <span
-                      key={value}
-                      className="inline-flex items-center gap-1.5 rounded-full bg-secondary px-2.5 py-1 text-xs text-primary"
-                    >
-                      {Icon && <Icon className="size-3.5" aria-hidden="true" />}
-                      {labelFor(ACTIVITY_TYPES, value)}
-                    </span>
-                  );
-                })}
-              </div>
+          <div className="grid min-w-0 gap-1.5">
+            <h3 className="font-display text-xl font-semibold leading-tight text-primary">
+              {entry.title}
+            </h3>
+            <div className="flex flex-wrap items-center gap-2">
+              {activities.map((value) => {
+                const Icon = ACTIVITY_ICONS[value];
+                return (
+                  <span
+                    key={value}
+                    className="inline-flex items-center gap-1.5 rounded-full bg-secondary px-2.5 py-1 text-xs text-primary"
+                  >
+                    {Icon && <Icon className="size-3.5" aria-hidden="true" />}
+                    {labelFor(ACTIVITY_TYPES, value)}
+                  </span>
+                );
+              })}
             </div>
           </div>
           <span className="flex shrink-0 items-center gap-1.5 text-xs text-muted-foreground">
