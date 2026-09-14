@@ -18,7 +18,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Switch } from "@/components/ui/switch";
+
 import { Skeleton } from "@/components/ui/skeleton";
 
 import { socialMeta } from "@/lib/seo";
@@ -139,15 +139,8 @@ function ProfilePage() {
                   Uzupełnij, jeśli logowanie nie przekazało Twojego adresu.
                 </p>
               </div>
-              <div className="flex items-center justify-between gap-4 rounded-lg bg-secondary p-4">
-                <div>
-                  <p className="text-sm font-medium">Powiadomienia e-mail</p>
-                  <p className="text-xs text-muted-foreground">
-                    Wysyłkę wiadomości uruchomimy w kolejnym kroku.
-                  </p>
-                </div>
-                <Switch checked={notifications} onCheckedChange={setNotifications} />
-              </div>
+              {/* Przełącznik powiadomień e-mail ukryty do czasu uruchomienia wysyłki. */}
+
               <div className="flex flex-wrap justify-between gap-2 pt-2">
                 <Button type="button" variant="outline" onClick={signOut}>
                   Wyloguj się

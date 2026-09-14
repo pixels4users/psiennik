@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { format, parseISO } from "date-fns";
 import { pl } from "date-fns/locale";
@@ -27,11 +27,15 @@ export const Route = createFileRoute("/_authenticated/pies/$id/")({
       privatePage: true,
     }),
   }),
+  validateSearch: (search: Record<string, unknown>): { wpis?: string | undefined } => ({
+    wpis: typeof search["wpis"] === "string" ? (search["wpis"] as string) : undefined,
+  }),
   component: DogListPage,
 });
 
 function DogListPage() {
   const { id } = Route.useParams();
+  const { wpis } = Route.useSearch();
   const { data: dog } = useDog(id);
   const { data: role, isLoading: roleLoading } = useDogRole(id);
   const { data: entries, isLoading } = useEntries(id);
@@ -44,7 +48,23 @@ function DogListPage() {
 
   const hasCoOwner =
     access?.some((row) => row.role === "owner" && row.user_id !== dog?.owner_id) ?? false;
-  const hasBehaviorist = access?.some((row) => row.role === "behaviorist") ?? false;
+  const behavioristRow = access?.find((row) => row.role === "behaviorist") ?? null;
+  const hasBehaviorist = !!behavioristRow;
+  const behavioristName =
+    behavioristRow?.profile?.display_name || behavioristRow?.profile?.email || "przypisany";
+
+  useEffect(() => {
+    if (!wpis || isLoading) return;
+    const el = document.getElementById(`wpis-${wpis}`);
+    if (!el) return;
+    el.scrollIntoView({ behavior: "smooth", block: "center" });
+    el.classList.add("ring-2", "ring-primary", "rounded-xl");
+    const timer = window.setTimeout(
+      () => el.classList.remove("ring-2", "ring-primary", "rounded-xl"),
+      2500,
+    );
+    return () => window.clearTimeout(timer);
+  }, [wpis, isLoading, entries]);
 
   const grouped = useMemo(() => {
     const map = new Map<string, Entry[]>();
@@ -91,7 +111,12 @@ function DogListPage() {
               Dodaj współwłaściciela
             </Button>
           )}
-          {!hasBehaviorist && (
+          {hasBehaviorist ? (
+            <span className="inline-flex items-center gap-2 rounded-lg bg-secondary px-3 py-2 text-sm text-primary">
+              <UserPlus className="size-4" aria-hidden="true" />
+              Behawiorysta: {behavioristName}
+            </span>
+          ) : (
             <Button variant="outline" onClick={() => setAccessOpen(true)}>
               <UserPlus className="size-4" />
               Dodaj behawiorystę
@@ -131,8 +156,8 @@ function DogListPage() {
               </h2>
               <div className="grid gap-3">
                 {dayEntries.map((entry) => (
+                  <div key={entry.id} id={`wpis-${entry.id}`} className="transition-shadow">
                   <EntryCard
-                    key={entry.id}
                     entry={entry}
                     canEdit={!!role?.canEditEntries}
                     canComment={!!role?.canComment}
@@ -148,6 +173,7 @@ function DogListPage() {
                       setCommentDialogOpen(true);
                     }}
                   />
+                  </div>
                 ))}
               </div>
             </section>
