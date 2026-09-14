@@ -2,7 +2,7 @@ import { useMemo, useState } from "react";
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { format, parseISO } from "date-fns";
 import { pl } from "date-fns/locale";
-import { Clock, PawPrint, Plus, Ticket } from "lucide-react";
+import { Clock, PawPrint, Plus, Ticket, UserPlus } from "lucide-react";
 import { toast } from "sonner";
 import {
   useDogs,
@@ -22,6 +22,7 @@ import {
   useSubscriptionLimits,
 } from "@/lib/access";
 import { DogFormDialog } from "@/components/dog-form-dialog";
+import { BehavioristCodeBar, InviteClientDialog } from "@/components/behaviorist-invite";
 import { DogAvatar } from "@/components/dog-avatar";
 import { RatingBadge } from "@/components/rating-badge";
 import { Button } from "@/components/ui/button";
@@ -206,6 +207,7 @@ function DogsPage() {
   const limits = useSubscriptionLimits();
   const [dialogOpen, setDialogOpen] = useState(false);
   const [joinOpen, setJoinOpen] = useState(false);
+  const [inviteOpen, setInviteOpen] = useState(false);
 
   const grouped = useMemo(() => {
     const active: DogWithAccess[] = [];
@@ -235,33 +237,39 @@ function DogsPage() {
           </p>
         </div>
         <div className="flex flex-wrap gap-2">
-          {isOwner && (
-            <Button variant="outline" onClick={() => setJoinOpen(true)}>
-              <Ticket className="size-4" />
-              Dołącz kodem
-            </Button>
-          )}
           {isBehaviorist ? (
-            <Button variant="outline" onClick={() => setJoinOpen(true)}>
-              <Ticket className="size-4" />
-              Dołącz kodem
-            </Button>
+            <>
+              <Button onClick={() => setInviteOpen(true)}>
+                <UserPlus className="size-4" />
+                Zaproś klienta
+              </Button>
+              <Button variant="outline" onClick={() => setJoinOpen(true)}>
+                <Ticket className="size-4" />
+                Dołącz kodem
+              </Button>
+            </>
           ) : (
-            <Button onClick={() => setDialogOpen(true)}>
-              <Plus className="size-4" />
-              Dodaj psa
-            </Button>
+            <>
+              {isOwner && (
+                <Button variant="outline" onClick={() => setJoinOpen(true)}>
+                  <Ticket className="size-4" />
+                  Dołącz kodem
+                </Button>
+              )}
+              <Button onClick={() => setDialogOpen(true)}>
+                <Plus className="size-4" />
+                Dodaj psa
+              </Button>
+            </>
           )}
         </div>
       </div>
 
       {isBehaviorist && (
-        <div className="mt-4 rounded-lg bg-secondary p-3 text-sm">
+        <BehavioristCodeBar>
           Aktywne procesy: {limits.active} / {limits.max}
-          {limits.pending > 0 && (
-            <span className="ml-3 text-muted-foreground">(oczekujące: {limits.pending})</span>
-          )}
-        </div>
+          {limits.pending > 0 && <span className="ml-2">(oczekujące: {limits.pending})</span>}
+        </BehavioristCodeBar>
       )}
 
       {!!recentEntries.length && (
@@ -292,17 +300,25 @@ function DogsPage() {
       ) : !dogs?.length ? (
         <div className="mt-10 rounded-xl bg-keylime p-12 text-center">
           <PawPrint className="mx-auto size-10 text-primary" />
-          <h2 className="mt-4 text-3xl">Jeszcze nie ma żadnego psa</h2>
+          <h2 className="mt-4 text-3xl">
+            {isBehaviorist ? "Zaproś pierwszego klienta" : "Jeszcze nie ma żadnego psa"}
+          </h2>
           <p className="mx-auto mt-2 max-w-md text-muted-foreground">
             {isBehaviorist
-              ? "Poproś właściciela o kod zaproszenia i dołącz do dziennika jego psa."
+              ? "Wyślij właścicielowi link — po rejestracji jego psy trafią pod Twoją opiekę."
               : "Dodaj pierwszego psa, aby zacząć zapisywać wydarzenia i śledzić postępy."}
           </p>
           {isBehaviorist ? (
-            <Button variant="outline" className="mt-6" onClick={() => setJoinOpen(true)}>
-              <Ticket className="size-4" />
-              Dołącz kodem
-            </Button>
+            <div className="mt-6 flex flex-wrap justify-center gap-2">
+              <Button onClick={() => setInviteOpen(true)}>
+                <UserPlus className="size-4" />
+                Zaproś klienta
+              </Button>
+              <Button variant="outline" onClick={() => setJoinOpen(true)}>
+                <Ticket className="size-4" />
+                Dołącz kodem
+              </Button>
+            </div>
           ) : (
             <Button className="mt-6" onClick={() => setDialogOpen(true)}>
               <Plus className="size-4" />
@@ -354,6 +370,7 @@ function DogsPage() {
 
       <DogFormDialog open={dialogOpen} onOpenChange={setDialogOpen} />
       <JoinDialog open={joinOpen} onOpenChange={setJoinOpen} />
+      <InviteClientDialog open={inviteOpen} onOpenChange={setInviteOpen} />
     </div>
   );
 }
