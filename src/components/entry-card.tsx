@@ -2,7 +2,6 @@ import { Pencil, MessageSquarePlus, MessageSquareText, Clock3 } from "lucide-rea
 import {
   ACTIVITY_TYPES,
   ACTIVITY_ICONS,
-  activityIcon,
   labelFor,
   entryActivities,
   entryTimes,
