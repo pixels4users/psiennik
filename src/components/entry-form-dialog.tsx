@@ -255,7 +255,7 @@ export function EntryFormDialog({
           <div className="grid gap-2">
             <Label>Typ aktywności</Label>
             <MultiToggle
-              options={ACTIVITY_TYPES.map((t) => ({ ...t, icon: ACTIVITY_ICONS[t.value] }))}
+              options={ACTIVITY_TYPES.map((t) => ({ ...t, icon: activityIcon(t.value) }))}
               values={activityTypes}
               onChange={setActivityTypes}
               ariaLabel="Typ aktywności"
