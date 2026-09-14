@@ -53,7 +53,7 @@ Jeżeli nie zaakceptujesz skrótu e-maila, alternatywą jest uczciwe zapisanie w
 >
 > Twój dziennik, wpisy, zdjęcia i profil usuwamy razem z kontem i nie obejmujemy ich powyższym okresem. Niezależnie od tego przez ograniczony czas mogą pozostawać kopie zapasowe podlegające rotacji, korespondencja z nami oraz dane niezbędne w konkretnej sprawie spornej — opisujemy je w pozostałych częściach tej polityki.
 >
-> Możesz w każdej chwili wnieść sprzeciw wobec tego przechowywania, pisząc na kontakt@psiennik.pl. Ocenimy zgłoszenie indywidualnie, biorąc pod uwagę Twoją sytuację, i usuniemy wpis, jeżeli nie będziemy mieli ważnych prawnie uzasadnionych podstaw do jego zachowania.
+> Możesz w każdej chwili wnieść sprzeciw wobec tego przechowywania, pisząc na [kontakt@psiennik.pl](mailto:kontakt@psiennik.pl). Ocenimy zgłoszenie indywidualnie, biorąc pod uwagę Twoją sytuację, i usuniemy wpis, jeżeli nie będziemy mieli ważnych prawnie uzasadnionych podstaw do jego zachowania.
 
 ## 3. Mechanizm usuwania
 
@@ -94,5 +94,24 @@ Jeżeli nie zaakceptujesz skrótu e-maila, alternatywą jest uczciwe zapisanie w
 
 ## Do decyzji przed wdrożeniem
 
-1. Skrót adresu e-mail (HMAC) jako minimalne powiązanie dla reklamacji po usunięciu konta — tak czy nie.
-2. Okresy dla poszczególnych rodzajów powiadomień — ustalamy je razem; plan nie wpisuje liczby arbitralnie.
+1. Skrót adresu e-mail (HMAC) jako minimalne powiązanie dla reklamacji po usunięciu konta — tak czy nie. -> NIE
+2. Okresy dla poszczególnych rodzajów powiadomień — ustalamy je razem; plan nie wpisuje liczby arbitralnie. ->   
+  
+**1. HMAC e-maila — rekomenduję „tak”, ale trzeba dopisać go do polityki**
+  To rozsądne, ograniczone powiązanie pozwalające odnaleźć zapis po usunięciu konta. Nadal jest jednak przetwarzaniem danych osobowych: celowo zachowujesz możliwość dopasowania adresu do osoby. To pseudonimizacja, nie anonimizacja. [Wyjaśnienie EROD](https://www.edpb.europa.eu/system/files/2025-02/edpb_summary_202501_pseudonymisation_en.pdf).
+  W proponowanym tekście polityki **HMAC nie został wymieniony**, mimo słowa „wyłącznie” przy wyliczeniu danych. Jeśli go wybierzesz, dodaj np.:
+  > Przechowujemy również zabezpieczony kryptograficznie identyfikator wyliczony z adresu e-mail, który pozwala odnaleźć zapis po podaniu tego adresu w zgłoszeniu.
+  Technicznie Lovable powinno uwzględnić zmianę adresu e-mail, adresy ukryte przez Apple oraz bezpieczne zarządzanie kluczem. Dopasowanie HMAC pomaga znaleźć konto — **nie jest samo w sobie potwierdzeniem tożsamości osoby składającej reklamację**.
+  **2. Powiadomienia — nie zostawiać pustego terminu w działającym systemie**
+  Plan słusznie nie wymyśla liczby lat, ale brak decyzji nie może skutkować zapisywaniem zdarzeń bez daty usunięcia.
+  Rekomenduję prostą zasadę: **uruchamiać dany typ powiadomienia dopiero po określeniu jego celu i retencji**. Nie trzeba teraz budować kategorii, których aplikacja jeszcze nie używa.
+  Do poprawienia jest także zdanie w polityce „powiadomienia przechowujemy krócej” — wcześniej plan dopuszcza dla istotnych zmian umowy okres podobny do akceptacji. Lepiej napisać „według rodzaju powiadomienia”, a następnie podać ustalone zasady.
+  **3. Token — dopisać dwa scenariusze do testów**
+  Podpisany token i idempotencja to dobry kierunek. Sprawdźcie jeszcze:
+  - czy token wydany dla jednego użytkownika lub procesu rejestracji nie może zostać wykorzystany w innym;
+  - czy działa przejście przez potwierdzenie e-maila i Google/Apple, również gdy dokument zmienił się podczas tego procesu.
+  Token powinien mieć określoną ważność. Sam podpis nie dowodzi, że użytkownik kliknął właściwy przycisk — zapis nadal musi następować w odpowiednim miejscu procesu.
+  **4. Usuwanie konta — poprawić obietnicę „wszystko albo nic”**
+  Konto, baza i zdjęcia w Storage nie muszą dać się usunąć jedną transakcją. Supabase wskazuje też ograniczenia usuwania użytkowników będących właścicielami plików. [Dokumentacja Supabase](https://supabase.com/docs/guides/auth/managing-user-data).
+  Wymaganiem powinno być: **operacja odporna na awarie, możliwa do bezpiecznego ponowienia, bez przedwczesnego komunikatu o sukcesie**. Test powinien zasymulować awarię usuwania zdjęć i sprawdzić, czy proces później dochodzi do końca.
+  **Co do sześciu lat:** zachowałbym to jako proponowaną politykę minimalnego rejestru do końcowej oceny prawnej. Uzasadnienie jest lepsze, ale warto zastąpić „ma zastosowanie do roszczeń konsumentów” przez „może mieć zastosowanie do roszczeń konsumentów” oraz usunąć absolutne „bez zapisu operator nie jest w stanie” — inne dowody również mogą istnieć.
