@@ -105,7 +105,7 @@ export function AppHeader() {
           </div>
         ) : (
           <Button asChild variant="default" size="sm">
-            <Link to="/auth">Zaloguj się</Link>
+            <Link to="/auth">Zaloguj się / Załóż konto</Link>
           </Button>
         )}
       </div>
