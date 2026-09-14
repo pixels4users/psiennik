@@ -1,5 +1,10 @@
 import { useEffect, useRef, useState } from "react";
-import { createFileRoute, useNavigate, useSearch } from "@tanstack/react-router";
+import {
+  Link as RouterLink,
+  createFileRoute,
+  useNavigate,
+  useSearch,
+} from "@tanstack/react-router";
 import { CircleCheckBig, Mail } from "lucide-react";
 import { toast } from "sonner";
 import { z } from "zod";
