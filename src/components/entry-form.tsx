@@ -166,7 +166,7 @@ export function EntryForm({
         </AlertDialogContent>
       </AlertDialog>
 
-      <form onSubmit={handleSubmit} className="grid gap-4">
+      <form onSubmit={handleSubmit} className="grid gap-8">
         <div className="grid gap-4">
           <div className="grid gap-2">
             <Label>Data</Label>
