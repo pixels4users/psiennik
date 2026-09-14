@@ -62,9 +62,8 @@ function PrivacyPage() {
             </li>
           </ul>
           <p className="mt-3 text-muted-foreground">
-            Dane dotyczące psa nie są same w sobie danymi osobowymi człowieka, ale są powiązane z
-            Twoim kontem. Pamiętaj, że w opisach i zdjęciach możesz przypadkowo umieścić informacje
-            o ludziach — prosimy tego unikać.
+             Pamiętaj, że w opisach i zdjęciach możesz przypadkowo umieścić informacje o sobie lub
+             osobach trzecich — prosimy tego unikać.
           </p>
         </div>
 
