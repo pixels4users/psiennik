@@ -207,6 +207,7 @@ function AuthPage() {
             <Button variant="outline" disabled={busy} onClick={() => oauth("apple")}>
               Kontynuuj z Apple
             </Button>
+            <LegalNotice />
           </div>
 
           <div className="flex items-center gap-3 text-xs tracking-wide text-muted-foreground uppercase">
@@ -284,6 +285,7 @@ function AuthPage() {
                     onChange={(e) => setPassword(e.target.value)}
                   />
                 </div>
+                <LegalNotice />
                 <Button type="submit" disabled={busy}>
                   Załóż konto
                 </Button>

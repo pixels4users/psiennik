@@ -4,6 +4,7 @@ import { QueryClientProvider, type QueryClient } from "@tanstack/react-query";
 import { AuthProvider } from "@/lib/auth";
 import { AppHeader } from "@/components/app-header";
 import { Toaster } from "@/components/ui/sonner";
+import { SiteFooter } from "@/components/site-footer";
 
 export const Route = createRootRoute({
   component: RootComponent,
@@ -75,6 +76,7 @@ function RootComponent() {
           <main className="flex-1">
             <Outlet />
           </main>
+          <SiteFooter />
         </div>
         <Toaster />
       </AuthProvider>

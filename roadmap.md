@@ -39,3 +39,5 @@
 - [x] Dodać indywidualne podglądy linków i wyłączyć prywatne strony z indeksowania
 - [x] Podmienić logo, ikonę i faviconę na nowe materiały oraz odświeżyć podglądy stron
 - [x] Spójne karty wydarzeń, ikony typów aktywności i ostatnie wydarzenia na liście psów
+- [x] Skonfigurować wysyłkę e-maili z notify.psiennik.pl (polskie szablony w stylu marki)
+- [ ] Audyt prywatności i informacji prawnych — wdrożenie po akceptacji

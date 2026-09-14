@@ -12,6 +12,8 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as AuthRouteImport } from './routes/auth'
+import { Route as PrywatnoscRouteImport } from './routes/prywatnosc'
+import { Route as RegulaminRouteImport } from './routes/regulamin'
 import { Route as AuthenticatedProfilRouteImport } from './routes/_authenticated/profil'
 import { Route as AuthenticatedPsyRouteImport } from './routes/_authenticated/psy'
 import { Route as AuthenticatedPiesIdRouteImport } from './routes/_authenticated/pies.$id'
@@ -20,6 +22,8 @@ import { Route as AuthenticatedPiesIdAnalizaRouteImport } from './routes/_authen
 import { Route as AuthenticatedPiesIdKalendarzRouteImport } from './routes/_authenticated/pies.$id.kalendarz'
 import { Route as AuthenticatedPiesIdTabelaRouteImport } from './routes/_authenticated/pies.$id.tabela'
 import { Route as AuthenticatedPiesIdZaleceniaRouteImport } from './routes/_authenticated/pies.$id.zalecenia'
+import { Route as LovableEmailAuthPreviewRouteImport } from './routes/lovable/email/auth/preview'
+import { Route as LovableEmailAuthWebhookRouteImport } from './routes/lovable/email/auth/webhook'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -33,6 +37,16 @@ const AuthenticatedRouteRoute = AuthenticatedRouteRouteImport.update({
 const AuthRoute = AuthRouteImport.update({
   id: '/auth',
   path: '/auth',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PrywatnoscRoute = PrywatnoscRouteImport.update({
+  id: '/prywatnosc',
+  path: '/prywatnosc',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const RegulaminRoute = RegulaminRouteImport.update({
+  id: '/regulamin',
+  path: '/regulamin',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AuthenticatedProfilRoute = AuthenticatedProfilRouteImport.update({
@@ -80,10 +94,22 @@ const AuthenticatedPiesIdZaleceniaRoute =
     path: '/zalecenia',
     getParentRoute: () => AuthenticatedPiesIdRoute,
   } as any)
+const LovableEmailAuthPreviewRoute = LovableEmailAuthPreviewRouteImport.update({
+  id: '/lovable/email/auth/preview',
+  path: '/lovable/email/auth/preview',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LovableEmailAuthWebhookRoute = LovableEmailAuthWebhookRouteImport.update({
+  id: '/lovable/email/auth/webhook',
+  path: '/lovable/email/auth/webhook',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
+  '/prywatnosc': typeof PrywatnoscRoute
+  '/regulamin': typeof RegulaminRoute
   '/profil': typeof AuthenticatedProfilRoute
   '/psy': typeof AuthenticatedPsyRoute
   '/pies/$id': typeof AuthenticatedPiesIdRouteWithChildren
@@ -91,17 +117,23 @@ export interface FileRoutesByFullPath {
   '/pies/$id/kalendarz': typeof AuthenticatedPiesIdKalendarzRoute
   '/pies/$id/tabela': typeof AuthenticatedPiesIdTabelaRoute
   '/pies/$id/zalecenia': typeof AuthenticatedPiesIdZaleceniaRoute
+  '/lovable/email/auth/preview': typeof LovableEmailAuthPreviewRoute
+  '/lovable/email/auth/webhook': typeof LovableEmailAuthWebhookRoute
   '/pies/$id/': typeof AuthenticatedPiesIdIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
+  '/prywatnosc': typeof PrywatnoscRoute
+  '/regulamin': typeof RegulaminRoute
   '/profil': typeof AuthenticatedProfilRoute
   '/psy': typeof AuthenticatedPsyRoute
   '/pies/$id/analiza': typeof AuthenticatedPiesIdAnalizaRoute
   '/pies/$id/kalendarz': typeof AuthenticatedPiesIdKalendarzRoute
   '/pies/$id/tabela': typeof AuthenticatedPiesIdTabelaRoute
   '/pies/$id/zalecenia': typeof AuthenticatedPiesIdZaleceniaRoute
+  '/lovable/email/auth/preview': typeof LovableEmailAuthPreviewRoute
+  '/lovable/email/auth/webhook': typeof LovableEmailAuthWebhookRoute
   '/pies/$id': typeof AuthenticatedPiesIdIndexRoute
 }
 export interface FileRoutesById {
@@ -109,6 +141,8 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
   '/auth': typeof AuthRoute
+  '/prywatnosc': typeof PrywatnoscRoute
+  '/regulamin': typeof RegulaminRoute
   '/_authenticated/profil': typeof AuthenticatedProfilRoute
   '/_authenticated/psy': typeof AuthenticatedPsyRoute
   '/_authenticated/pies/$id': typeof AuthenticatedPiesIdRouteWithChildren
@@ -116,6 +150,8 @@ export interface FileRoutesById {
   '/_authenticated/pies/$id/kalendarz': typeof AuthenticatedPiesIdKalendarzRoute
   '/_authenticated/pies/$id/tabela': typeof AuthenticatedPiesIdTabelaRoute
   '/_authenticated/pies/$id/zalecenia': typeof AuthenticatedPiesIdZaleceniaRoute
+  '/lovable/email/auth/preview': typeof LovableEmailAuthPreviewRoute
+  '/lovable/email/auth/webhook': typeof LovableEmailAuthWebhookRoute
   '/_authenticated/pies/$id/': typeof AuthenticatedPiesIdIndexRoute
 }
 export interface FileRouteTypes {
@@ -123,6 +159,8 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/auth'
+    | '/prywatnosc'
+    | '/regulamin'
     | '/profil'
     | '/psy'
     | '/pies/$id'
@@ -130,23 +168,31 @@ export interface FileRouteTypes {
     | '/pies/$id/kalendarz'
     | '/pies/$id/tabela'
     | '/pies/$id/zalecenia'
+    | '/lovable/email/auth/preview'
+    | '/lovable/email/auth/webhook'
     | '/pies/$id/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
     | '/auth'
+    | '/prywatnosc'
+    | '/regulamin'
     | '/profil'
     | '/psy'
     | '/pies/$id/analiza'
     | '/pies/$id/kalendarz'
     | '/pies/$id/tabela'
     | '/pies/$id/zalecenia'
+    | '/lovable/email/auth/preview'
+    | '/lovable/email/auth/webhook'
     | '/pies/$id'
   id:
     | '__root__'
     | '/'
     | '/_authenticated'
     | '/auth'
+    | '/prywatnosc'
+    | '/regulamin'
     | '/_authenticated/profil'
     | '/_authenticated/psy'
     | '/_authenticated/pies/$id'
@@ -154,6 +200,8 @@ export interface FileRouteTypes {
     | '/_authenticated/pies/$id/kalendarz'
     | '/_authenticated/pies/$id/tabela'
     | '/_authenticated/pies/$id/zalecenia'
+    | '/lovable/email/auth/preview'
+    | '/lovable/email/auth/webhook'
     | '/_authenticated/pies/$id/'
   fileRoutesById: FileRoutesById
 }
@@ -161,6 +209,10 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
   AuthRoute: typeof AuthRoute
+  PrywatnoscRoute: typeof PrywatnoscRoute
+  RegulaminRoute: typeof RegulaminRoute
+  LovableEmailAuthPreviewRoute: typeof LovableEmailAuthPreviewRoute
+  LovableEmailAuthWebhookRoute: typeof LovableEmailAuthWebhookRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -184,6 +236,20 @@ declare module '@tanstack/react-router' {
       path: '/auth'
       fullPath: '/auth'
       preLoaderRoute: typeof AuthRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/prywatnosc': {
+      id: '/prywatnosc'
+      path: '/prywatnosc'
+      fullPath: '/prywatnosc'
+      preLoaderRoute: typeof PrywatnoscRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/regulamin': {
+      id: '/regulamin'
+      path: '/regulamin'
+      fullPath: '/regulamin'
+      preLoaderRoute: typeof RegulaminRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_authenticated/profil': {
@@ -242,6 +308,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedPiesIdZaleceniaRouteImport
       parentRoute: typeof AuthenticatedPiesIdRoute
     }
+    '/lovable/email/auth/preview': {
+      id: '/lovable/email/auth/preview'
+      path: '/lovable/email/auth/preview'
+      fullPath: '/lovable/email/auth/preview'
+      preLoaderRoute: typeof LovableEmailAuthPreviewRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/lovable/email/auth/webhook': {
+      id: '/lovable/email/auth/webhook'
+      path: '/lovable/email/auth/webhook'
+      fullPath: '/lovable/email/auth/webhook'
+      preLoaderRoute: typeof LovableEmailAuthWebhookRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -283,6 +363,10 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
   AuthRoute: AuthRoute,
+  PrywatnoscRoute: PrywatnoscRoute,
+  RegulaminRoute: RegulaminRoute,
+  LovableEmailAuthPreviewRoute: LovableEmailAuthPreviewRoute,
+  LovableEmailAuthWebhookRoute: LovableEmailAuthWebhookRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
