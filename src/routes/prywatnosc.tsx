@@ -56,8 +56,9 @@ function PrivacyPage() {
               regulaminu (wersja, data, sposób).
             </li>
             <li>
-              <strong>Rejestr zdarzeń prawnych:</strong> rodzaj dokumentu, wersja, data i sposób
-              akceptacji lub powiadomienia — w celu udowodnienia zawarcia umowy.
+              <strong>Rejestr czynności dotyczących dokumentów:</strong> techniczny identyfikator
+              konta, rodzaj dokumentu, wersja pokazana użytkownikowi, czas zapisany przez nasz
+              serwer i sposób wykonania czynności.
             </li>
           </ul>
           <p className="mt-3 text-muted-foreground">
@@ -155,9 +156,15 @@ function PrivacyPage() {
               — szczegóły retencji podamy po potwierdzeniu przez Lovable.
             </li>
             <li>
-              <strong>Rejestr akceptacji regulaminu:</strong> minimalny zakres (identyfikator konta,
-              rodzaj dokumentu, wersja, data, sposób) w celu udowodnienia zawarcia umowy. Okres
-              przechowywania ustalamy przed wdrożeniem i wpisujemy w tę politykę.
+              <strong>Rejestr czynności dotyczących dokumentów:</strong> dowody akceptacji
+              regulaminu przechowujemy przez czas trwania umowy o prowadzenie konta, a po jej
+              zakończeniu do końca szóstego roku kalendarzowego liczonego od roku zakończenia
+              umowy. Usuwamy je wcześniej, jeżeli przestaną być potrzebne. Jeżeli toczy się
+              konkretna sprawa sporna, zachowujemy wyłącznie dowody potrzebne w tej sprawie i
+              wyłącznie do czasu jej zakończenia i rozliczenia. To nasza wewnętrzna zasada dowodowa,
+              a nie termin nakazany przepisami o ochronie danych. Zapisy o samym powiadomieniu o
+              zmianie dokumentu przechowujemy według rodzaju powiadomienia — okres ustalamy razem z
+              wprowadzeniem danego powiadomienia, a zakończenie umowy nigdy go nie przedłuża.
             </li>
             <li>
               <strong>Konta nieużywane:</strong> nie kasujemy ich automatycznie, ale co roku
@@ -166,6 +173,43 @@ function PrivacyPage() {
             </li>
           </ul>
         </div>
+
+        <div>
+          <h2 className="text-2xl text-primary">Rejestr czynności dotyczących dokumentów</h2>
+          <p className="mt-3 text-muted-foreground">
+            Zapisujemy dowód akceptacji regulaminu oraz, odrębnie, udostępnienia Ci informacji o
+            przetwarzaniu danych. Wpis potwierdza wykonanie konkretnej czynności i udostępnienie
+            dokumentu w określonej wersji — nie stanowi potwierdzenia, że dokument został
+            przeczytany.
+          </p>
+          <p className="mt-3 text-muted-foreground">
+            Wpis zawiera wyłącznie: techniczny identyfikator konta, rodzaj dokumentu, wersję, która
+            została Ci pokazana, czas zapisany przez nasz serwer oraz sposób, w jaki czynność
+            nastąpiła (założenie konta, logowanie przez zewnętrznego dostawcę albo ekran z prośbą o
+            akceptację zmiany). Nie zapisujemy adresu IP ani danych Twojego urządzenia.
+          </p>
+          <p className="mt-3 text-muted-foreground">
+            Podstawą jest nasz prawnie uzasadniony interes (art. 6 ust. 1 lit. f RODO) polegający na
+            możliwości wykazania treści zawartej umowy i wykonania obowiązku informacyjnego.
+          </p>
+          <p className="mt-3 text-muted-foreground">
+            Po usunięciu konta w rejestrze nie zostaje Twój adres e-mail ani imię — wyłącznie
+            techniczny identyfikator konta. Oznacza to, że wartość dowodowa takiego zapisu jest
+            ograniczona: odnalezienie właściwego wpisu na podstawie samego nazwiska lub adresu
+            e-mail zwykle nie jest możliwe i wymaga informacji przekazanych przez osobę zgłaszającą.
+            Świadomie nie dodajemy w tym celu żadnego dodatkowego powiązania z Twoimi danymi.
+          </p>
+          <p className="mt-3 text-muted-foreground">
+            Możesz w każdej chwili wnieść sprzeciw wobec tego przechowywania, pisząc na{" "}
+            <a className="underline" href={`mailto:${OPERATOR.email}`}>
+              {contactEmailLabel()}
+            </a>
+            . Ocenimy zgłoszenie indywidualnie, biorąc pod uwagę Twoją sytuację, i usuniemy wpis,
+            jeżeli nie będziemy mieli ważnych prawnie uzasadnionych podstaw do jego zachowania.
+          </p>
+        </div>
+
+
 
         <div>
           <h2 className="text-2xl text-primary">Twoje prawa</h2>
