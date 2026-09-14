@@ -250,7 +250,7 @@ function AuthPage() {
             <span className="h-px flex-1 bg-border" />
           </div>
 
-          <Tabs defaultValue="login">
+          <Tabs defaultValue={rola ? "register" : "login"}>
             <TabsList className="w-full">
               <TabsTrigger value="login" className="flex-1">
                 Logowanie
