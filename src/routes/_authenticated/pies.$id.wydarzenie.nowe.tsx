@@ -8,7 +8,7 @@ import { socialMeta } from "@/lib/seo";
 
 export const Route = createFileRoute("/_authenticated/pies/$id/wydarzenie/nowe")({
   validateSearch: (search: Record<string, unknown>) => ({
-    wroc: search.wroc === "kalendarz" ? ("kalendarz" as const) : undefined,
+    wroc: search["wroc"] === "kalendarz" ? ("kalendarz" as const) : undefined,
   }),
   head: ({ params }) => ({
     meta: socialMeta({

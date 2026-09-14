@@ -74,7 +74,11 @@ function DogListPage() {
           {role?.canEditEntries && (
             <Button
               onClick={() =>
-                navigate({ to: "/pies/$id/wydarzenie/nowe", params: { id } })
+                navigate({
+                  to: "/pies/$id/wydarzenie/nowe",
+                  params: { id },
+                  search: { wroc: undefined },
+                })
               }
             >
               <Plus className="size-4" />
