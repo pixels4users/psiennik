@@ -11,13 +11,15 @@ const acceptanceSchema = z.object({
 
 /**
  * Zapisuje zdarzenie akceptacji lub powiadomienia o dokumencie prawnym.
- * Wywoływane z klienta, bo tabela legal_acceptances ma INSERT tylko dla service_role.
+ * Tabela legal_acceptances ma INSERT tylko dla service_role, więc w handlerze
+ * używamy klienta admina (dynamiczny import po stronie serwera).
  */
 export const recordLegalAcceptance = createServerFn({ method: "POST" })
   .validator((data) => acceptanceSchema.parse(data))
   .middleware([requireSupabaseAuth])
   .handler(async ({ context, data }) => {
-    const { error } = await context.supabase.from("legal_acceptances").insert({
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { error } = await supabaseAdmin.from("legal_acceptances").insert({
       user_id: context.userId,
       document_kind: data.documentKind,
       version: data.version,
