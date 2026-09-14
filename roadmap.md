@@ -34,7 +34,8 @@
 - [x] Limity darmowego planu behawiorysty bez blokowania tworzenia psa
 - [x] Dashboard behawiorysty z aktywnymi/zakończonymi/oczekującymi procesami
 - [x] Galeria przykładowych dzienników psów na stronie głównej
-- [x] Ujednolicić nazwy ocen i określenie „zalecenia” w całej aplikacji
+- [x] Ujednolicić nazwy ocen i określenie „zalecenia" w całej aplikacji
 - [x] Dodać zakładkę zbierającą wszystkie zalecenia behawiorysty
 - [x] Dodać indywidualne podglądy linków i wyłączyć prywatne strony z indeksowania
 - [x] Podmienić logo, ikonę i faviconę na nowe materiały oraz odświeżyć podglądy stron
+- [x] Spójne karty wydarzeń, ikony typów aktywności i ostatnie wydarzenia na liście psów

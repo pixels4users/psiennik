@@ -1,7 +1,9 @@
-import { Pencil, MessageSquarePlus, MessageSquareText } from "lucide-react";
+import { Pencil, MessageSquarePlus, MessageSquareText, Clock3 } from "lucide-react";
 import {
   ACTIVITY_TYPES,
-  labelsFor,
+  ACTIVITY_ICONS,
+  activityIcon,
+  labelFor,
   entryActivities,
   entryTimes,
   timesLabel,
@@ -24,30 +26,42 @@ export function EntryCard({
   onEdit?: (entry: Entry) => void;
   onComment?: (entry: Entry) => void;
 }) {
+  const activities = entryActivities(entry);
+  const times = entryTimes(entry);
+  const PrimaryIcon = activityIcon(activities[0] ?? "inne");
+
   return (
     <Card className="shadow-none">
       <CardContent className="grid gap-3 p-5">
         <div className="flex items-start justify-between gap-3">
-          <div className="grid gap-1.5">
-            <h3 className="font-display text-xl leading-tight">{entry.title}</h3>
-            <p className="text-sm text-muted-foreground">
-              {labelsFor(ACTIVITY_TYPES, entryActivities(entry))} ·{" "}
-              {timesLabel(entryTimes(entry))}
-            </p>
-          </div>
-          <div className="flex shrink-0 items-center gap-2">
-            <RatingBadge rating={entry.rating} />
-            {canEdit && onEdit && (
-              <Button
-                variant="ghost"
-                size="icon"
-                aria-label="Edytuj wydarzenie"
-                onClick={() => onEdit(entry)}
-              >
-                <Pencil className="size-4" />
-              </Button>
+          <div className="flex min-w-0 items-start gap-3">
+            {PrimaryIcon && (
+              <span className="flex size-10 shrink-0 items-center justify-center rounded-full bg-secondary text-primary">
+                <PrimaryIcon className="size-5" aria-hidden="true" />
+              </span>
             )}
+            <div className="grid gap-1.5">
+              <h3 className="font-display text-xl leading-tight">{entry.title}</h3>
+              <div className="flex flex-wrap items-center gap-2">
+                {activities.map((value) => {
+                  const Icon = ACTIVITY_ICONS[value];
+                  return (
+                    <span
+                      key={value}
+                      className="inline-flex items-center gap-1.5 rounded-full bg-secondary px-2.5 py-1 text-xs text-primary"
+                    >
+                      {Icon && <Icon className="size-3.5" aria-hidden="true" />}
+                      {labelFor(ACTIVITY_TYPES, value)}
+                    </span>
+                  );
+                })}
+              </div>
+            </div>
           </div>
+          <span className="flex shrink-0 items-center gap-1.5 text-xs text-muted-foreground">
+            <Clock3 className="size-3.5" aria-hidden="true" />
+            {timesLabel(times)}
+          </span>
         </div>
 
         {entry.description && (
@@ -85,6 +99,20 @@ export function EntryCard({
             </Button>
           )
         )}
+
+        <div className="flex items-center justify-between gap-2 border-t pt-3">
+          <RatingBadge rating={entry.rating} />
+          {canEdit && onEdit && (
+            <Button
+              variant="ghost"
+              size="icon"
+              aria-label="Edytuj wydarzenie"
+              onClick={() => onEdit(entry)}
+            >
+              <Pencil className="size-4" />
+            </Button>
+          )}
+        </div>
       </CardContent>
     </Card>
   );

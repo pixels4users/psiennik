@@ -7,6 +7,7 @@ import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import {
   ACTIVITY_TYPES,
+  activityIcon,
   TIMES_OF_DAY,
   RATINGS,
   entryActivities,
@@ -254,7 +255,7 @@ export function EntryFormDialog({
           <div className="grid gap-2">
             <Label>Typ aktywności</Label>
             <MultiToggle
-              options={ACTIVITY_TYPES}
+              options={ACTIVITY_TYPES.map((t) => ({ ...t, icon: activityIcon(t.value) }))}
               values={activityTypes}
               onChange={setActivityTypes}
               ariaLabel="Typ aktywności"

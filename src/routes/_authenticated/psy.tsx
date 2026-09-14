@@ -4,7 +4,17 @@ import { format, parseISO } from "date-fns";
 import { pl } from "date-fns/locale";
 import { Clock, PawPrint, Plus, Ticket } from "lucide-react";
 import { toast } from "sonner";
-import { useDogs, useRecentEntries, type DogWithAccess } from "@/lib/dogs";
+import {
+  useDogs,
+  useRecentEntries,
+  useDogPhotoUrl,
+  ACTIVITY_TYPES,
+  ACTIVITY_ICONS,
+  entryActivities,
+  labelFor,
+  type DogWithAccess,
+  type RecentEntry,
+} from "@/lib/dogs";
 import {
   useIsOwner,
   useIsBehaviorist,
@@ -21,6 +31,7 @@ import { Label } from "@/components/ui/label";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { socialMeta } from "@/lib/seo";
+import sygnetAsset from "@/assets/Psiennik_sygnet.png.asset.json";
 import {
   Dialog,
   DialogContent,
@@ -131,6 +142,62 @@ function DogCard({ dog }: { dog: DogWithAccess }) {
   );
 }
 
+function RecentEntryDogPhoto({ photoUrl }: { photoUrl: string | null }) {
+  const { data: url } = useDogPhotoUrl(photoUrl);
+
+  if (!photoUrl) {
+    return (
+      <img
+        src={sygnetAsset.url}
+        alt=""
+        className="size-12 shrink-0 rounded-full object-cover bg-secondary p-1.5"
+      />
+    );
+  }
+
+  if (!url) return <Skeleton className="size-12 shrink-0 rounded-full" />;
+
+  return <img src={url} alt="" className="size-12 shrink-0 rounded-full object-cover" />;
+}
+
+function RecentEntryCard({ entry }: { entry: RecentEntry }) {
+  const activities = entryActivities(entry);
+
+  return (
+    <Link to="/pies/$id" params={{ id: entry.dog_id }} className="block">
+      <Card className="shadow-none transition-colors hover:bg-keylime">
+        <CardContent className="flex items-start gap-4 p-4">
+          <RecentEntryDogPhoto photoUrl={entry.dogs?.photo_url ?? null} />
+          <div className="grid min-w-0 flex-1 gap-1.5">
+            <div className="flex items-start justify-between gap-2">
+              <p className="truncate font-display text-lg leading-tight">{entry.title}</p>
+              <RatingBadge rating={entry.rating} />
+            </div>
+            <p className="text-sm text-muted-foreground">
+              {entry.dogs?.name ?? "Pies"} ·{" "}
+              {format(parseISO(entry.date), "d MMMM yyyy", { locale: pl })}
+            </p>
+            <div className="flex flex-wrap gap-1.5">
+              {activities.map((value) => {
+                const Icon = ACTIVITY_ICONS[value];
+                return (
+                  <span
+                    key={value}
+                    className="inline-flex items-center gap-1 rounded-full bg-secondary px-2 py-0.5 text-xs text-primary"
+                  >
+                    {Icon && <Icon className="size-3" aria-hidden="true" />}
+                    {labelFor(ACTIVITY_TYPES, value)}
+                  </span>
+                );
+              })}
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+    </Link>
+  );
+}
+
 function DogsPage() {
   const { data: isOwner, isLoading: ownerLoading } = useIsOwner();
   const { data: isBehaviorist, isLoading: behavioristLoading } = useIsBehaviorist();
@@ -154,6 +221,7 @@ function DogsPage() {
   }, [dogs]);
 
   const loading = isLoading || ownerLoading || behavioristLoading;
+  const recentEntries = (recent ?? []).slice(0, 3);
 
   return (
     <div className="mx-auto max-w-5xl px-5 py-12">
@@ -196,25 +264,12 @@ function DogsPage() {
         </div>
       )}
 
-      {isBehaviorist && !!recent?.length && (
+      {!!recentEntries.length && (
         <div className="mt-10">
           <h2 className="text-2xl">Ostatnie wydarzenia</h2>
-          <div className="mt-4 grid gap-2">
-            {recent.map((entry) => (
-              <Link key={entry.id} to="/pies/$id" params={{ id: entry.dog_id }} className="block">
-                <Card className="shadow-none transition-colors hover:bg-keylime">
-                  <CardContent className="flex flex-wrap items-center justify-between gap-3 p-4">
-                    <div className="min-w-0">
-                      <p className="truncate font-display text-lg leading-tight">{entry.title}</p>
-                      <p className="text-sm text-muted-foreground">
-                        {entry.dogs?.name ?? "Pies"} ·{" "}
-                        {format(parseISO(entry.date), "d MMMM yyyy", { locale: pl })}
-                      </p>
-                    </div>
-                    <RatingBadge rating={entry.rating} />
-                  </CardContent>
-                </Card>
-              </Link>
+          <div className="mt-4 grid gap-3">
+            {recentEntries.map((entry) => (
+              <RecentEntryCard key={entry.id} entry={entry} />
             ))}
           </div>
         </div>
