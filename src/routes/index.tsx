@@ -54,7 +54,6 @@ const JOURNAL_PREVIEWS = [
     timeOfDay: "Rano",
     rating: "good" as const,
     ratingLabel: "Dobrze",
-    icon: activityIcon("spacer"),
   },
   {
     name: "Lunka",
