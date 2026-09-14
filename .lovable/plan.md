@@ -6,9 +6,7 @@ Domykamy etap A po Twoich decyzjach. Płatności (etap B) zostają nietknięte.
 
 Nie mogę założyć skrzynki pocztowej — Psiennik ma tylko wysyłkę e-maili z `notify.psiennik.pl`, bez odbierania poczty. Skrzynkę zakłada się u dostawcy poczty lub w panelu domeny.
 
-Proponuję dwa kroki:
-- Teraz: w dokumentach i stopce wpisuję `pixels4users@gmail.com`, żeby nie było placeholdera.
-- Kiedy zechcesz: zakładasz `kontakt@psiennik.pl` (np. przekierowanie na Twojego Gmaila w panelu domeny albo Google Workspace / Zoho Mail), dajesz mi znać i podmieniam adres w jednym miejscu.
+W dokumentach i stopce wpisuję `kontakt@psiennik.pl`.
 
 Uwaga: rekordy MX ustawiasz na `psiennik.pl`; nie ruszamy `notify.psiennik.pl`, żeby nie zepsuć wysyłki.
 
