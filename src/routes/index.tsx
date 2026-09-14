@@ -100,7 +100,9 @@ function LandingPage() {
             </p>
             <div className="flex w-full flex-col gap-3 sm:flex-row">
               <Button asChild size="lg" className="w-full sm:w-auto">
-                <Link to="/auth">Jestem właścicielem</Link>
+                <Link to="/auth" search={{ rola: "owner" }}>
+                  Jestem właścicielem
+                </Link>
               </Button>
               <Button
                 asChild
@@ -108,8 +110,11 @@ function LandingPage() {
                 variant="outline"
                 className="w-full border-primary text-primary hover:bg-slate-50 sm:w-auto"
               >
-                <Link to="/auth">Jestem behawiorystą</Link>
+                <Link to="/auth" search={{ rola: "behaviorist" }}>
+                  Jestem behawiorystą
+                </Link>
               </Button>
+
             </div>
           </div>
 

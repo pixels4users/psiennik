@@ -8,10 +8,14 @@ import {
 import { CircleCheckBig, Mail } from "lucide-react";
 import { toast } from "sonner";
 import { z } from "zod";
+import { useQueryClient } from "@tanstack/react-query";
+import { useServerFn } from "@tanstack/react-start";
 import { supabase } from "@/integrations/supabase/client";
 import { lovable } from "@/integrations/lovable";
 import { useAuth } from "@/lib/auth";
 import { useRedeemInvite } from "@/lib/access";
+import { claimBehavioristRole } from "@/lib/role.functions";
+
 import {
   DEMO_BEHAVIORIST_EMAIL,
   DEMO_OWNER_EMAIL,
@@ -27,7 +31,11 @@ import { socialMeta } from "@/lib/seo";
 
 const searchSchema = z.object({
   code: z.string().optional(),
+  rola: z.enum(["owner", "behaviorist"]).optional(),
 });
+
+const PENDING_ROLE_KEY = "psiennik.pending-role";
+
 
 export const Route = createFileRoute("/auth")({
   ssr: false,
@@ -47,17 +55,33 @@ export const Route = createFileRoute("/auth")({
 function AuthPage() {
   const navigate = useNavigate();
   const { user, loading } = useAuth();
-  const { code } = useSearch({ from: "/auth" });
+  const { code, rola } = useSearch({ from: "/auth" });
   const redeem = useRedeemInvite();
+  const queryClient = useQueryClient();
+  const claimBehaviorist = useServerFn(claimBehavioristRole);
   const [busy, setBusy] = useState(false);
   const redeemedRef = useRef(false);
+  const claimedRef = useRef(false);
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [name, setName] = useState("");
+  const [role, setRole] = useState<"owner" | "behaviorist">(rola ?? "owner");
   const [registeredEmail, setRegisteredEmail] = useState<string | null>(null);
 
   const searchCode = code?.trim();
+
+  // Rejestracja przez Google/Apple: wybraną rolę zapamiętujemy przed przekierowaniem
+  // i po powrocie z sesją nadajemy ją na serwerze (tylko dla świeżego konta).
+  useEffect(() => {
+    if (loading || !user || claimedRef.current) return;
+    if (sessionStorage.getItem(PENDING_ROLE_KEY) !== "behaviorist") return;
+    claimedRef.current = true;
+    sessionStorage.removeItem(PENDING_ROLE_KEY);
+    claimBehaviorist({ data: {} })
+      .then(() => queryClient.invalidateQueries())
+      .catch(() => undefined);
+  }, [loading, user, claimBehaviorist, queryClient]);
 
   useEffect(() => {
     if (loading || !user) return;
@@ -85,15 +109,19 @@ function AuthPage() {
     }
   }, [loading, user, searchCode, navigate, redeem]);
 
-  const oauth = async (provider: "google" | "apple") => {
+
+  const oauth = async (provider: "google" | "apple", chosenRole?: "owner" | "behaviorist") => {
     setBusy(true);
     try {
+      if (chosenRole === "behaviorist") sessionStorage.setItem(PENDING_ROLE_KEY, "behaviorist");
+      else sessionStorage.removeItem(PENDING_ROLE_KEY);
       const redirectTo = searchCode
         ? `${window.location.origin}/auth?code=${encodeURIComponent(searchCode)}`
         : window.location.origin;
       const result = await lovable.auth.signInWithOAuth(provider, {
         redirect_uri: redirectTo,
       });
+
       if (result.error) throw result.error;
       if (!result.redirected) navigate({ to: "/psy", replace: true });
     } catch (err) {
@@ -128,7 +156,7 @@ function AuthPage() {
           emailRedirectTo: searchCode
             ? `${window.location.origin}/auth?code=${encodeURIComponent(searchCode)}`
             : window.location.origin,
-          data: { display_name: name },
+          data: { display_name: name, role },
         },
       });
       if (error) throw error;
@@ -206,12 +234,13 @@ function AuthPage() {
       <Card className="mt-8 shadow-none">
         <CardContent className="grid gap-5 p-6">
           <div className="grid gap-2">
-            <Button variant="outline" disabled={busy} onClick={() => oauth("google")}>
+            <Button variant="outline" disabled={busy} onClick={() => oauth("google", role)}>
               Kontynuuj z Google
             </Button>
-            <Button variant="outline" disabled={busy} onClick={() => oauth("apple")}>
+            <Button variant="outline" disabled={busy} onClick={() => oauth("apple", role)}>
               Kontynuuj z Apple
             </Button>
+
             <LegalNotice />
           </div>
 
@@ -221,7 +250,7 @@ function AuthPage() {
             <span className="h-px flex-1 bg-border" />
           </div>
 
-          <Tabs defaultValue="login">
+          <Tabs defaultValue={rola ? "register" : "login"}>
             <TabsList className="w-full">
               <TabsTrigger value="login" className="flex-1">
                 Logowanie
@@ -261,7 +290,29 @@ function AuthPage() {
 
             <TabsContent value="register">
               <form onSubmit={signUp} className="grid gap-4 pt-4">
+                <fieldset className="grid gap-2">
+                  <legend className="mb-2 text-sm font-medium">Zakładam konto jako</legend>
+                  <div className="grid grid-cols-2 gap-2">
+                    <Button
+                      type="button"
+                      variant={role === "owner" ? "default" : "outline"}
+                      aria-pressed={role === "owner"}
+                      onClick={() => setRole("owner")}
+                    >
+                      Właściciel psa
+                    </Button>
+                    <Button
+                      type="button"
+                      variant={role === "behaviorist" ? "default" : "outline"}
+                      aria-pressed={role === "behaviorist"}
+                      onClick={() => setRole("behaviorist")}
+                    >
+                      Behawiorysta
+                    </Button>
+                  </div>
+                </fieldset>
                 <div className="grid gap-2">
+
                   <Label htmlFor="reg-name">Imię</Label>
                   <Input
                     id="reg-name"
