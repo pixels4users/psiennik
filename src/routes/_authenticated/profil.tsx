@@ -181,27 +181,33 @@ function ExportDataCard() {
   const exportData = useServerFn(exportMyData);
   const [exporting, setExporting] = useState(false);
 
+  const triggerDownload = (href: string, fileName: string) => {
+    const a = document.createElement("a");
+    a.href = href;
+    a.download = fileName;
+    a.rel = "noopener";
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+  };
+
   const download = async () => {
     setExporting(true);
     try {
       const data = await exportData({});
-      const text = JSON.stringify(data, null, 2);
-      const blob = new Blob([text], { type: "application/json" });
+      const blob = new Blob([data.text], { type: "text/plain;charset=utf-8" });
       const url = URL.createObjectURL(blob);
-      const a = document.createElement("a");
-      a.href = url;
-      a.download = `psiennik-export-${new Date().toISOString().slice(0, 10)}.json`;
-      a.click();
-      URL.revokeObjectURL(url);
+      triggerDownload(url, data.fileName);
+      setTimeout(() => URL.revokeObjectURL(url), 10_000);
 
       // Zdjęcia pobieramy osobno jako oryginalne pliki.
       for (const path of data.photoPaths) {
-        const { data: signed, error } = await supabase.storage.from("dog-photos").createSignedUrl(path, 60);
+        const { data: signed, error } = await supabase.storage.from("dog-photos").createSignedUrl(path, 60, {
+          download: path.split("/").pop() ?? "zdjecie.jpg",
+        });
         if (error || !signed) continue;
-        const img = document.createElement("a");
-        img.href = signed.signedUrl;
-        img.download = path.split("/").pop() ?? "zdjecie.jpg";
-        img.click();
+        triggerDownload(signed.signedUrl, path.split("/").pop() ?? "zdjecie.jpg");
+        await new Promise((r) => setTimeout(r, 300));
       }
 
       toast.success("Pobrano dane. Zdjęcia pobierają się osobno.");
