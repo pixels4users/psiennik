@@ -23,6 +23,19 @@ import { Switch } from "@/components/ui/switch";
 import { Skeleton } from "@/components/ui/skeleton";
 import { cn } from "@/lib/utils";
 import { socialMeta } from "@/lib/seo";
+import { useServerFn } from "@tanstack/react-start";
+import { deleteMyAccount } from "@/lib/account.functions";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 
 export const Route = createFileRoute("/_authenticated/profil")({
   head: () => ({
@@ -160,7 +173,74 @@ function ProfilePage() {
       <BehavioristCodeCard />
       <OwnerBehavioristsCard />
       <BehavioristOwnersCard />
+      <DeleteAccountCard />
     </div>
+  );
+}
+
+function DeleteAccountCard() {
+  const queryClient = useQueryClient();
+  const navigate = useNavigate();
+  const deleteAccount = useServerFn(deleteMyAccount);
+  const [deleting, setDeleting] = useState(false);
+
+  const remove = async () => {
+    setDeleting(true);
+    try {
+      await deleteAccount({});
+      await queryClient.cancelQueries();
+      queryClient.clear();
+      await supabase.auth.signOut();
+      toast.success("Konto zostało usunięte");
+      navigate({ to: "/", replace: true });
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Nie udało się usunąć konta");
+      setDeleting(false);
+    }
+  };
+
+  return (
+    <Card className="mt-6 border-destructive/30 shadow-none">
+      <CardHeader>
+        <CardTitle className="text-xl">Usunięcie konta</CardTitle>
+      </CardHeader>
+      <CardContent className="grid gap-4">
+        <p className="text-sm leading-relaxed text-muted-foreground">
+          Usunięcie konta jest nieodwracalne. Skasujemy Twój profil oraz psy, których jesteś
+          głównym właścicielem — razem z ich wpisami, zaleceniami i zdjęciami. Psy udostępnione Ci
+          przez inne osoby zostaną u ich właścicieli, stracisz jedynie dostęp.
+        </p>
+        <AlertDialog>
+          <AlertDialogTrigger asChild>
+            <Button variant="outline" className="justify-self-start text-destructive" disabled={deleting}>
+              <Trash2 className="mr-2 size-4" />
+              Usuń konto
+            </Button>
+          </AlertDialogTrigger>
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle>Usunąć konto na stałe?</AlertDialogTitle>
+              <AlertDialogDescription>
+                Tej operacji nie da się cofnąć. Twoje psy, wpisy, zalecenia i zdjęcia zostaną
+                trwale usunięte.
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel disabled={deleting}>Anuluj</AlertDialogCancel>
+              <AlertDialogAction
+                disabled={deleting}
+                onClick={(e) => {
+                  e.preventDefault();
+                  void remove();
+                }}
+              >
+                {deleting ? "Usuwanie…" : "Usuń konto"}
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
+      </CardContent>
+    </Card>
   );
 }
 

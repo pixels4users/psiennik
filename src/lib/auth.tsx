@@ -3,6 +3,7 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import type { Session, User } from "@supabase/supabase-js";
 import { supabase } from "@/integrations/supabase/client";
 import type { Tables } from "@/integrations/supabase/types";
+import { TERMS_VERSION } from "@/lib/legal";
 
 export type Role = "owner" | "behaviorist";
 export type DogRole = "owner" | "coowner" | "behaviorist";
@@ -50,6 +51,34 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     });
     return () => sub.subscription.unsubscribe();
   }, [queryClient]);
+
+  // Zapis akceptacji regulaminu: przy pierwszym zalogowaniu uzupełniamy
+  // wersję, datę i sposób (rejestracja e-mailem albo logowanie Google/Apple).
+  const userId = session?.user?.id;
+  const provider = session?.user?.app_metadata?.["provider"] as string | undefined;
+  useEffect(() => {
+    if (!userId) return;
+    let cancelled = false;
+    (async () => {
+      const { data } = await supabase
+        .from("profiles")
+        .select("terms_accepted_at")
+        .eq("id", userId)
+        .maybeSingle();
+      if (cancelled || !data || data.terms_accepted_at) return;
+      await supabase
+        .from("profiles")
+        .update({
+          terms_version: TERMS_VERSION,
+          terms_accepted_at: new Date().toISOString(),
+          terms_accepted_method: provider ?? "email",
+        })
+        .eq("id", userId);
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [userId, provider]);
 
   return (
     <AuthContext.Provider value={{ session, user: session?.user ?? null, loading }}>

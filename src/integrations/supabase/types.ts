@@ -265,6 +265,9 @@ export type Database = {
           id: string
           max_active_dogs: number
           plan_type: string
+          terms_accepted_at: string | null
+          terms_accepted_method: string | null
+          terms_version: string | null
           updated_at: string
         }
         Insert: {
@@ -275,6 +278,9 @@ export type Database = {
           id: string
           max_active_dogs?: number
           plan_type?: string
+          terms_accepted_at?: string | null
+          terms_accepted_method?: string | null
+          terms_version?: string | null
           updated_at?: string
         }
         Update: {
@@ -285,6 +291,9 @@ export type Database = {
           id?: string
           max_active_dogs?: number
           plan_type?: string
+          terms_accepted_at?: string | null
+          terms_accepted_method?: string | null
+          terms_version?: string | null
           updated_at?: string
         }
         Relationships: []

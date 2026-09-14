@@ -39,3 +39,8 @@
 - [x] Dodać indywidualne podglądy linków i wyłączyć prywatne strony z indeksowania
 - [x] Podmienić logo, ikonę i faviconę na nowe materiały oraz odświeżyć podglądy stron
 - [x] Spójne karty wydarzeń, ikony typów aktywności i ostatnie wydarzenia na liście psów
+- [x] Skonfigurować wysyłkę e-maili z notify.psiennik.pl (polskie szablony w stylu marki)
+- [x] Etap A audytu: regulamin, polityka prywatności, stopka, notka przy rejestracji, usuwanie konta, zapis akceptacji regulaminu
+- [ ] Uzupełnić adres e-mail kontaktowy w `src/lib/legal.ts` (dziś placeholder)
+- [ ] Decyzja: hostowanie fontów lokalnie zamiast Google Fonts
+- [ ] Etap B audytu — przed uruchomieniem płatnych kont
