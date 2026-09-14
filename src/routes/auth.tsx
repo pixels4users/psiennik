@@ -27,7 +27,11 @@ import { socialMeta } from "@/lib/seo";
 
 const searchSchema = z.object({
   code: z.string().optional(),
+  rola: z.enum(["owner", "behaviorist"]).optional(),
 });
+
+const PENDING_ROLE_KEY = "psiennik.pending-role";
+
 
 export const Route = createFileRoute("/auth")({
   ssr: false,
