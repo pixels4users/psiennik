@@ -140,6 +140,7 @@ function DogListPage() {
                       navigate({
                         to: "/pies/$id/wydarzenie/$entryId",
                         params: { id, entryId: e.id },
+                        search: { wroc: undefined },
                       })
                     }
                     onComment={(e) => {
