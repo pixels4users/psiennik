@@ -156,8 +156,8 @@ function DogListPage() {
               </h2>
               <div className="grid gap-3">
                 {dayEntries.map((entry) => (
+                  <div key={entry.id} id={`wpis-${entry.id}`} className="transition-shadow">
                   <EntryCard
-                    key={entry.id}
                     entry={entry}
                     canEdit={!!role?.canEditEntries}
                     canComment={!!role?.canComment}
