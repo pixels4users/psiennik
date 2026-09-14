@@ -1,5 +1,5 @@
 import { useMemo, useState } from "react";
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import {
   addDays,
   addWeeks,
@@ -13,7 +13,7 @@ import { useDog, useEntries, type Entry } from "@/lib/dogs";
 import { useDogRole } from "@/lib/auth";
 import { DogNav } from "@/components/dog-nav";
 import { EntryCard } from "@/components/entry-card";
-import { EntryFormDialog } from "@/components/entry-form-dialog";
+
 import { CommentDialog } from "@/components/comment-dialog";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -61,6 +61,7 @@ function ratingDotSize(count: number) {
 
 function DogCalendarPage() {
   const { id } = Route.useParams();
+  const navigate = useNavigate();
   const { data: role } = useDogRole(id);
   const { data: dog } = useDog(id);
   const { data: entries, isLoading } = useEntries(id);
@@ -68,8 +69,6 @@ function DogCalendarPage() {
     startOfWeek(new Date(), { weekStartsOn: 1 }),
   );
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
-  const [editedEntry, setEditedEntry] = useState<Entry | null>(null);
-  const [entryDialogOpen, setEntryDialogOpen] = useState(false);
   const [commentedEntry, setCommentedEntry] = useState<Entry | null>(null);
   const [commentDialogOpen, setCommentDialogOpen] = useState(false);
 
@@ -238,10 +237,13 @@ function DogCalendarPage() {
                     entry={entry}
                     canEdit={!!role?.canEditEntries}
                     canComment={!!role?.canComment}
-                    onEdit={(item) => {
-                      setEditedEntry(item);
-                      setEntryDialogOpen(true);
-                    }}
+                    onEdit={(item) =>
+                      navigate({
+                        to: "/pies/$id/wydarzenie/$entryId",
+                        params: { id, entryId: item.id },
+                        search: { wroc: "kalendarz" },
+                      })
+                    }
                     onComment={(item) => {
                       setCommentedEntry(item);
                       setCommentDialogOpen(true);
@@ -254,12 +256,6 @@ function DogCalendarPage() {
         </SheetContent>
       </Sheet>
 
-      <EntryFormDialog
-        dogId={id}
-        open={entryDialogOpen}
-        onOpenChange={setEntryDialogOpen}
-        entry={editedEntry}
-      />
       <CommentDialog
         entry={commentedEntry}
         open={commentDialogOpen}

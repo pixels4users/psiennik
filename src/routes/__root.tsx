@@ -1,4 +1,10 @@
-import { HeadContent, Outlet, Scripts, createRootRoute } from "@tanstack/react-router";
+import {
+  HeadContent,
+  Outlet,
+  Scripts,
+  createRootRoute,
+  useRouterState,
+} from "@tanstack/react-router";
 import appCss from "../styles.css?url";
 import { QueryClientProvider, type QueryClient } from "@tanstack/react-query";
 import { AuthProvider } from "@/lib/auth";
@@ -59,15 +65,18 @@ function RootShell({ children }: { children: React.ReactNode }) {
 
 function RootComponent() {
   const { queryClient } = Route.useRouteContext() as { queryClient: QueryClient };
+  const bareScreen = useRouterState({
+    select: (state) => state.location.pathname.includes("/wydarzenie/"),
+  });
   return (
     <QueryClientProvider client={queryClient}>
       <AuthProvider>
         <div className="flex min-h-screen flex-col">
-          <AppHeader />
+          {!bareScreen && <AppHeader />}
           <main className="flex-1">
             <Outlet />
           </main>
-          <SiteFooter />
+          {!bareScreen && <SiteFooter />}
         </div>
         <Toaster />
       </AuthProvider>
