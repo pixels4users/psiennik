@@ -273,10 +273,10 @@ function DogsPage() {
       </div>
 
       {isBehaviorist && (
-        <BehavioristCodeBar>
-          Aktywne procesy: {limits.active} / {limits.max}
-          {limits.pending > 0 && <span className="ml-2">(oczekujące: {limits.pending})</span>}
-        </BehavioristCodeBar>
+        <p className="mt-3 text-sm text-muted-foreground">
+          Aktywne procesy: {limits.active} z {limits.max}
+          {limits.pending > 0 && ` · oczekujące: ${limits.pending}`}
+        </p>
       )}
 
       {!!recentEntries.length && (
