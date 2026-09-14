@@ -1,5 +1,5 @@
 import { useMemo, useState } from "react";
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { format, parseISO } from "date-fns";
 import { pl } from "date-fns/locale";
 import { Plus, UserPlus, Users } from "lucide-react";
@@ -8,7 +8,7 @@ import { useDogAccess } from "@/lib/access";
 import { useDog, useEntries, type Entry } from "@/lib/dogs";
 import { DogNav } from "@/components/dog-nav";
 import { EntryCard } from "@/components/entry-card";
-import { EntryFormDialog } from "@/components/entry-form-dialog";
+
 import { CommentDialog } from "@/components/comment-dialog";
 import { AccessDialog } from "@/components/invite-dialog";
 import { Button } from "@/components/ui/button";
@@ -37,8 +37,7 @@ function DogListPage() {
   const { data: entries, isLoading } = useEntries(id);
   const { data: access } = useDogAccess(id);
 
-  const [entryDialogOpen, setEntryDialogOpen] = useState(false);
-  const [editedEntry, setEditedEntry] = useState<Entry | null>(null);
+  const navigate = useNavigate();
   const [commentedEntry, setCommentedEntry] = useState<Entry | null>(null);
   const [commentDialogOpen, setCommentDialogOpen] = useState(false);
   const [accessOpen, setAccessOpen] = useState(false);
