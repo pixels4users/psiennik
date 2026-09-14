@@ -61,6 +61,7 @@ function ratingDotSize(count: number) {
 
 function DogCalendarPage() {
   const { id } = Route.useParams();
+  const navigate = useNavigate();
   const { data: role } = useDogRole(id);
   const { data: dog } = useDog(id);
   const { data: entries, isLoading } = useEntries(id);
