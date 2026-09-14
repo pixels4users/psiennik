@@ -10,10 +10,14 @@ export const DEMO_PASSWORD = "DemoPsiennik123!";
  * na stronie logowania w podglądzie deweloperskim.
  */
 export const ensureDemoAccounts = createServerFn({ method: "POST" }).handler(async () => {
-  // Konta demo istnieją wyłącznie na potrzeby podglądu deweloperskiego —
-  // endpoint używa klucza serwisowego, więc w produkcji jest całkowicie wyłączony.
-  if (process.env["NODE_ENV"] === "production") {
-    throw new Error("Konta demo są dostępne tylko w środowisku deweloperskim.");
+  // Endpoint używa klucza serwisowego, więc działa wyłącznie na lokalnej maszynie
+  // deweloperskiej: wymagamy jawnego trybu "development" ORAZ świadomego
+  // włączenia przełącznikiem ENABLE_DEMO_ACCOUNTS. Każde inne wdrożenie
+  // (podgląd, staging, produkcja) nie jest w stanie uruchomić tej ścieżki.
+  const isDevRuntime = process.env["NODE_ENV"] === "development";
+  const demoEnabled = process.env["ENABLE_DEMO_ACCOUNTS"] === "true";
+  if (!isDevRuntime || !demoEnabled) {
+    throw new Error("Konta demo są dostępne tylko w lokalnym środowisku deweloperskim.");
   }
 
   const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
