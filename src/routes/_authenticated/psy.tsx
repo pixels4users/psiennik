@@ -165,7 +165,12 @@ function RecentEntryCard({ entry }: { entry: RecentEntry }) {
   const activities = entryActivities(entry);
 
   return (
-    <Link to="/pies/$id" params={{ id: entry.dog_id }} className="block">
+    <Link
+      to="/pies/$id"
+      params={{ id: entry.dog_id }}
+      search={{ wpis: entry.id }}
+      className="block"
+    >
       <Card className="shadow-none transition-colors hover:bg-keylime">
         <CardContent className="flex items-start gap-4 p-4">
           <RecentEntryDogPhoto photoUrl={entry.dogs?.photo_url ?? null} />
@@ -238,16 +243,18 @@ function DogsPage() {
         </div>
         <div className="flex flex-wrap gap-2">
           {isBehaviorist ? (
-            <>
-              <Button onClick={() => setInviteOpen(true)}>
-                <UserPlus className="size-4" />
-                Zaproś klienta
-              </Button>
-              <Button variant="outline" onClick={() => setJoinOpen(true)}>
-                <Ticket className="size-4" />
-                Dołącz kodem
-              </Button>
-            </>
+            dogs?.length ? (
+              <>
+                <Button onClick={() => setInviteOpen(true)}>
+                  <UserPlus className="size-4" />
+                  Zaproś klienta
+                </Button>
+                <Button variant="outline" onClick={() => setJoinOpen(true)}>
+                  <Ticket className="size-4" />
+                  Dołącz kodem
+                </Button>
+              </>
+            ) : null
           ) : (
             <>
               {isOwner && (
