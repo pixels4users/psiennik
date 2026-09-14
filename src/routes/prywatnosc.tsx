@@ -106,9 +106,7 @@ function PrivacyPage() {
           <p className="mt-3 text-muted-foreground">
             Dane powierzamy dostawcom, którzy przetwarzają je na nasze zlecenie: dostawcy platformy
             i hostingu aplikacji (Lovable) oraz infrastruktury bazy danych i przechowywania plików.
-            Baza danych aplikacji działa na serwerach w Unii Europejskiej (Irlandia). Szczegóły
-            umowy powierzenia, podprocesorów, retencji kopii zapasowych i logów ustalamy z Lovable —
-            do czasu ich potwierdzenia nie deklarujemy ich w tej polityce.
+             Baza danych aplikacji działa na serwerach w Unii Europejskiej (Irlandia).
           </p>
           <p className="mt-3 text-muted-foreground">
             Przy logowaniu Google lub Apple dane uwierzytelniające przetwarzają ci dostawcy zgodnie
