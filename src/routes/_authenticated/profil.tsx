@@ -226,7 +226,7 @@ function ExportDataCard() {
       <CardContent className="grid gap-4">
         <p className="text-sm leading-relaxed text-muted-foreground">
           Możesz pobrać kopię swoich danych: psy, wpisy, zalecenia oraz zdjęcia w oryginalnych
-          formatach. Plik tekstowy zawiera dane w formacie JSON.
+          formatach. Plik tekstowy zawiera czytelny opis Twoich psów, wpisów i zaleceń.
         </p>
         <Button variant="outline" className="justify-self-start" disabled={exporting} onClick={() => void download()}>
           <Download className="mr-2 size-4" />
