@@ -335,6 +335,11 @@ function DogsPage() {
         </div>
       ) : (
         <Tabs defaultValue="active" className="mt-10">
+          <p className="mb-3 text-sm text-muted-foreground">
+            {isBehaviorist
+              ? "Etap współpracy z właścicielem — nie stan psa."
+              : "Etap współpracy z behawiorystą — nie stan psa."}
+          </p>
           <TabsList className="mb-6">
             <TabsTrigger value="active">
               Aktywne
