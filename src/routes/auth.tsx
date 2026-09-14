@@ -51,17 +51,33 @@ export const Route = createFileRoute("/auth")({
 function AuthPage() {
   const navigate = useNavigate();
   const { user, loading } = useAuth();
-  const { code } = useSearch({ from: "/auth" });
+  const { code, rola } = useSearch({ from: "/auth" });
   const redeem = useRedeemInvite();
+  const queryClient = useQueryClient();
+  const claimBehaviorist = useServerFn(claimBehavioristRole);
   const [busy, setBusy] = useState(false);
   const redeemedRef = useRef(false);
+  const claimedRef = useRef(false);
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [name, setName] = useState("");
+  const [role, setRole] = useState<"owner" | "behaviorist">(rola ?? "owner");
   const [registeredEmail, setRegisteredEmail] = useState<string | null>(null);
 
   const searchCode = code?.trim();
+
+  // Rejestracja przez Google/Apple: wybraną rolę zapamiętujemy przed przekierowaniem
+  // i po powrocie z sesją nadajemy ją na serwerze (tylko dla świeżego konta).
+  useEffect(() => {
+    if (loading || !user || claimedRef.current) return;
+    if (sessionStorage.getItem(PENDING_ROLE_KEY) !== "behaviorist") return;
+    claimedRef.current = true;
+    sessionStorage.removeItem(PENDING_ROLE_KEY);
+    claimBehaviorist({ data: {} })
+      .then(() => queryClient.invalidateQueries())
+      .catch(() => undefined);
+  }, [loading, user, claimBehaviorist, queryClient]);
 
   useEffect(() => {
     if (loading || !user) return;
@@ -88,6 +104,7 @@ function AuthPage() {
       navigate({ to: "/psy", replace: true });
     }
   }, [loading, user, searchCode, navigate, redeem]);
+
 
   const oauth = async (provider: "google" | "apple") => {
     setBusy(true);
