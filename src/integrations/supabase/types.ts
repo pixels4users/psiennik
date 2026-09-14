@@ -232,6 +232,36 @@ export type Database = {
           },
         ]
       }
+      legal_acceptances: {
+        Row: {
+          created_at: string
+          document_kind: string
+          event_kind: string
+          id: string
+          method: string
+          user_id: string
+          version: string
+        }
+        Insert: {
+          created_at?: string
+          document_kind: string
+          event_kind: string
+          id?: string
+          method: string
+          user_id: string
+          version: string
+        }
+        Update: {
+          created_at?: string
+          document_kind?: string
+          event_kind?: string
+          id?: string
+          method?: string
+          user_id?: string
+          version?: string
+        }
+        Relationships: []
+      }
       owner_behaviorists: {
         Row: {
           behaviorist_id: string

@@ -57,3 +57,57 @@ export const deleteMyAccount = createServerFn({ method: "POST" })
 
     return { deleted: true } as const;
   });
+
+/**
+ * Zwraca dane użytkownika do eksportu: psy, wpisy, zalecenia i listę zdjęć.
+ * Pliki pobierane są osobno przez signed URL-e; tu zwracamy metadane i tekstową
+ * reprezentację danych.
+ */
+export const exportMyData = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }) => {
+    const userId = context.userId;
+    const supabase = context.supabase;
+
+    const { data: profile, error: profileError } = await supabase
+      .from("profiles")
+      .select("id, display_name, email, role, created_at, terms_version, terms_accepted_at, terms_accepted_method")
+      .eq("id", userId)
+      .single();
+    if (profileError) throw new Error(profileError.message);
+
+    // Psy, do których użytkownik ma dostęp (własne + udostępnione).
+    const { data: dogAccess, error: accessError } = await supabase
+      .from("dog_access")
+      .select("dog_id, role")
+      .eq("user_id", userId);
+    if (accessError) throw new Error(accessError.message);
+
+    const dogIds = (dogAccess ?? []).map((d) => d.dog_id);
+
+    const { data: dogs, error: dogsError } =
+      dogIds.length > 0
+        ? await supabase.from("dogs").select("*").in("id", dogIds)
+        : { data: [], error: null };
+    if (dogsError) throw new Error(dogsError.message);
+
+    const { data: entries, error: entriesError } =
+      dogIds.length > 0
+        ? await supabase.from("entries").select("*").in("dog_id", dogIds)
+        : { data: [], error: null };
+    if (entriesError) throw new Error(entriesError.message);
+
+    // Lista zdjęć do pobrania osobno.
+    const photoPaths: string[] = [];
+    for (const dog of dogs ?? []) {
+      if (dog.photo_url) photoPaths.push(dog.photo_url);
+    }
+
+    return {
+      exportedAt: new Date().toISOString(),
+      profile,
+      dogs: dogs ?? [],
+      entries: entries ?? [],
+      photoPaths,
+    } as const;
+  });
