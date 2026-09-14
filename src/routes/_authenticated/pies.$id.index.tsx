@@ -48,7 +48,23 @@ function DogListPage() {
 
   const hasCoOwner =
     access?.some((row) => row.role === "owner" && row.user_id !== dog?.owner_id) ?? false;
-  const hasBehaviorist = access?.some((row) => row.role === "behaviorist") ?? false;
+  const behavioristRow = access?.find((row) => row.role === "behaviorist") ?? null;
+  const hasBehaviorist = !!behavioristRow;
+  const behavioristName =
+    behavioristRow?.profile?.display_name || behavioristRow?.profile?.email || "przypisany";
+
+  useEffect(() => {
+    if (!wpis || isLoading) return;
+    const el = document.getElementById(`wpis-${wpis}`);
+    if (!el) return;
+    el.scrollIntoView({ behavior: "smooth", block: "center" });
+    el.classList.add("ring-2", "ring-primary", "rounded-xl");
+    const timer = window.setTimeout(
+      () => el.classList.remove("ring-2", "ring-primary", "rounded-xl"),
+      2500,
+    );
+    return () => window.clearTimeout(timer);
+  }, [wpis, isLoading, entries]);
 
   const grouped = useMemo(() => {
     const map = new Map<string, Entry[]>();
