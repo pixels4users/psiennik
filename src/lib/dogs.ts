@@ -1,4 +1,16 @@
 import { useQuery } from "@tanstack/react-query";
+import type { LucideIcon } from "lucide-react";
+import {
+  Bone,
+  CakeSlice,
+  CarFront,
+  Dog,
+  Dumbbell,
+  Footprints,
+  Shapes,
+  Sparkles,
+  Umbrella,
+} from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import type { Tables } from "@/integrations/supabase/types";
 
@@ -16,6 +28,19 @@ export const ACTIVITY_TYPES = [
   { value: "czystosc", label: "Czystość" },
   { value: "inne", label: "Inne" },
 ] as const;
+
+/** Ikony dla każdego typu aktywności — używane w kartach i formularzu. */
+export const ACTIVITY_ICONS: Record<string, LucideIcon> = {
+  spacer: Footprints,
+  trening: Dumbbell,
+  socjalizacja: Dog,
+  goscie: CakeSlice,
+  wypoczynek: Umbrella,
+  podroz: CarFront,
+  jedzenie: Bone,
+  czystosc: Sparkles,
+  inne: Shapes,
+};
 
 export const TIMES_OF_DAY = [
   { value: "rano", label: "Rano" },
@@ -108,7 +133,9 @@ export function useEntries(dogId: string) {
   });
 }
 
-export type RecentEntry = Entry & { dogs: { name: string } | null };
+export type RecentEntry = Entry & {
+  dogs: { name: string; photo_url: string | null } | null;
+};
 
 /** Najnowsze wpisy ze wszystkich psów, do których użytkownik ma dostęp. */
 export function useRecentEntries(limit = 5) {
@@ -117,7 +144,7 @@ export function useRecentEntries(limit = 5) {
     queryFn: async (): Promise<RecentEntry[]> => {
       const { data, error } = await supabase
         .from("entries")
-        .select("*, dogs(name)")
+        .select("*, dogs(name, photo_url)")
         .order("created_at", { ascending: false })
         .limit(limit);
       if (error) throw error;
