@@ -7,7 +7,7 @@ import { PRIVACY_VERSION, TERMS_VERSION } from "@/lib/legal";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useServerFn } from "@tanstack/react-start";
-import { recordLegalAcceptance } from "@/lib/legal.functions";
+import { issueDocumentToken, recordLegalAcceptance } from "@/lib/legal.functions";
 
 export type Role = "owner" | "behaviorist";
 export type DogRole = "owner" | "coowner" | "behaviorist";
@@ -45,6 +45,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   } | null>(null);
   const queryClient = useQueryClient();
   const recordAcceptanceFn = useServerFn(recordLegalAcceptance);
+  const issueTokenFn = useServerFn(issueDocumentToken);
 
   useEffect(() => {
     const { data: sub } = supabase.auth.onAuthStateChange((event, next) => {
@@ -68,6 +69,28 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const provider = session?.user?.app_metadata?.["provider"] as string | undefined;
   const method = provider === "google" ? "google" : provider === "apple" ? "apple" : "email";
 
+  /**
+   * Zapis czynności: najpierw prosimy serwer o podpisany token dla dokumentu,
+   * który za chwilę pokazujemy/pokazaliśmy, a dopiero potem zapisujemy czynność.
+   * Serwer bierze wersję z tokenu — nie z żadnego pola przesłanego przez przeglądarkę.
+   * Gdy w międzyczasie opublikowano nowszą wersję, zapis zostaje odrzucony i
+   * użytkownik dostaje ekran z nową treścią.
+   */
+  const recordWithToken = async (
+    kind: "terms" | "privacy",
+    how: "email" | "google" | "apple" | "change_screen",
+  ): Promise<{ ok: boolean }> => {
+    const issued = await issueTokenFn({ data: { documentKind: kind } });
+    const result = await recordAcceptanceFn({
+      data: { token: issued.token, eventKind: "acceptance", method: how },
+    });
+    if (!result.ok) {
+      setPendingVersion({ kind, version: result.currentVersion });
+      return { ok: false };
+    }
+    return { ok: true };
+  };
+
   useEffect(() => {
     if (!userId) return;
     let cancelled = false;
@@ -77,22 +100,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
       // Brak zapisanej wersji = pierwsze logowanie/rejestracja — zapisujemy bez ekranu blokującego.
       if (!data.terms_version) {
-        await recordAcceptanceFn({
-          data: {
-            documentKind: "terms",
-            version: TERMS_VERSION,
-            eventKind: "acceptance",
-            method,
-          },
-        });
-        await recordAcceptanceFn({
-          data: {
-            documentKind: "privacy",
-            version: PRIVACY_VERSION,
-            eventKind: "acceptance",
-            method,
-          },
-        });
+        const terms = await recordWithToken("terms", method);
+        const privacy = await recordWithToken("privacy", method);
+        if (cancelled || !terms.ok || !privacy.ok) return;
         await supabase
           .from("profiles")
           .update({
@@ -114,18 +124,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return () => {
       cancelled = true;
     };
-  }, [userId, method, recordAcceptanceFn]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [userId, method]);
 
   const acceptPending = async () => {
     if (!userId || !pendingVersion) return;
-    await recordAcceptanceFn({
-      data: {
-        documentKind: pendingVersion.kind,
-        version: pendingVersion.version,
-        eventKind: "acceptance",
-        method: "change_screen",
-      },
-    });
+    const result = await recordWithToken(pendingVersion.kind, "change_screen");
+    // Wersja zmieniła się w trakcie — ekran pokaże nową treść, nic nie zapisujemy.
+    if (!result.ok) return;
     await supabase
       .from("profiles")
       .update({

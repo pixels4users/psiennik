@@ -234,30 +234,54 @@ export type Database = {
       }
       legal_acceptances: {
         Row: {
+          account_ref: string | null
+          contract_ended_at: string | null
           created_at: string
           document_kind: string
           event_kind: string
           id: string
+          idempotency_key: string | null
+          legal_hold: boolean
+          legal_hold_owner: string | null
+          legal_hold_reason: string | null
+          legal_hold_review_on: string | null
           method: string
-          user_id: string
+          purge_after: string | null
+          user_id: string | null
           version: string
         }
         Insert: {
+          account_ref?: string | null
+          contract_ended_at?: string | null
           created_at?: string
           document_kind: string
           event_kind: string
           id?: string
+          idempotency_key?: string | null
+          legal_hold?: boolean
+          legal_hold_owner?: string | null
+          legal_hold_reason?: string | null
+          legal_hold_review_on?: string | null
           method: string
-          user_id: string
+          purge_after?: string | null
+          user_id?: string | null
           version: string
         }
         Update: {
+          account_ref?: string | null
+          contract_ended_at?: string | null
           created_at?: string
           document_kind?: string
           event_kind?: string
           id?: string
+          idempotency_key?: string | null
+          legal_hold?: boolean
+          legal_hold_owner?: string | null
+          legal_hold_reason?: string | null
+          legal_hold_review_on?: string | null
           method?: string
-          user_id?: string
+          purge_after?: string | null
+          user_id?: string | null
           version?: string
         }
         Relationships: []
