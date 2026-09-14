@@ -2,12 +2,10 @@ import { useEffect, useState } from "react";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { Copy, Download, Link, RefreshCw, Trash2 } from "lucide-react";
+import { Download, Trash2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth, useProfile } from "@/lib/auth";
 import {
-  useBehavioristLink,
-  useCreateBehavioristLink,
   useOwnerBehaviorists,
   useBehavioristOwners,
   useRemoveOwnerBehaviorist,
@@ -15,13 +13,14 @@ import {
   useIsBehaviorist,
   type OwnerBehavioristWithProfile,
 } from "@/lib/access";
+import { BehavioristInviteCard } from "@/components/behaviorist-invite";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Skeleton } from "@/components/ui/skeleton";
-import { cn } from "@/lib/utils";
+
 import { socialMeta } from "@/lib/seo";
 import { useServerFn } from "@tanstack/react-start";
 import { deleteMyAccount, exportMyData } from "@/lib/account.functions";
@@ -56,12 +55,6 @@ const STATUS_LABELS: Record<string, string> = {
   pending: "oczekująca",
 };
 
-function copy(text: string) {
-  navigator.clipboard.writeText(text).then(
-    () => toast.success("Skopiowano"),
-    () => toast.info(`Kod: ${text}`),
-  );
-}
 
 function ProfilePage() {
   const { user } = useAuth();
@@ -359,88 +352,9 @@ function DeleteAccountCard() {
 }
 
 function BehavioristCodeCard() {
-  const { data: link, isLoading } = useBehavioristLink();
-  const create = useCreateBehavioristLink();
   const { data: isBehaviorist, isLoading: roleLoading } = useIsBehaviorist();
-
-  if (!roleLoading && !isBehaviorist) return null;
-
-  const copyLinkUrl = (url: string) => {
-    navigator.clipboard.writeText(url).then(
-      () => toast.success("Link skopiowany"),
-      () => toast.info(`Link: ${url}`),
-    );
-  };
-
-  return (
-    <Card className="mt-6 shadow-none">
-      <CardHeader>
-        <CardTitle className="text-xl">Kod zapraszający behawiorysty</CardTitle>
-      </CardHeader>
-      <CardContent className="grid gap-4">
-        {isLoading ? (
-          <Skeleton className="h-12 w-full" />
-        ) : link ? (
-          <div className="grid gap-2 rounded-lg bg-keylime px-4 py-3">
-            <div className="flex items-center justify-between gap-3">
-              <div>
-                <p className="font-display text-3xl tracking-widest text-primary">
-                  {link.invite_code}
-                </p>
-                <p className="text-xs text-muted-foreground">
-                  Podaj ten kod właścicielom — połączą Cię ze swoim psem.
-                </p>
-              </div>
-              <div className="flex items-center gap-1">
-                <Button variant="ghost" size="icon" aria-label="Kopiuj kod" onClick={() => copy(link.invite_code)}>
-                  <Copy className="size-4" />
-                </Button>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  aria-label="Kopiuj link"
-                  onClick={() =>
-                    copyLinkUrl(`${window.location.origin}/auth?code=${encodeURIComponent(link.invite_code)}`)
-                  }
-                >
-                  <Link className="size-4" />
-                </Button>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  aria-label="Wygeneruj nowy kod"
-                  disabled={create.isPending}
-                  onClick={() => create.mutate(undefined, { onSuccess: (l) => copy(l.invite_code) })}
-                >
-                  <RefreshCw className={cn("size-4", create.isPending && "animate-spin")} />
-                </Button>
-              </div>
-            </div>
-            <p className="text-xs leading-relaxed text-muted-foreground">
-              Wyślij ten link właścicielowi. Po zalogowaniu lub rejestracji zostanie automatycznie połączony z Tobą i nowe psy będą trafiały pod Twoją opiekę.
-            </p>
-            <p className="truncate text-xs text-primary">
-              {`${window.location.origin}/auth?code=${encodeURIComponent(link.invite_code)}`}
-            </p>
-          </div>
-        ) : (
-          <div className="rounded-lg bg-secondary p-4 text-center">
-            <p className="text-sm text-muted-foreground">
-              Nie masz jeszcze kodu. Wygeneruj go, aby właściciele mogli Cię zaprosić.
-            </p>
-            <Button
-              className="mt-3"
-              disabled={create.isPending}
-              onClick={() => create.mutate(undefined, { onSuccess: (l) => copy(l.invite_code) })}
-            >
-              <RefreshCw className={cn("mr-2 size-4", create.isPending && "animate-spin")} />
-              Wygeneruj kod
-            </Button>
-          </div>
-        )}
-      </CardContent>
-    </Card>
-  );
+  if (roleLoading || !isBehaviorist) return null;
+  return <BehavioristInviteCard />;
 }
 
 function OwnerBehavioristsCard() {

@@ -1,6 +1,6 @@
 # Zapraszanie klientów na stronie „Psy pod opieką”
 
-Behawiorysta po zalogowaniu nie widzi, jak zdobyć pierwszego klienta — kod zapraszający jest tylko w profilu. Przenosimy zapraszanie na stronę z psami i robimy z niego akcję główną.
+Behawiorysta po zalogowaniu nie widzi, jak zdobyć pierwszego klienta — kod zapraszający jest tylko w profilu.  Dodajemy zapraszanie na stronę z psami i robimy z niego akcję główną.
 
 ## Hierarchia strony (widok behawiorysty)
 
