@@ -1,5 +1,5 @@
 import { useMemo, useState } from "react";
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import {
   addDays,
   addWeeks,
@@ -13,7 +13,7 @@ import { useDog, useEntries, type Entry } from "@/lib/dogs";
 import { useDogRole } from "@/lib/auth";
 import { DogNav } from "@/components/dog-nav";
 import { EntryCard } from "@/components/entry-card";
-import { EntryFormDialog } from "@/components/entry-form-dialog";
+
 import { CommentDialog } from "@/components/comment-dialog";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -68,8 +68,6 @@ function DogCalendarPage() {
     startOfWeek(new Date(), { weekStartsOn: 1 }),
   );
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
-  const [editedEntry, setEditedEntry] = useState<Entry | null>(null);
-  const [entryDialogOpen, setEntryDialogOpen] = useState(false);
   const [commentedEntry, setCommentedEntry] = useState<Entry | null>(null);
   const [commentDialogOpen, setCommentDialogOpen] = useState(false);
 
