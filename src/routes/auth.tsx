@@ -152,7 +152,7 @@ function AuthPage() {
           emailRedirectTo: searchCode
             ? `${window.location.origin}/auth?code=${encodeURIComponent(searchCode)}`
             : window.location.origin,
-          data: { display_name: name },
+          data: { display_name: name, role },
         },
       });
       if (error) throw error;
