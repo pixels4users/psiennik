@@ -6,8 +6,8 @@ Ujednolicić wygląd wydarzeń w aplikacji z atrakcyjniejszymi kartami ze strony
 ## Ikony typów aktywności
 Dodamy jeden centralny zestaw ikon Lucide, używany konsekwentnie w aplikacji:
 
-- **Spacer** — PawPrint
-- **Trening / ćwiczenie** — Footprints
+- **Spacer** — Footprints
+- **Trening / ćwiczenie** — Dumbbell
 - **Socjalizacja** — Dog
 - **Goście / wizyta** — CakeSlice
 - **Wypoczynek** — Umbrella
