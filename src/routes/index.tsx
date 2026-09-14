@@ -1,7 +1,8 @@
 import { useEffect } from "react";
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { Brain, CalendarRange, Footprints, MessageSquareText, PawPrint } from "lucide-react";
+import { CalendarRange, MessageSquareText, PawPrint } from "lucide-react";
 import { useAuth } from "@/lib/auth";
+import { ACTIVITY_ICONS } from "@/lib/dogs";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { DogJournalPreviewCard } from "@/components/dog-journal-preview-card";
@@ -54,7 +55,7 @@ const JOURNAL_PREVIEWS = [
     timeOfDay: "Rano",
     rating: "good" as const,
     ratingLabel: "Dobrze",
-    icon: Footprints,
+    icon: ACTIVITY_ICONS["spacer"],
   },
   {
     name: "Lunka",
@@ -65,7 +66,7 @@ const JOURNAL_PREVIEWS = [
     timeOfDay: "Południe",
     rating: "warn" as const,
     ratingLabel: "Wyzwanie",
-    icon: Brain,
+    icon: ACTIVITY_ICONS["trening"],
   },
   {
     name: "Luna",
@@ -76,7 +77,7 @@ const JOURNAL_PREVIEWS = [
     timeOfDay: "Wieczór",
     rating: "good" as const,
     ratingLabel: "Dobrze",
-    icon: PawPrint,
+    icon: ACTIVITY_ICONS["wypoczynek"],
   },
 ];
 
