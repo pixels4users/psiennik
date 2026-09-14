@@ -22,7 +22,7 @@ import {
   useSubscriptionLimits,
 } from "@/lib/access";
 import { DogFormDialog } from "@/components/dog-form-dialog";
-import { BehavioristCodeBar, InviteClientDialog } from "@/components/behaviorist-invite";
+import { InviteClientDialog } from "@/components/behaviorist-invite";
 import { DogAvatar } from "@/components/dog-avatar";
 import { RatingBadge } from "@/components/rating-badge";
 import { Button } from "@/components/ui/button";
