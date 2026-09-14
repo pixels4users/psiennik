@@ -106,15 +106,18 @@ function AuthPage() {
   }, [loading, user, searchCode, navigate, redeem]);
 
 
-  const oauth = async (provider: "google" | "apple") => {
+  const oauth = async (provider: "google" | "apple", chosenRole?: "owner" | "behaviorist") => {
     setBusy(true);
     try {
+      if (chosenRole === "behaviorist") sessionStorage.setItem(PENDING_ROLE_KEY, "behaviorist");
+      else sessionStorage.removeItem(PENDING_ROLE_KEY);
       const redirectTo = searchCode
         ? `${window.location.origin}/auth?code=${encodeURIComponent(searchCode)}`
         : window.location.origin;
       const result = await lovable.auth.signInWithOAuth(provider, {
         redirect_uri: redirectTo,
       });
+
       if (result.error) throw result.error;
       if (!result.redirected) navigate({ to: "/psy", replace: true });
     } catch (err) {
