@@ -25,6 +25,8 @@ import { Route as AuthenticatedPiesIdTabelaRouteImport } from './routes/_authent
 import { Route as AuthenticatedPiesIdZaleceniaRouteImport } from './routes/_authenticated/pies.$id.zalecenia'
 import { Route as LovableEmailAuthPreviewRouteImport } from './routes/lovable/email/auth/preview'
 import { Route as LovableEmailAuthWebhookRouteImport } from './routes/lovable/email/auth/webhook'
+import { Route as AuthenticatedPiesIdWydarzenieEntryIdRouteImport } from './routes/_authenticated/pies.$id.wydarzenie.$entryId'
+import { Route as AuthenticatedPiesIdWydarzenieNoweRouteImport } from './routes/_authenticated/pies.$id.wydarzenie.nowe'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -110,6 +112,18 @@ const LovableEmailAuthWebhookRoute = LovableEmailAuthWebhookRouteImport.update({
   path: '/lovable/email/auth/webhook',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AuthenticatedPiesIdWydarzenieEntryIdRoute =
+  AuthenticatedPiesIdWydarzenieEntryIdRouteImport.update({
+    id: '/wydarzenie/$entryId',
+    path: '/wydarzenie/$entryId',
+    getParentRoute: () => AuthenticatedPiesIdRoute,
+  } as any)
+const AuthenticatedPiesIdWydarzenieNoweRoute =
+  AuthenticatedPiesIdWydarzenieNoweRouteImport.update({
+    id: '/wydarzenie/nowe',
+    path: '/wydarzenie/nowe',
+    getParentRoute: () => AuthenticatedPiesIdRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -127,6 +141,8 @@ export interface FileRoutesByFullPath {
   '/lovable/email/auth/preview': typeof LovableEmailAuthPreviewRoute
   '/lovable/email/auth/webhook': typeof LovableEmailAuthWebhookRoute
   '/pies/$id/': typeof AuthenticatedPiesIdIndexRoute
+  '/pies/$id/wydarzenie/$entryId': typeof AuthenticatedPiesIdWydarzenieEntryIdRoute
+  '/pies/$id/wydarzenie/nowe': typeof AuthenticatedPiesIdWydarzenieNoweRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -143,6 +159,8 @@ export interface FileRoutesByTo {
   '/lovable/email/auth/preview': typeof LovableEmailAuthPreviewRoute
   '/lovable/email/auth/webhook': typeof LovableEmailAuthWebhookRoute
   '/pies/$id': typeof AuthenticatedPiesIdIndexRoute
+  '/pies/$id/wydarzenie/$entryId': typeof AuthenticatedPiesIdWydarzenieEntryIdRoute
+  '/pies/$id/wydarzenie/nowe': typeof AuthenticatedPiesIdWydarzenieNoweRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -162,6 +180,8 @@ export interface FileRoutesById {
   '/lovable/email/auth/preview': typeof LovableEmailAuthPreviewRoute
   '/lovable/email/auth/webhook': typeof LovableEmailAuthWebhookRoute
   '/_authenticated/pies/$id/': typeof AuthenticatedPiesIdIndexRoute
+  '/_authenticated/pies/$id/wydarzenie/$entryId': typeof AuthenticatedPiesIdWydarzenieEntryIdRoute
+  '/_authenticated/pies/$id/wydarzenie/nowe': typeof AuthenticatedPiesIdWydarzenieNoweRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -181,6 +201,8 @@ export interface FileRouteTypes {
     | '/lovable/email/auth/preview'
     | '/lovable/email/auth/webhook'
     | '/pies/$id/'
+    | '/pies/$id/wydarzenie/$entryId'
+    | '/pies/$id/wydarzenie/nowe'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -197,6 +219,8 @@ export interface FileRouteTypes {
     | '/lovable/email/auth/preview'
     | '/lovable/email/auth/webhook'
     | '/pies/$id'
+    | '/pies/$id/wydarzenie/$entryId'
+    | '/pies/$id/wydarzenie/nowe'
   id:
     | '__root__'
     | '/'
@@ -215,6 +239,8 @@ export interface FileRouteTypes {
     | '/lovable/email/auth/preview'
     | '/lovable/email/auth/webhook'
     | '/_authenticated/pies/$id/'
+    | '/_authenticated/pies/$id/wydarzenie/$entryId'
+    | '/_authenticated/pies/$id/wydarzenie/nowe'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -342,6 +368,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LovableEmailAuthWebhookRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_authenticated/pies/$id/wydarzenie/$entryId': {
+      id: '/_authenticated/pies/$id/wydarzenie/$entryId'
+      path: '/wydarzenie/$entryId'
+      fullPath: '/pies/$id/wydarzenie/$entryId'
+      preLoaderRoute: typeof AuthenticatedPiesIdWydarzenieEntryIdRouteImport
+      parentRoute: typeof AuthenticatedPiesIdRoute
+    }
+    '/_authenticated/pies/$id/wydarzenie/nowe': {
+      id: '/_authenticated/pies/$id/wydarzenie/nowe'
+      path: '/wydarzenie/nowe'
+      fullPath: '/pies/$id/wydarzenie/nowe'
+      preLoaderRoute: typeof AuthenticatedPiesIdWydarzenieNoweRouteImport
+      parentRoute: typeof AuthenticatedPiesIdRoute
+    }
   }
 }
 
@@ -351,6 +391,8 @@ interface AuthenticatedPiesIdRouteChildren {
   AuthenticatedPiesIdTabelaRoute: typeof AuthenticatedPiesIdTabelaRoute
   AuthenticatedPiesIdZaleceniaRoute: typeof AuthenticatedPiesIdZaleceniaRoute
   AuthenticatedPiesIdIndexRoute: typeof AuthenticatedPiesIdIndexRoute
+  AuthenticatedPiesIdWydarzenieEntryIdRoute: typeof AuthenticatedPiesIdWydarzenieEntryIdRoute
+  AuthenticatedPiesIdWydarzenieNoweRoute: typeof AuthenticatedPiesIdWydarzenieNoweRoute
 }
 
 const AuthenticatedPiesIdRouteChildren: AuthenticatedPiesIdRouteChildren = {
@@ -359,6 +401,10 @@ const AuthenticatedPiesIdRouteChildren: AuthenticatedPiesIdRouteChildren = {
   AuthenticatedPiesIdTabelaRoute: AuthenticatedPiesIdTabelaRoute,
   AuthenticatedPiesIdZaleceniaRoute: AuthenticatedPiesIdZaleceniaRoute,
   AuthenticatedPiesIdIndexRoute: AuthenticatedPiesIdIndexRoute,
+  AuthenticatedPiesIdWydarzenieEntryIdRoute:
+    AuthenticatedPiesIdWydarzenieEntryIdRoute,
+  AuthenticatedPiesIdWydarzenieNoweRoute:
+    AuthenticatedPiesIdWydarzenieNoweRoute,
 }
 
 const AuthenticatedPiesIdRouteWithChildren =
