@@ -27,7 +27,6 @@ export function EntryCard({
 }) {
   const activities = entryActivities(entry);
   const times = entryTimes(entry);
-  const PrimaryIcon = activityIcon(activities[0] ?? "inne");
 
   return (
     <Card className="shadow-none">
