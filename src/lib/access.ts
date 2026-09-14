@@ -307,23 +307,32 @@ export function useIsOwner() {
   });
 }
 
-/** Czy użytkownik ma rolę behawiorysty w jakimkolwiek psie. */
+/** Czy konto ma rolę behawiorysty (z profilu konta; starsze konta rozpoznajemy po dostępach). */
 export function useIsBehaviorist() {
   const { user } = useAuth();
   return useQuery({
     queryKey: ["is-behaviorist", user?.id],
     enabled: !!user,
     queryFn: async (): Promise<boolean> => {
-      const { count, error } = await supabase
+      const { data, error } = await supabase
+        .from("user_roles")
+        .select("role")
+        .eq("user_id", user!.id);
+      if (error) throw error;
+      if ((data ?? []).some((r) => r.role === "behaviorist")) return true;
+
+      // Konta założone przed wyborem roli: rozpoznajemy po opiece nad psem.
+      const { count, error: accessError } = await supabase
         .from("dog_access")
         .select("*", { count: "exact", head: true })
         .eq("user_id", user!.id)
         .eq("role", "behaviorist");
-      if (error) throw error;
+      if (accessError) throw accessError;
       return (count ?? 0) > 0;
     },
   });
 }
+
 
 /** Limity aktywnych procesów dla behawiorysty. */
 export function useSubscriptionLimits() {
