@@ -74,7 +74,6 @@ const JOURNAL_PREVIEWS = [
     timeOfDay: "Wieczór",
     rating: "good" as const,
     ratingLabel: "Dobrze",
-    icon: activityIcon("wypoczynek"),
   },
 ];
 
