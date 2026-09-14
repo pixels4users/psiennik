@@ -3,7 +3,11 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import type { Session, User } from "@supabase/supabase-js";
 import { supabase } from "@/integrations/supabase/client";
 import type { Tables } from "@/integrations/supabase/types";
-import { TERMS_VERSION } from "@/lib/legal";
+import { PRIVACY_VERSION, TERMS_VERSION } from "@/lib/legal";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { useServerFn } from "@tanstack/react-start";
+import { recordLegalAcceptance } from "@/lib/legal.functions";
 
 export type Role = "owner" | "behaviorist";
 export type DogRole = "owner" | "coowner" | "behaviorist";
@@ -35,7 +39,12 @@ const AuthContext = createContext<{
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
+  const [pendingVersion, setPendingVersion] = useState<{
+    kind: "terms" | "privacy";
+    version: string;
+  } | null>(null);
   const queryClient = useQueryClient();
+  const recordAcceptanceFn = useServerFn(recordLegalAcceptance);
 
   useEffect(() => {
     const { data: sub } = supabase.auth.onAuthStateChange((event, next) => {
@@ -52,38 +61,122 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return () => sub.subscription.unsubscribe();
   }, [queryClient]);
 
-  // Zapis akceptacji regulaminu: przy pierwszym zalogowaniu uzupełniamy
+  // Zapis akceptacji regulaminu/polityki: przy pierwszym zalogowaniu uzupełniamy
   // wersję, datę i sposób (rejestracja e-mailem albo logowanie Google/Apple).
+  // Wymagamy też akceptacji, gdy wersja dokumentu jest nowsza niż zapisana w profilu.
   const userId = session?.user?.id;
   const provider = session?.user?.app_metadata?.["provider"] as string | undefined;
+  const method = provider === "google" ? "google" : provider === "apple" ? "apple" : "email";
+
   useEffect(() => {
     if (!userId) return;
     let cancelled = false;
     (async () => {
-      const { data } = await supabase
-        .from("profiles")
-        .select("terms_accepted_at")
-        .eq("id", userId)
-        .maybeSingle();
-      if (cancelled || !data || data.terms_accepted_at) return;
-      await supabase
-        .from("profiles")
-        .update({
-          terms_version: TERMS_VERSION,
-          terms_accepted_at: new Date().toISOString(),
-          terms_accepted_method: provider ?? "email",
-        })
-        .eq("id", userId);
+      const { data } = await supabase.from("profiles").select("terms_version").eq("id", userId).maybeSingle();
+      if (cancelled || !data) return;
+
+      // Brak zapisanej wersji = pierwsze logowanie/rejestracja — zapisujemy bez ekranu blokującego.
+      if (!data.terms_version) {
+        await recordAcceptanceFn({
+          data: {
+            documentKind: "terms",
+            version: TERMS_VERSION,
+            eventKind: "acceptance",
+            method,
+          },
+        });
+        await recordAcceptanceFn({
+          data: {
+            documentKind: "privacy",
+            version: PRIVACY_VERSION,
+            eventKind: "acceptance",
+            method,
+          },
+        });
+        await supabase
+          .from("profiles")
+          .update({
+            terms_version: TERMS_VERSION,
+            terms_accepted_at: new Date().toISOString(),
+            terms_accepted_method: method,
+          })
+          .eq("id", userId);
+        return;
+      }
+
+      // Nowsza wersja wymaga wyraźnej akceptacji — blokujemy interfejs.
+      if (data.terms_version !== TERMS_VERSION) {
+        setPendingVersion({ kind: "terms", version: TERMS_VERSION });
+      } else if (data.terms_version !== PRIVACY_VERSION) {
+        setPendingVersion({ kind: "privacy", version: PRIVACY_VERSION });
+      }
     })();
     return () => {
       cancelled = true;
     };
-  }, [userId, provider]);
+  }, [userId, method, recordAcceptanceFn]);
+
+  const acceptPending = async () => {
+    if (!userId || !pendingVersion) return;
+    await recordAcceptanceFn({
+      data: {
+        documentKind: pendingVersion.kind,
+        version: pendingVersion.version,
+        eventKind: "acceptance",
+        method: "change_screen",
+      },
+    });
+    await supabase
+      .from("profiles")
+      .update({
+        terms_version: TERMS_VERSION,
+        terms_accepted_at: new Date().toISOString(),
+        terms_accepted_method: "change_screen",
+      })
+      .eq("id", userId);
+    setPendingVersion(null);
+    await queryClient.invalidateQueries({ queryKey: ["profile"] });
+  };
+
+  if (!loading && pendingVersion && userId) {
+    return <LegalChangeScreen kind={pendingVersion.kind} onAccept={acceptPending} />;
+  }
 
   return (
     <AuthContext.Provider value={{ session, user: session?.user ?? null, loading }}>
       {children}
     </AuthContext.Provider>
+  );
+}
+
+function LegalChangeScreen({ kind, onAccept }: { kind: "terms" | "privacy"; onAccept: () => void }) {
+  const title = kind === "terms" ? "Nowa wersja regulaminu" : "Nowa wersja polityki prywatności";
+  const link = kind === "terms" ? "/regulamin" : "/prywatnosc";
+  const label = kind === "terms" ? "regulamin" : "politykę prywatności";
+
+  return (
+    <div className="flex min-h-screen items-center justify-center px-5 py-12">
+      <Card className="mx-auto w-full max-w-lg shadow-none">
+        <CardHeader>
+          <CardTitle className="text-2xl text-primary">{title}</CardTitle>
+        </CardHeader>
+        <CardContent className="grid gap-5">
+          <p className="text-muted-foreground">
+            Przygotowaliśmy nową wersję {label}. Aby dalej korzystać z Psiennika, zapoznaj się z
+            dokumentem i zaakceptuj zmiany.
+          </p>
+          <a
+            href={link}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center text-primary underline"
+          >
+            Przeczytaj pełny dokument
+          </a>
+          <Button onClick={onAccept}>Akceptuję i kontynuuję</Button>
+        </CardContent>
+      </Card>
+    </div>
   );
 }
 
@@ -118,51 +211,28 @@ export function useDogRole(dogId: string) {
       const [{ data: dog, error: dogError }, { data: accessRows, error: accessError }] =
         await Promise.all([
           supabase.from("dogs").select("owner_id").eq("id", dogId).single(),
-          supabase.from("dog_access").select("*").eq("dog_id", dogId),
+          supabase.from("dog_access").select("role, process_status").eq("dog_id", dogId).eq("user_id", user!.id),
         ]);
       if (dogError) throw dogError;
       if (accessError) throw accessError;
 
-      const myAccess = accessRows?.find((row) => row.user_id === user!.id);
-      const behaviorists = accessRows?.filter((row) => row.role === "behaviorist") ?? [];
-      const hasActiveBehaviorist = behaviorists.some((row) => row.process_status === "active");
-      const hasBehaviorist = behaviorists.length > 0;
-      const allCompleted = hasBehaviorist && !hasActiveBehaviorist;
-
-      if (!myAccess) {
-        return {
-          role: null,
-          processStatus: null,
-          canManage: false,
-          canEditEntries: false,
-          canComment: false,
-          isReadOnly: false,
-          isPrimaryOwner: false,
-        };
-      }
-
-      if (myAccess.role === "owner") {
-        const isPrimaryOwner = user!.id === dog.owner_id;
-        const canManage = true;
-        return {
-          role: isPrimaryOwner ? "owner" : "coowner",
-          processStatus: null,
-          canManage,
-          canEditEntries: canManage && !allCompleted,
-          canComment: false,
-          isReadOnly: canManage && allCompleted,
-          isPrimaryOwner,
-        };
-      }
+      const isOwner = dog.owner_id === user!.id;
+      const access = accessRows?.[0];
+      const role: DogRole | null = isOwner ? "owner" : access ? (access.role as DogRole) : null;
+      const processStatus = access?.process_status ?? null;
+      const canManage = role === "owner" || role === "coowner";
+      const isReadOnly = processStatus === "completed";
+      const canEditEntries = canManage && !isReadOnly;
+      const canComment = role === "behaviorist" && processStatus === "active";
 
       return {
-        role: "behaviorist",
-        processStatus: myAccess.process_status,
-        canManage: false,
-        canEditEntries: false,
-        canComment: myAccess.process_status === "active",
-        isReadOnly: false,
-        isPrimaryOwner: false,
+        role,
+        processStatus,
+        canManage,
+        canEditEntries,
+        canComment,
+        isReadOnly,
+        isPrimaryOwner: isOwner,
       };
     },
   });

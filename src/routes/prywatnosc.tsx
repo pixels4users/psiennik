@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { LEGAL_UPDATED, OPERATOR, contactEmailLabel } from "@/lib/legal";
+import { LEGAL_UPDATED, LEGAL_VERSIONS, MINIMUM_AGE, OPERATOR, contactEmailLabel } from "@/lib/legal";
 import { socialMeta } from "@/lib/seo";
 
 export const Route = createFileRoute("/prywatnosc")({
@@ -28,7 +28,10 @@ function PrivacyPage() {
           <p className="mt-3 text-muted-foreground">
             Administratorem Twoich danych jest {OPERATOR.name}, {OPERATOR.street}, {OPERATOR.city},
             NIP {OPERATOR.nip}, REGON {OPERATOR.regon}. Kontakt w sprawach danych:{" "}
-            {contactEmailLabel()}.
+            <a className="underline" href={`mailto:${OPERATOR.email}`}>
+              {contactEmailLabel()}
+            </a>
+            .
           </p>
         </div>
 
@@ -51,6 +54,10 @@ function PrivacyPage() {
             <li>
               <strong>Ustawienia:</strong> preferencja powiadomień e-mail, informacja o akceptacji
               regulaminu (wersja, data, sposób).
+            </li>
+            <li>
+              <strong>Rejestr zdarzeń prawnych:</strong> rodzaj dokumentu, wersja, data i sposób
+              akceptacji lub powiadomienia — w celu udowodnienia zawarcia umowy.
             </li>
           </ul>
           <p className="mt-3 text-muted-foreground">
@@ -98,10 +105,14 @@ function PrivacyPage() {
           <p className="mt-3 text-muted-foreground">
             Dane powierzamy dostawcom, którzy przetwarzają je na nasze zlecenie: dostawcy platformy
             i hostingu aplikacji (Lovable) oraz infrastruktury bazy danych i przechowywania plików.
-            Baza danych aplikacji działa na serwerach w Unii Europejskiej (Irlandia). Przy
-            logowaniu Google lub Apple dane uwierzytelniające przetwarzają ci dostawcy zgodnie z
-            własnymi zasadami. Strona pobiera też kroje pisma z serwerów Google Fonts, co wiąże się
-            z przekazaniem adresu IP przeglądarki do Google.
+            Baza danych aplikacji działa na serwerach w Unii Europejskiej (Irlandia). Szczegóły
+            umowy powierzenia, podprocesorów, retencji kopii zapasowych i logów ustalamy z Lovable —
+            do czasu ich potwierdzenia nie deklarujemy ich w tej polityce.
+          </p>
+          <p className="mt-3 text-muted-foreground">
+            Przy logowaniu Google lub Apple dane uwierzytelniające przetwarzają ci dostawcy zgodnie
+            z własnymi zasadami. Korespondencję kontaktową, reklamacje i zgłoszenia dotyczące
+            prywatności obsługujemy przez skrzynkę w Google Workspace.
           </p>
         </div>
 
@@ -114,16 +125,46 @@ function PrivacyPage() {
             nie prosimy o zgodę na cookies. Sesję usuwa wylogowanie lub wyczyszczenie danych
             przeglądarki.
           </p>
+          <p className="mt-3 text-muted-foreground">
+            Pobieranie krojów pisma nie powoduje połączenia z serwerami Google — fonty serwujemy z
+            własnego serwera na podstawie licencji SIL Open Font License.
+          </p>
         </div>
 
         <div>
           <h2 className="text-2xl text-primary">Jak długo przechowujemy dane</h2>
-          <p className="mt-3 text-muted-foreground">
-            Dane konta i treści dziennika przechowujemy do czasu usunięcia konta. Usunięcie konta w
-            ustawieniach profilu kasuje profil, psy, których jesteś głównym właścicielem, ich wpisy
-            oraz zdjęcia. Kopie zapasowe i logi techniczne prowadzą nasi dostawcy infrastruktury i
-            dane mogą pozostawać w nich jeszcze przez krótki czas po usunięciu.
-          </p>
+          <ul className="mt-3 grid gap-2 text-muted-foreground">
+            <li>
+              <strong>Konto i treści dziennika:</strong> do czasu usunięcia konta przez użytkownika.
+              Usunięcie z aplikacji kasuje profil, psy, których jesteś głównym właścicielem, ich
+              wpisy oraz zdjęcia.
+            </li>
+            <li>
+              <strong>Zalecenia behawiorysty:</strong> treść pozostaje przy wpisie właściciela
+              (jego dokumentacja), ale po usunięciu konta behawiorysty zrywamy powiązanie z jego
+              kontem i pokazujemy „Behawiorysta — konto usunięte". Treść może zawierać dane
+              osobowe, więc możesz zgłosić żądanie jej usunięcia lub zmiany na{" "}
+              <a className="underline" href={`mailto:${OPERATOR.email}`}>
+                {contactEmailLabel()}
+              </a>
+              .
+            </li>
+            <li>
+              <strong>Kopie zapasowe i logi techniczne:</strong> prowadzą nasi dostawcy
+              infrastruktury. Dane usunięte z aplikacji mogą pozostawać w ich kopiach do czasu rotacji
+              — szczegóły retencji podamy po potwierdzeniu przez Lovable.
+            </li>
+            <li>
+              <strong>Rejestr akceptacji regulaminu:</strong> minimalny zakres (identyfikator konta,
+              rodzaj dokumentu, wersja, data, sposób) w celu udowodnienia zawarcia umowy. Okres
+              przechowywania ustalamy przed wdrożeniem i wpisujemy w tę politykę.
+            </li>
+            <li>
+              <strong>Konta nieużywane:</strong> nie kasujemy ich automatycznie, ale co roku
+              przeglądamy zasadność dalszego przechowywania. Po 24 miesiącach bezczynności możemy
+              wysłać przypomnienie, a następnie podjąć decyzję o usunięciu lub pozostawieniu konta.
+            </li>
+          </ul>
         </div>
 
         <div>
@@ -131,9 +172,23 @@ function PrivacyPage() {
           <p className="mt-3 text-muted-foreground">
             Masz prawo dostępu do danych, ich sprostowania, usunięcia, ograniczenia przetwarzania,
             przenoszenia oraz sprzeciwu wobec przetwarzania opartego na prawnie uzasadnionym
-            interesie. Konto możesz usunąć samodzielnie w profilu; kopię swoich danych otrzymasz po
-            napisaniu na adres {contactEmailLabel()}. Przysługuje Ci też skarga do Prezesa Urzędu
-            Ochrony Danych Osobowych (ul. Stawki 2, 00-193 Warszawa).
+            interesie. Konto możesz usunąć samodzielnie w profilu. Kopię swoich danych możesz pobrać
+            w profilu (psy, wpisy, zalecenia, zdjęcia) lub uzyskać po zgłoszeniu na{" "}
+            <a className="underline" href={`mailto:${OPERATOR.email}`}>
+              {contactEmailLabel()}
+            </a>
+            . Przysługuje Ci też skarga do Prezesa Urzędu Ochrony Danych Osobowych (ul. Stawki 2,
+            00-193 Warszawa).
+          </p>
+        </div>
+
+        <div>
+          <h2 className="text-2xl text-primary">Dostęp do danych i eksport</h2>
+          <p className="mt-3 text-muted-foreground">
+            Możesz poprosić o dostęp do swoich danych oraz ich kopię w formacie czytelnym dla
+            człowieka i maszyny. Eksport z profilu obejmuje psy, wpisy i zalecenia w pliku tekstowym
+            oraz zdjęcia w oryginalnych formatach. Żądanie możesz złożyć również mailowo; rozpatrujemy
+            je w terminie 30 dni.
           </p>
         </div>
 
@@ -143,6 +198,17 @@ function PrivacyPage() {
             O istotnych zmianach poinformujemy w aplikacji lub e-mailem. Aktualna wersja jest zawsze
             dostępna na tej stronie.
           </p>
+        </div>
+
+        <div>
+          <h2 className="text-2xl text-primary">Archiwum wersji</h2>
+          <ul className="mt-3 grid gap-2 text-muted-foreground">
+            {LEGAL_VERSIONS.filter((v) => v.kind === "privacy").map((v) => (
+              <li key={v.version}>
+                Wersja {v.version} z {v.date}
+              </li>
+            ))}
+          </ul>
         </div>
       </section>
     </article>

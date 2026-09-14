@@ -1,23 +1,20 @@
 import { Link } from "@tanstack/react-router";
-import { OPERATOR, contactEmailLabel } from "@/lib/legal";
+import { OPERATOR } from "@/lib/legal";
 
 export function SiteFooter() {
   return (
     <footer className="border-t border-border bg-background">
-      <div className="mx-auto grid max-w-7xl gap-3 px-5 py-8 text-sm text-muted-foreground md:flex md:items-center md:justify-between">
+      <div className="mx-auto grid max-w-7xl gap-4 px-5 py-8 text-sm text-muted-foreground md:flex md:items-center md:justify-between">
         <p className="leading-relaxed">
-          Psiennik — {OPERATOR.name}, {OPERATOR.street}, {OPERATOR.city}
-          <br />
-          NIP {OPERATOR.nip} · REGON {OPERATOR.regon} · kontakt:{" "}
-          {OPERATOR.email ? (
-            <a className="underline" href={`mailto:${OPERATOR.email}`}>
-              {OPERATOR.email}
-            </a>
-          ) : (
-            contactEmailLabel()
-          )}
+          {OPERATOR.name} ·{" "}
+          <a className="underline" href={`mailto:${OPERATOR.email}`}>
+            {OPERATOR.email}
+          </a>
         </p>
-        <nav className="flex gap-4">
+        <nav className="flex flex-wrap gap-4">
+          <Link to="/kontakt" className="underline hover:text-primary">
+            Kontakt
+          </Link>
           <Link to="/regulamin" className="underline hover:text-primary">
             Regulamin
           </Link>

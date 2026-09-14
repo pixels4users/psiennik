@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { useQueryClient } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { Copy, Link, RefreshCw, Trash2 } from "lucide-react";
+import { Copy, Download, Link, RefreshCw, Trash2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth, useProfile } from "@/lib/auth";
 import {
@@ -24,7 +24,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { cn } from "@/lib/utils";
 import { socialMeta } from "@/lib/seo";
 import { useServerFn } from "@tanstack/react-start";
-import { deleteMyAccount } from "@/lib/account.functions";
+import { deleteMyAccount, exportMyData } from "@/lib/account.functions";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -113,9 +113,7 @@ function ProfilePage() {
   return (
     <div className="mx-auto max-w-2xl px-5 py-12">
       <h1 className="text-4xl">Mój profil</h1>
-      <p className="mt-2 text-muted-foreground">
-        Ustawienia konta i zarządzanie dostępem.
-      </p>
+      <p className="mt-2 text-muted-foreground">Ustawienia konta i zarządzanie dostępem.</p>
 
       <Card className="mt-8 shadow-none">
         <CardContent className="p-6">
@@ -170,6 +168,7 @@ function ProfilePage() {
         </CardContent>
       </Card>
 
+      <ExportDataCard />
       <BehavioristCodeCard />
       <OwnerBehavioristsCard />
       <BehavioristOwnersCard />
@@ -178,13 +177,94 @@ function ProfilePage() {
   );
 }
 
+function ExportDataCard() {
+  const exportData = useServerFn(exportMyData);
+  const [exporting, setExporting] = useState(false);
+
+  const download = async () => {
+    setExporting(true);
+    try {
+      const data = await exportData({});
+      const text = JSON.stringify(data, null, 2);
+      const blob = new Blob([text], { type: "application/json" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `psiennik-export-${new Date().toISOString().slice(0, 10)}.json`;
+      a.click();
+      URL.revokeObjectURL(url);
+
+      // Zdjęcia pobieramy osobno jako oryginalne pliki.
+      for (const path of data.photoPaths) {
+        const { data: signed, error } = await supabase.storage.from("dog-photos").createSignedUrl(path, 60);
+        if (error || !signed) continue;
+        const img = document.createElement("a");
+        img.href = signed.signedUrl;
+        img.download = path.split("/").pop() ?? "zdjecie.jpg";
+        img.click();
+      }
+
+      toast.success("Pobrano dane. Zdjęcia pobierają się osobno.");
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Nie udało się pobrać danych");
+    } finally {
+      setExporting(false);
+    }
+  };
+
+  return (
+    <Card className="mt-6 shadow-none">
+      <CardHeader>
+        <CardTitle className="text-xl">Twoje dane</CardTitle>
+      </CardHeader>
+      <CardContent className="grid gap-4">
+        <p className="text-sm leading-relaxed text-muted-foreground">
+          Możesz pobrać kopię swoich danych: psy, wpisy, zalecenia oraz zdjęcia w oryginalnych
+          formatach. Plik tekstowy zawiera dane w formacie JSON.
+        </p>
+        <Button variant="outline" className="justify-self-start" disabled={exporting} onClick={() => void download()}>
+          <Download className="mr-2 size-4" />
+          {exporting ? "Pobieranie…" : "Pobierz moje dane"}
+        </Button>
+      </CardContent>
+    </Card>
+  );
+}
+
 function DeleteAccountCard() {
+  const { user } = useAuth();
   const queryClient = useQueryClient();
   const navigate = useNavigate();
   const deleteAccount = useServerFn(deleteMyAccount);
   const [deleting, setDeleting] = useState(false);
+  const [confirmWord, setConfirmWord] = useState("");
+  const [open, setOpen] = useState(false);
+
+  const { data: impact, isLoading: impactLoading } = useQuery({
+    queryKey: ["delete-impact", user?.id],
+    enabled: !!user,
+    queryFn: async () => {
+      const userId = user!.id;
+      const { data: dogs, error: dogsError } = await supabase.from("dogs").select("id, name").eq("owner_id", userId);
+      if (dogsError) throw dogsError;
+
+      const dogIds = (dogs ?? []).map((d) => d.id);
+      const { count, error: accessError } =
+        dogIds.length > 0
+          ? await supabase
+              .from("dog_access")
+              .select("*", { count: "exact", head: true })
+              .in("dog_id", dogIds)
+              .neq("user_id", userId)
+          : { count: 0, error: null };
+      if (accessError) throw accessError;
+
+      return { dogs: dogs ?? [], otherPeople: count ?? 0 };
+    },
+  });
 
   const remove = async () => {
+    if (confirmWord.trim().toLowerCase() !== "usuń") return;
     setDeleting(true);
     try {
       await deleteAccount({});
@@ -205,12 +285,32 @@ function DeleteAccountCard() {
         <CardTitle className="text-xl">Usunięcie konta</CardTitle>
       </CardHeader>
       <CardContent className="grid gap-4">
-        <p className="text-sm leading-relaxed text-muted-foreground">
-          Usunięcie konta jest nieodwracalne. Skasujemy Twój profil oraz psy, których jesteś
-          głównym właścicielem — razem z ich wpisami, zaleceniami i zdjęciami. Psy udostępnione Ci
-          przez inne osoby zostaną u ich właścicieli, stracisz jedynie dostęp.
-        </p>
-        <AlertDialog>
+        <div className="text-sm leading-relaxed text-muted-foreground">
+          <p>Usunięcie konta jest nieodwracalne. Skasujemy:</p>
+          <ul className="mt-2 list-disc pl-5">
+            <li>Twój profil i dane logowania,</li>
+            <li>psy, których jesteś głównym właścicielem — razem z wpisami, zaleceniami i zdjęciami,</li>
+            <li>Twoje dostępy do cudzych psów oraz powiązania z behawiorystami.</li>
+          </ul>
+          {impactLoading ? (
+            <p className="mt-3">Obliczam skutki usunięcia…</p>
+          ) : impact && impact.dogs.length > 0 ? (
+            <p className="mt-3">
+              Psy, które znikną: {impact.dogs.map((d) => d.name).join(", ")}.
+              {impact.otherPeople > 0 && (
+                <>
+                  {" "}
+                  Dostęp straci {impact.otherPeople}{" "}
+                  {impact.otherPeople === 1 ? "osoba" : impact.otherPeople < 5 ? "osoby" : "osób"}, którym udostępniłeś/aś te dzienniki.
+                </>
+              )}
+            </p>
+          ) : null}
+          <p className="mt-3">
+            Jeśli chcesz zachować dane, pobierz je najpierw przyciskiem „Pobierz moje dane".
+          </p>
+        </div>
+        <AlertDialog open={open} onOpenChange={setOpen}>
           <AlertDialogTrigger asChild>
             <Button variant="outline" className="justify-self-start text-destructive" disabled={deleting}>
               <Trash2 className="mr-2 size-4" />
@@ -219,16 +319,24 @@ function DeleteAccountCard() {
           </AlertDialogTrigger>
           <AlertDialogContent>
             <AlertDialogHeader>
-              <AlertDialogTitle>Usunąć konto na stałe?</AlertDialogTitle>
+              <AlertDialogTitle>Potwierdź usunięcie konta</AlertDialogTitle>
               <AlertDialogDescription>
-                Tej operacji nie da się cofnąć. Twoje psy, wpisy, zalecenia i zdjęcia zostaną
-                trwale usunięte.
+                Tej operacji nie da się cofnąć. Aby potwierdzić, wpisz poniżej słowo{" "}
+                <strong>usuń</strong>.
               </AlertDialogDescription>
             </AlertDialogHeader>
+            <Input
+              value={confirmWord}
+              onChange={(e) => setConfirmWord(e.target.value)}
+              placeholder="Wpisz usuń"
+              autoFocus
+            />
             <AlertDialogFooter>
-              <AlertDialogCancel disabled={deleting}>Anuluj</AlertDialogCancel>
+              <AlertDialogCancel disabled={deleting} onClick={() => setConfirmWord("")}>
+                Anuluj
+              </AlertDialogCancel>
               <AlertDialogAction
-                disabled={deleting}
+                disabled={deleting || confirmWord.trim().toLowerCase() !== "usuń"}
                 onClick={(e) => {
                   e.preventDefault();
                   void remove();
