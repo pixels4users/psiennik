@@ -64,7 +64,6 @@ const JOURNAL_PREVIEWS = [
     timeOfDay: "Południe",
     rating: "warn" as const,
     ratingLabel: "Wyzwanie",
-    icon: activityIcon("trening"),
   },
   {
     name: "Luna",
