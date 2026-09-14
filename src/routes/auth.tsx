@@ -8,10 +8,14 @@ import {
 import { CircleCheckBig, Mail } from "lucide-react";
 import { toast } from "sonner";
 import { z } from "zod";
+import { useQueryClient } from "@tanstack/react-query";
+import { useServerFn } from "@tanstack/react-start";
 import { supabase } from "@/integrations/supabase/client";
 import { lovable } from "@/integrations/lovable";
 import { useAuth } from "@/lib/auth";
 import { useRedeemInvite } from "@/lib/access";
+import { claimBehavioristRole } from "@/lib/role.functions";
+
 import {
   DEMO_BEHAVIORIST_EMAIL,
   DEMO_OWNER_EMAIL,
