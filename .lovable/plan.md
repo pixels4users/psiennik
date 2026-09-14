@@ -51,9 +51,9 @@ Twoje decyzje, które wdrażam:
 1. **Zalecenia po usunięciu konta behawiorysty** — treść zostaje przy dzienniku, powiązanie z kontem usuwamy, przy zaleceniu pokazujemy „Behawiorysta — konto usunięte". Nie nazywamy tego anonimizacją: treść może zawierać podpis lub inne dane. W polityce opisujemy cel dalszego przechowywania (dokumentacja pracy z psem prowadzona przez właściciela) i tryb obsługi żądań dotyczących takich treści — zgłoszenie na `kontakt@psiennik.pl`, ocena indywidualna, usunięcie fragmentu gdy nie ma podstaw do zachowania.
 2. **Historia akceptacji po usunięciu konta** — zachowujemy minimalny, faktycznie użyteczny dowód: identyfikator konta, rodzaj dokumentu, wersja, data, sposób. Bez e-maila i imienia. Okresu nie wybieram arbitralnie — proponuję ustalić go razem przed wdrożeniem, na podstawie tego, przed jakim roszczeniem ten dowód ma chronić; do tego czasu nie wpisuję żadnej liczby do dokumentów.
 3. **Dzienniki współwłaścicieli** — na MVP usuwane razem z kontem głównego właściciela. Ekran potwierdzenia wymienia psy i liczbę osób, które stracą dostęp, i proponuje eksport przed usunięciem.
-4. **Eksport** — przycisk „Pobierz moje dane" w profilu. Zakres: psy, wpisy i zalecenia w pliku JSON plus czytelny plik tekstowy; zdjęcia pobierane osobno linkami ważnymi czasowo (albo w paczce ZIP, jeśli wolisz). Eksport działa na uprawnieniach zalogowanego konta — obejmuje wyłącznie psy, do których ma dostęp, i nie zawiera danych innych kont poza tym, co i tak widać w aplikacji (imię autora zalecenia).
+4. **Eksport** — przycisk „Pobierz moje dane" w profilu. Zakres: psy, wpisy i zalecenia w czytelnym pliku tekstowym; zdjęcia dołączane tak, jak je przechowujemy (oryginalne pliki z ich ścieżkami). Eksport działa na uprawnieniach zalogowanego konta — obejmuje wyłącznie psy, do których ma dostęp, i nie zawiera danych innych kont poza tym, co i tak widać w aplikacji (imię autora zalecenia).
 
-Do domknięcia przed wdrożeniem dokumentów: okres przechowywania rejestru akceptacji (punkt 2) i format zdjęć w eksporcie (punkt 4).
+Do domknięcia przed wdrożeniem dokumentów: okres przechowywania rejestru akceptacji (punkt 2).
 
 ## 6. Wiek i status użytkownika
 
@@ -64,12 +64,7 @@ Do domknięcia przed wdrożeniem dokumentów: okres przechowywania rejestru akce
 
 Nie publikujemy zdania „szczegóły powierzenia w trakcie ustaleń" — to nie zastępuje umowy powierzenia. Do czasu potwierdzenia polityka wskazuje wyłącznie fakty potwierdzone: dostawcą infrastruktury jest Lovable, baza działa w regionie UE (Irlandia); o logach, kopiach, wsparciu i pozostałych usługach nic nie deklarujemy.
 
-Pytania do wysłania do Lovable (przygotuję gotową wiadomość do skopiowania):
-1. Jaka umowa obejmuje przetwarzanie danych użytkowników aplikacji na planie Pro i jak ją zawrzeć — publiczna strona wiąże DPA z Business/Enterprise.
-2. Kto jest podprocesorem bazy i plików, gdzie fizycznie leżą dane poza wskazanym regionem.
-3. Czy występują transfery poza EOG (wsparcie, logi, monitoring) i na jakiej podstawie.
-4. Retencja kopii zapasowych i logów oraz czas usunięcia danych z kopii po skasowaniu konta.
-5. Kto po stronie Lovable i podprocesorów ma techniczny dostęp do treści bazy i jak jest to kontrolowane.
+Pytania do Lovable zostały przez Ciebie wysłane. Do czasu odpowiedzi polityka prywatności wskazuje wyłącznie fakty potwierdzone, bez deklaracji o DPA, logach, kopiach ani wsparciu.
 
 Materiały: DPA Lovable (https://lovable.dev/data-processing-agreement), podprocesorzy (https://lovable.dev/subprocessors).
 
