@@ -316,3 +316,19 @@ function AuthPage() {
     </div>
   );
 }
+
+function LegalNotice() {
+  return (
+    <p className="text-xs leading-relaxed text-muted-foreground">
+      Zakładając konto, akceptujesz{" "}
+      <RouterLink to="/regulamin" className="underline">
+        Regulamin
+      </RouterLink>{" "}
+      Psiennika. Informacje o przetwarzaniu danych znajdziesz w{" "}
+      <RouterLink to="/prywatnosc" className="underline">
+        Polityce prywatności
+      </RouterLink>
+      .
+    </p>
+  );
+}
