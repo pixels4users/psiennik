@@ -27,8 +27,8 @@ export const Route = createFileRoute("/_authenticated/pies/$id/")({
       privatePage: true,
     }),
   }),
-  validateSearch: (search: Record<string, unknown>): { wpis?: string } => ({
-    wpis: typeof search.wpis === "string" ? search.wpis : undefined,
+  validateSearch: (search: Record<string, unknown>): { wpis?: string | undefined } => ({
+    wpis: typeof search["wpis"] === "string" ? (search["wpis"] as string) : undefined,
   }),
   component: DogListPage,
 });
