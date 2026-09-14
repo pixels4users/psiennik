@@ -234,12 +234,13 @@ function AuthPage() {
       <Card className="mt-8 shadow-none">
         <CardContent className="grid gap-5 p-6">
           <div className="grid gap-2">
-            <Button variant="outline" disabled={busy} onClick={() => oauth("google")}>
+            <Button variant="outline" disabled={busy} onClick={() => oauth("google", role)}>
               Kontynuuj z Google
             </Button>
-            <Button variant="outline" disabled={busy} onClick={() => oauth("apple")}>
+            <Button variant="outline" disabled={busy} onClick={() => oauth("apple", role)}>
               Kontynuuj z Apple
             </Button>
+
             <LegalNotice />
           </div>
 
