@@ -57,10 +57,7 @@ function EditEntryPage() {
         <ArrowLeft className="size-4" />
         {dog?.name ? `Wróć do dziennika: ${dog.name}` : "Wróć"}
       </Button>
-      <h1 className="font-display text-3xl font-light text-primary">Edytuj wydarzenie</h1>
-      <p className="mt-2 mb-6 text-sm text-muted-foreground">
-        Zmień aktywność i ocenę dnia — zalecenie behawiorysty dodawane jest osobno.
-      </p>
+      <h1 className="mb-6 font-display text-3xl font-light text-primary">Edytuj wydarzenie</h1>
       {entry ? (
         <EntryForm dogId={id} entry={entry} onDone={goBack} onCancel={goBack} />
       ) : (

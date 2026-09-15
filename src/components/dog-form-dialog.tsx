@@ -10,7 +10,6 @@ import {
   DialogContent,
   DialogHeader,
   DialogTitle,
-  DialogDescription,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -116,7 +115,7 @@ export function DogFormDialog({
       if (dog?.photo_url) {
         await queryClient.invalidateQueries({ queryKey: ["dog-photo", dog.photo_url] });
       }
-      toast.success(dog ? "Dane psa zostały zapisane" : `${name.trim()} dodany do dziennika`);
+      toast.success(dog ? "Dane psa zostały zapisane" : `Dodano psa: ${name.trim()}`);
       reset();
       onOpenChange(false);
       if (!dog) navigate({ to: "/pies/$id", params: { id: data.id } });
@@ -129,14 +128,11 @@ export function DogFormDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-md">
+      <DialogContent className="sm:max-w-md" aria-describedby={undefined}>
         <DialogHeader>
           <DialogTitle className="font-display text-2xl font-light text-primary">
             {dog ? "Edytuj psa" : "Dodaj psa"}
           </DialogTitle>
-          <DialogDescription>
-            {dog ? "Zmień dane lub zdjęcie podopiecznego." : "Podstawowe informacje o podopiecznym."}
-          </DialogDescription>
         </DialogHeader>
         <form onSubmit={handleSubmit} className="grid gap-4">
           <div className="grid gap-2">

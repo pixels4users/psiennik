@@ -179,9 +179,9 @@ function DogAnalysisPage() {
               <CardContent className="grid gap-3 p-6">
                 <h2 className="text-xl">Ten tydzień</h2>
                 <div className="flex flex-wrap gap-2">
-                  <span className="rounded-full bg-good/15 px-3 py-1 text-xs font-medium text-good">{analysis.week.green} dobrze</span>
-                  <span className="rounded-full bg-warn/15 px-3 py-1 text-xs font-medium text-warn">{analysis.week.amber} wyzwania</span>
-                  <span className="rounded-full bg-bad/15 px-3 py-1 text-xs font-medium text-bad">{analysis.week.red} trudno</span>
+                  <span className="rounded-full bg-good/15 px-3 py-1 text-xs font-medium text-good">Dobrze: {analysis.week.green}</span>
+                  <span className="rounded-full bg-warn/15 px-3 py-1 text-xs font-medium text-warn">Wyzwanie: {analysis.week.amber}</span>
+                  <span className="rounded-full bg-bad/15 px-3 py-1 text-xs font-medium text-bad">Trudno: {analysis.week.red}</span>
                 </div>
               </CardContent>
             </Card>
@@ -202,7 +202,7 @@ function DogAnalysisPage() {
                       ))}
                     </div>
                     <p className="text-sm text-muted-foreground">
-                      {analysis.total.green} zielonych · {analysis.total.amber} pomarańczowych · {analysis.total.red} czerwonych z {totalCount} wpisów
+                      Dobrze: {analysis.total.green} · Wyzwanie: {analysis.total.amber} · Trudno: {analysis.total.red}
                     </p>
                   </>
                 )}
@@ -210,9 +210,9 @@ function DogAnalysisPage() {
             </Card>
             <Card className="shadow-none">
               <CardContent className="grid gap-3 p-6">
-                <h2 className="text-xl">Powtarzające się tematy</h2>
+                <h2 className="text-xl">Częste słowa w trudnych wydarzeniach</h2>
                 {analysis.keywords.length === 0 ? (
-                  <p className="text-sm text-muted-foreground">Brak trudnych sytuacji do przeanalizowania.</p>
+                  <p className="text-sm text-muted-foreground">Brak słów do zestawienia</p>
                 ) : (
                   <div className="flex flex-wrap gap-1.5">
                     {analysis.keywords.map(([word, count]) => (

@@ -243,7 +243,7 @@ export function EntryForm({
             id="entry-title"
             value={title}
             onChange={(e) => setTitle(e.target.value)}
-            placeholder="np. Spacer z Kokosem 45 min po osiedlu"
+            placeholder="np. Spacer po osiedlu"
           />
         </div>
         <div className="grid gap-2">
@@ -252,12 +252,12 @@ export function EntryForm({
             id="entry-description"
             value={description}
             onChange={(e) => setDescription(e.target.value)}
-            placeholder="Brak zachowań problemowych albo opis sytuacji problemowej…"
+            placeholder="Co się wydarzyło? Jak zareagował pies?"
             rows={4}
           />
         </div>
         <div className="grid gap-2">
-          <Label>Ocena</Label>
+          <Label>Ocena wydarzenia</Label>
           <div className="flex gap-2">
             {RATINGS.map((r) => (
               <button
