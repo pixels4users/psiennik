@@ -293,7 +293,9 @@ Bezpośrednio na API (z sesjami testowymi, nie tylko przez interfejs):
 - inny uczestnik próbuje edytować, usunąć lub „odusunąć" cudzy komentarz → odrzucone,
 - behawiorysta oczekujący oraz po zakończonym procesie nie mogą nic dopisać ani zmienić,
 - właściciel i współwłaściciel próbują dodać komentarz przy psie bez aktywnego behawiorysty → odrzucone przez RLS i trigger,
-- próba trwałego usunięcia komentarza przez aplikację → brak polityki, odrzucone.
+- próba trwałego usunięcia komentarza przez aplikację → brak polityki, odrzucone,
+- usunięcie konta autora: współwłaściciel lub aktywny behawiorysta dodaje komentarz przy cudzym psie, usuwa konto istniejącym mechanizmem → konto znika bez błędu, komentarz zostaje w historii z `author_id = NULL`, interfejs pokazuje „Usunięty użytkownik", a treść, rola historyczna i wszystkie daty pozostają bez zmian,
+- próba ustawienia `author_id = NULL` przez zwykłego użytkownika → odrzucona przez RLS i trigger.
 
 Interfejs: 390×844 i desktop — odczyt, dodanie, edycja i usunięcie komentarza, dodanie zalecenia, widok po zakończonym procesie.
 
