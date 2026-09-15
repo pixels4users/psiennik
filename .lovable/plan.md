@@ -254,7 +254,23 @@ FOR EACH ROW EXECUTE FUNCTION private.guard_entry_insert();
 - Liczniki dla całej listy wpisów psa jednym zapytaniem (`useEntryCommentCounts(dogId)`), z pominięciem usuniętych; `EntryCard` dostaje `commentCount` i `onOpenDetails`.
 - Nazwa autora z `profiles`; brak profilu → „Usunięty użytkownik".
 - Eksport „Pobierz moje dane": komentarze (bez usuniętych treści) dopisane przy wydarzeniach; ścieżka usuwania konta sprawdzona — `ON DELETE SET NULL` jej nie blokuje.
-- Po migracji: regeneracja typów, `bunx tsgo --noEmit`, build i sprawdzenie w przeglądarce na 390×844 oraz desktopie (właściciel i behawiorysta: odczyt, dodanie, edycja, usunięcie komentarza, dodanie zalecenia, proces zakończony).
+- Uprawnienia w `useDogRole`: zamiast dotychczasowego `canComment` wprowadzamy `canDiscuss` (właściciel, współwłaściciel, aktywny behawiorysta) oraz `canRecommend` (wyłącznie aktywny behawiorysta). Wszystkie obecne użycia `canComment` (Dziennik, Kalendarz, `EntryCard`) przechodzą na `canRecommend`, bo dotyczą zalecenia; nowa dyskusja korzysta z `canDiscuss`.
+- Po migracji: regeneracja typów, `bunx tsgo --noEmit`, build i sprawdzenie w przeglądarce na 390×844 oraz desktopie.
+
+## Testy przed zamknięciem prac
+
+Bezpośrednio na API (z sesjami testowymi, nie tylko przez interfejs):
+
+- właściciel próbuje utworzyć wydarzenie z wypełnionym zaleceniem → odrzucone,
+- właściciel próbuje zmienić istniejące zalecenie → zalecenie bez zmian,
+- aktywny behawiorysta próbuje zmienić tytuł, datę, psa, identyfikator lub datę zalecenia → zmiany ignorowane,
+- współwłaściciel dodaje komentarz i edytuje wydarzenie → obie akcje działają,
+- autor edytuje i miękko usuwa własny komentarz → znaczniki ustawia baza, treść wyczyszczona,
+- inny uczestnik próbuje edytować, usunąć lub „odusunąć" cudzy komentarz → odrzucone,
+- behawiorysta oczekujący oraz po zakończonym procesie nie mogą nic dopisać ani zmienić,
+- próba trwałego usunięcia komentarza przez aplikację → brak polityki, odrzucone.
+
+Interfejs: 390×844 i desktop — odczyt, dodanie, edycja i usunięcie komentarza, dodanie zalecenia, widok po zakończonym procesie.
 
 ## Poza zakresem
 
