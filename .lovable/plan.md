@@ -138,6 +138,23 @@ BEGIN
   END IF;
 
   -- UPDATE
+
+  -- Wyjątek: techniczna anonimizacja autora po usunięciu konta
+  -- (klucz obcy ON DELETE SET NULL). Dozwolone tylko wtedy, gdy wyłącznie
+  -- author_id przechodzi na NULL i nic więcej się nie zmienia.
+  IF OLD.author_id IS NOT NULL AND NEW.author_id IS NULL THEN
+    IF NEW.id IS NOT DISTINCT FROM OLD.id
+       AND NEW.entry_id IS NOT DISTINCT FROM OLD.entry_id
+       AND NEW.author_role IS NOT DISTINCT FROM OLD.author_role
+       AND NEW.body IS NOT DISTINCT FROM OLD.body
+       AND NEW.created_at IS NOT DISTINCT FROM OLD.created_at
+       AND NEW.edited_at IS NOT DISTINCT FROM OLD.edited_at
+       AND NEW.deleted_at IS NOT DISTINCT FROM OLD.deleted_at THEN
+      RETURN NEW;
+    END IF;
+    RAISE EXCEPTION 'Nie można zmienić autora komentarza';
+  END IF;
+
   IF OLD.author_id IS NULL OR OLD.author_id <> auth.uid() THEN
     RAISE EXCEPTION 'Możesz zmienić tylko własny komentarz';
   END IF;
