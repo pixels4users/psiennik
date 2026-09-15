@@ -196,16 +196,15 @@ function AuthPage() {
           <div className="mx-auto flex size-16 items-center justify-center rounded-full bg-keylime text-primary">
             <CircleCheckBig className="size-8" aria-hidden="true" />
           </div>
-          <h1 className="mt-6 text-4xl">Konto zostało utworzone</h1>
+          <h1 className="mt-6 text-4xl">Potwierdź adres e-mail</h1>
           <p className="mt-4 text-lg text-muted-foreground">
-            Wysłaliśmy wiadomość z linkiem potwierdzającym na adres:
+            Wysłaliśmy link na:
           </p>
           <p className="mt-2 break-words font-semibold text-foreground">{registeredEmail}</p>
           <div className="mt-8 flex items-start gap-3 rounded-lg bg-muted p-5 text-left">
             <Mail className="mt-0.5 size-5 shrink-0 text-primary" aria-hidden="true" />
             <p className="text-sm leading-relaxed text-muted-foreground">
-              Otwórz wiadomość i kliknij link, aby potwierdzić adres e-mail i dokończyć rejestrację.
-              Jeśli jej nie widzisz, sprawdź folder spam.
+              Otwórz link, aby dokończyć rejestrację. Nie widzisz wiadomości? Sprawdź spam.
             </p>
           </div>
         </div>
@@ -216,17 +215,12 @@ function AuthPage() {
   return (
     <div className="mx-auto max-w-md px-5 py-14">
       <h1 className="text-4xl">Witaj w Psienniku</h1>
-      <p className="mt-2 text-muted-foreground">
-        Zaloguj się, aby prowadzić dziennik behawioralny swojego psa.
-      </p>
 
       {searchCode && (
         <div className="mt-6 rounded-lg bg-keylime p-4 text-center text-sm">
           <p className="font-medium text-foreground">Masz zaproszenie</p>
           <p className="mt-1 text-muted-foreground">
-            Zaloguj się lub załóż konto, a kod{" "}
-            <span className="font-display text-lg tracking-widest text-primary">{searchCode}</span>{" "}
-            zostanie automatycznie użyty.
+            Zaloguj się lub załóż konto, aby z niego skorzystać.
           </p>
         </div>
       )}

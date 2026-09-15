@@ -225,10 +225,7 @@ function DogCalendarPage() {
             <div className="grid gap-3 p-5 sm:p-7">
               {selectedDayEntries.length === 0 ? (
                 <div className="rounded-xl bg-keylime px-5 py-12 text-center">
-                  <h3 className="text-2xl">Spokojny dzień</h3>
-                  <p className="mt-2 text-sm text-muted-foreground">
-                    Nie zapisano żadnych wydarzeń dla tej daty.
-                  </p>
+                  <h3 className="text-2xl">Brak wydarzeń tego dnia</h3>
                 </div>
               ) : (
                 selectedDayEntries.map((entry) => (

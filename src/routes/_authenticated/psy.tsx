@@ -235,11 +235,6 @@ function DogsPage() {
       <div className="flex flex-wrap items-end justify-between gap-4">
         <div>
           <h1 className="text-4xl">{isBehaviorist ? "Psy pod opieką" : "Twoje psy"}</h1>
-          <p className="mt-2 text-muted-foreground">
-            {isBehaviorist
-              ? "Wybierz psa, aby zobaczyć dziennik i dodać zalecenia."
-              : "Wybierz psa, aby zobaczyć jego dziennik, albo dodaj nowego."}
-          </p>
         </div>
         <div className="flex flex-wrap gap-2">
           {isBehaviorist ? (
@@ -308,13 +303,13 @@ function DogsPage() {
         <div className="mt-10 rounded-xl bg-keylime p-12 text-center">
           <PawPrint className="mx-auto size-10 text-primary" />
           <h2 className="mt-4 text-3xl">
-            {isBehaviorist ? "Zaproś pierwszego klienta" : "Jeszcze nie ma żadnego psa"}
+            {isBehaviorist ? "Zaproś pierwszego klienta" : "Nie masz jeszcze dodanych psów"}
           </h2>
-          <p className="mx-auto mt-2 max-w-md text-muted-foreground">
-            {isBehaviorist
-              ? "Wyślij właścicielowi link — po rejestracji jego psy trafią pod Twoją opiekę."
-              : "Dodaj pierwszego psa, aby zacząć zapisywać wydarzenia i śledzić postępy."}
-          </p>
+          {isBehaviorist && (
+            <p className="mx-auto mt-2 max-w-md text-muted-foreground">
+              Wyślij właścicielowi link — po rejestracji jego psy trafią pod Twoją opiekę.
+            </p>
+          )}
           {isBehaviorist ? (
             <div className="mt-6 flex flex-wrap justify-center gap-2">
               <Button onClick={() => setInviteOpen(true)}>
@@ -335,11 +330,6 @@ function DogsPage() {
         </div>
       ) : (
         <Tabs defaultValue="active" className="mt-10">
-          <p className="mb-3 text-sm text-muted-foreground">
-            {isBehaviorist
-              ? "Etap współpracy z właścicielem — nie stan psa."
-              : "Etap współpracy z behawiorystą — nie stan psa."}
-          </p>
           <TabsList className="mb-6">
             <TabsTrigger value="active">
               Aktywne

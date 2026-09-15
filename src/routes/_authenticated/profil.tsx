@@ -106,7 +106,6 @@ function ProfilePage() {
   return (
     <div className="mx-auto max-w-2xl px-5 py-12">
       <h1 className="text-4xl">Mój profil</h1>
-      <p className="mt-2 text-muted-foreground">Ustawienia konta i zarządzanie dostępem.</p>
 
       <Card className="mt-8 shadow-none">
         <CardContent className="p-6">
@@ -392,7 +391,7 @@ function BehavioristOwnersCard() {
     return (
       <Card className="mt-6 shadow-none">
         <CardHeader>
-          <CardTitle className="text-xl">Twoi właściciele</CardTitle>
+          <CardTitle className="text-xl">Twoi klienci</CardTitle>
         </CardHeader>
         <CardContent>
           <Skeleton className="h-10 w-full" />
@@ -406,7 +405,7 @@ function BehavioristOwnersCard() {
   return (
     <Card className="mt-6 shadow-none">
       <CardHeader>
-        <CardTitle className="text-xl">Twoi właściciele</CardTitle>
+        <CardTitle className="text-xl">Twoi klienci</CardTitle>
       </CardHeader>
       <CardContent className="grid gap-3">
         <div className="rounded-lg bg-secondary p-3 text-sm">
