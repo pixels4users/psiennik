@@ -138,6 +138,23 @@ BEGIN
   END IF;
 
   -- UPDATE
+
+  -- Wyjątek: techniczna anonimizacja autora po usunięciu konta
+  -- (klucz obcy ON DELETE SET NULL). Dozwolone tylko wtedy, gdy wyłącznie
+  -- author_id przechodzi na NULL i nic więcej się nie zmienia.
+  IF OLD.author_id IS NOT NULL AND NEW.author_id IS NULL THEN
+    IF NEW.id IS NOT DISTINCT FROM OLD.id
+       AND NEW.entry_id IS NOT DISTINCT FROM OLD.entry_id
+       AND NEW.author_role IS NOT DISTINCT FROM OLD.author_role
+       AND NEW.body IS NOT DISTINCT FROM OLD.body
+       AND NEW.created_at IS NOT DISTINCT FROM OLD.created_at
+       AND NEW.edited_at IS NOT DISTINCT FROM OLD.edited_at
+       AND NEW.deleted_at IS NOT DISTINCT FROM OLD.deleted_at THEN
+      RETURN NEW;
+    END IF;
+    RAISE EXCEPTION 'Nie można zmienić autora komentarza';
+  END IF;
+
   IF OLD.author_id IS NULL OR OLD.author_id <> auth.uid() THEN
     RAISE EXCEPTION 'Możesz zmienić tylko własny komentarz';
   END IF;
@@ -276,7 +293,9 @@ Bezpośrednio na API (z sesjami testowymi, nie tylko przez interfejs):
 - inny uczestnik próbuje edytować, usunąć lub „odusunąć" cudzy komentarz → odrzucone,
 - behawiorysta oczekujący oraz po zakończonym procesie nie mogą nic dopisać ani zmienić,
 - właściciel i współwłaściciel próbują dodać komentarz przy psie bez aktywnego behawiorysty → odrzucone przez RLS i trigger,
-- próba trwałego usunięcia komentarza przez aplikację → brak polityki, odrzucone.
+- próba trwałego usunięcia komentarza przez aplikację → brak polityki, odrzucone,
+- usunięcie konta autora: współwłaściciel lub aktywny behawiorysta dodaje komentarz przy cudzym psie, usuwa konto istniejącym mechanizmem → konto znika bez błędu, komentarz zostaje w historii z `author_id = NULL`, interfejs pokazuje „Usunięty użytkownik", a treść, rola historyczna i wszystkie daty pozostają bez zmian,
+- próba ustawienia `author_id = NULL` przez zwykłego użytkownika → odrzucona przez RLS i trigger.
 
 Interfejs: 390×844 i desktop — odczyt, dodanie, edycja i usunięcie komentarza, dodanie zalecenia, widok po zakończonym procesie.
 
