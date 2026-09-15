@@ -48,11 +48,10 @@
 - Sprawdzenie typów i budowanie projektu.
 - Przegląd w podglądzie na komputerze (1280) i telefonie (390) na kontach demo: lista psów właściciela i behawiorysty (także pusta), dodawanie i edycja psa oraz wydarzenia, pusty dzień w kalendarzu, analiza, profil, logowanie, ekran po rejestracji, ramka zaproszenia — z uwagą na odstępy i zawijanie dłuższych nagłówków.
 
-## Pull request na GitHubie
+## Scalenie i synchronizacja
 
-Nie mogę scalić tego pull requesta ani przełączyć gałęzi: ten warsztat pracuje na wewnętrznym repozytorium Lovable, a nie na Twoim repozytorium GitHub. Kroki po Twojej stronie:
+Pull request nr 1 jest już scalony do `main` (commit `b3dd18d`). Pozostaje wyłącznie weryfikacja synchronizacji — bez ponownego nanoszenia zmian:
 
-1. W pull requeście nr 1 kliknij „Ready for review", a potem „Merge pull request" (zwykłe scalenie, bez nadpisywania historii).
-2. Albo, jeśli wolisz jedno źródło zmian: zamknij pull request bez scalania — te same zmiany trafią do `main` z Lovable przez synchronizację z GitHubem.
-
-Wybór drugiej opcji unika podwójnego wprowadzenia tych samych zmian; przy pierwszej mogą pojawić się konflikty do ręcznego rozwiązania.
+1. Sprawdzam, czy ten warsztat pobrał aktualny kod z `main` (synchronizacja z GitHubem).
+2. Sprawdzam w podglądzie, czy widać pierwszą paczkę UX Writing (m.in. „Twoi klienci" w profilu, „Dodano psa: [imię]" po dodaniu, etykiety „Dobrze: 3 / Wyzwanie: 1 / Trudno: 0" w analizie).
+3. Jeśli podgląd pokazuje starszą wersję — zgłaszam to, zamiast edytować pliki ponownie.
