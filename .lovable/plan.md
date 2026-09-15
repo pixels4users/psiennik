@@ -185,18 +185,23 @@ ALTER TABLE public.entry_comments ADD CONSTRAINT entry_comments_body_check CHECK
 --    zwykłe pola tylko dla właściciela/współwłaściciela
 CREATE OR REPLACE FUNCTION private.guard_entry_update()
 RETURNS trigger LANGUAGE plpgsql SECURITY DEFINER SET search_path = public AS $$
+DECLARE
+  v_dog_id uuid := OLD.dog_id;
 BEGIN
-  IF private.can_manage_dog(NEW.dog_id, auth.uid()) THEN
-    IF private.all_behaviorists_completed(NEW.dog_id) THEN
+  -- wydarzenia nie da się przenieść między psami ani podmienić jego identyfikatora
+  NEW.id := OLD.id;
+  NEW.dog_id := OLD.dog_id;
+  NEW.created_at := OLD.created_at;
+
+  IF private.can_manage_dog(v_dog_id, auth.uid()) THEN
+    IF private.all_behaviorists_completed(v_dog_id) THEN
       RAISE EXCEPTION 'Proces z behawiorystą został zakończony. Dziennik jest w trybie tylko do odczytu.';
     END IF;
-    -- właściciel nie rusza zalecenia
+    -- właściciel i współwłaściciel nie ruszają zalecenia
     NEW.behaviorist_comment := OLD.behaviorist_comment;
     NEW.commented_at := OLD.commented_at;
-    NEW.created_at := OLD.created_at;
-  ELSIF private.is_active_behaviorist(NEW.dog_id, auth.uid()) THEN
+  ELSIF private.is_active_behaviorist(v_dog_id, auth.uid()) THEN
     -- behawiorysta zmienia wyłącznie zalecenie
-    NEW.dog_id := OLD.dog_id;
     NEW.date := OLD.date;
     NEW.title := OLD.title;
     NEW.activity_type := OLD.activity_type;
@@ -205,9 +210,10 @@ BEGIN
     NEW.times_of_day := OLD.times_of_day;
     NEW.description := OLD.description;
     NEW.rating := OLD.rating;
-    NEW.created_at := OLD.created_at;
     IF NEW.behaviorist_comment IS DISTINCT FROM OLD.behaviorist_comment THEN
       NEW.commented_at := now();
+    ELSE
+      NEW.commented_at := OLD.commented_at;
     END IF;
   ELSE
     RAISE EXCEPTION 'Brak uprawnień do edycji tego wpisu';
@@ -216,6 +222,26 @@ BEGIN
   RETURN NEW;
 END;
 $$;
+
+-- 6. Ochrona tworzenia wydarzeń: zalecenie nie może powstać razem z wydarzeniem
+CREATE OR REPLACE FUNCTION private.guard_entry_insert()
+RETURNS trigger LANGUAGE plpgsql SECURITY DEFINER SET search_path = public AS $$
+BEGIN
+  IF NEW.behaviorist_comment IS NOT NULL AND btrim(NEW.behaviorist_comment) <> '' THEN
+    RAISE EXCEPTION 'Zalecenie może dodać wyłącznie aktywny behawiorysta do istniejącego wydarzenia';
+  END IF;
+  IF NEW.commented_at IS NOT NULL THEN
+    RAISE EXCEPTION 'Data zalecenia jest ustawiana przez system';
+  END IF;
+  NEW.behaviorist_comment := NULL;
+  NEW.commented_at := NULL;
+  RETURN NEW;
+END;
+$$;
+
+CREATE TRIGGER guard_entry_insert_trigger
+BEFORE INSERT ON public.entries
+FOR EACH ROW EXECUTE FUNCTION private.guard_entry_insert();
 ```
 
 **Skutki dla istniejących danych:** żadne dane nie są zmieniane ani usuwane. Stare wydarzenia mają zero komentarzy. Zmienia się wyłącznie zakres tego, kto co może zapisać w `entries`.
