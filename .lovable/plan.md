@@ -72,12 +72,19 @@ RETURNS boolean LANGUAGE sql STABLE SECURITY DEFINER SET search_path = public AS
   )
 $$;
 
--- kto może w ogóle pisać w dyskusji: właściciel/współwłaściciel przy niezakończonym
--- procesie albo aktywny behawiorysta
+-- kto może pisać w dyskusji: wyłącznie w ramach aktywnego procesu —
+-- właściciel/współwłaściciel albo aktywny behawiorysta, i tylko gdy
+-- przy psie istnieje aktywny behawiorysta
 CREATE OR REPLACE FUNCTION private.can_discuss_dog(_dog_id uuid, _user_id uuid)
 RETURNS boolean LANGUAGE sql STABLE SECURITY DEFINER SET search_path = public AS $$
-  SELECT private.can_edit_entries(_dog_id, _user_id)
-      OR private.is_active_behaviorist(_dog_id, _user_id)
+  SELECT EXISTS (
+    SELECT 1 FROM public.dog_access
+    WHERE dog_id = _dog_id AND role = 'behaviorist' AND process_status = 'active'
+  )
+  AND (
+    private.can_manage_dog(_dog_id, _user_id)
+    OR private.is_active_behaviorist(_dog_id, _user_id)
+  )
 $$;
 
 -- 3. Polityki RLS
@@ -254,7 +261,7 @@ FOR EACH ROW EXECUTE FUNCTION private.guard_entry_insert();
 - Liczniki dla całej listy wpisów psa jednym zapytaniem (`useEntryCommentCounts(dogId)`), z pominięciem usuniętych; `EntryCard` dostaje `commentCount` i `onOpenDetails`.
 - Nazwa autora z `profiles`; brak profilu → „Usunięty użytkownik".
 - Eksport „Pobierz moje dane": komentarze (bez usuniętych treści) dopisane przy wydarzeniach; ścieżka usuwania konta sprawdzona — `ON DELETE SET NULL` jej nie blokuje.
-- Uprawnienia w `useDogRole`: zamiast dotychczasowego `canComment` wprowadzamy `canDiscuss` (właściciel, współwłaściciel, aktywny behawiorysta) oraz `canRecommend` (wyłącznie aktywny behawiorysta). Wszystkie obecne użycia `canComment` (Dziennik, Kalendarz, `EntryCard`) przechodzą na `canRecommend`, bo dotyczą zalecenia; nowa dyskusja korzysta z `canDiscuss`.
+- Uprawnienia w `useDogRole`: zamiast dotychczasowego `canComment` wprowadzamy `canDiscuss` (właściciel, współwłaściciel i aktywny behawiorysta — wyłącznie gdy przy psie jest aktywny behawiorysta; pies bez aktywnego procesu nie ma pola dyskusji) oraz `canRecommend` (wyłącznie aktywny behawiorysta). Wszystkie obecne użycia `canComment` (Dziennik, Kalendarz, `EntryCard`) przechodzą na `canRecommend`, bo dotyczą zalecenia; nowa dyskusja korzysta z `canDiscuss`.
 - Po migracji: regeneracja typów, `bunx tsgo --noEmit`, build i sprawdzenie w przeglądarce na 390×844 oraz desktopie.
 
 ## Testy przed zamknięciem prac
@@ -268,6 +275,7 @@ Bezpośrednio na API (z sesjami testowymi, nie tylko przez interfejs):
 - autor edytuje i miękko usuwa własny komentarz → znaczniki ustawia baza, treść wyczyszczona,
 - inny uczestnik próbuje edytować, usunąć lub „odusunąć" cudzy komentarz → odrzucone,
 - behawiorysta oczekujący oraz po zakończonym procesie nie mogą nic dopisać ani zmienić,
+- właściciel i współwłaściciel próbują dodać komentarz przy psie bez aktywnego behawiorysty → odrzucone przez RLS i trigger,
 - próba trwałego usunięcia komentarza przez aplikację → brak polityki, odrzucone.
 
 Interfejs: 390×844 i desktop — odczyt, dodanie, edycja i usunięcie komentarza, dodanie zalecenia, widok po zakończonym procesie.
