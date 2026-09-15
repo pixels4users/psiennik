@@ -39,4 +39,13 @@ Uszczelnienie zapisu wydarzeń — dziś każda osoba z dostępem do psa może z
 
 ## Poza zakresem
 
-Odpowiedzi w wątku, edycja i usuwanie komentarzy, powiadomienia i nieprzeczytane, Realtime, załączniki, druga tabela na zalecenia, przebudowa Dziennika, Kalendarza, tabeli i analizy.
+Odpowiedzi w wątku, powiadomienia i nieprzeczytane, Realtime, załączniki, druga tabela na zalecenia, przebudowa Dziennika, Kalendarza, tabeli i analizy.
+
+## Edycja i usuwanie własnego komentarza
+
+Autor może poprawić lub usunąć swój komentarz — i tylko swój; reguły w bazie pilnują tego niezależnie od interfejsu.
+
+- Po poprawce pod treścią pojawia się „Komentarz edytowany · 15.09.2026, 22:41".
+- Po usunięciu komentarz zostaje w wątku jako „Komentarz usunięty · 15.09.2026, 22:41" bez treści, żeby rozmowa pozostała zrozumiała.
+- Po zakończeniu procesu nic już nie da się zmienić ani usunąć.
+- Technicznie: kolumny `edited_at` i `deleted_at` w `entry_comments`; zmiana dozwolona tylko autorowi, tylko pola `body` (z automatycznym `edited_at`) i tylko gdy komentarz nie jest usunięty; usunięcie to ustawienie `deleted_at` i wyczyszczenie treści, bez kasowania wiersza; licznik na karcie wydarzenia pomija usunięte.
