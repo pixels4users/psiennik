@@ -97,32 +97,27 @@ export function EntryCard({
           )
         )}
 
-        <div className="flex items-center justify-between gap-2 border-t pt-3">
+        <div className="flex flex-wrap items-center justify-between gap-3 border-t pt-3">
           <div className="flex items-center gap-3">
             <RatingBadge rating={entry.rating} />
+            <span className="inline-flex items-center gap-1.5 text-sm text-muted-foreground">
+              <MessagesSquare className="size-4" aria-hidden="true" />
+              Komentarze ({commentCount ?? 0})
+            </span>
+          </div>
+          <div className="flex items-center gap-2">
+            {canEdit && onEdit && (
+              <Button variant="outline" size="sm" onClick={() => onEdit(entry)}>
+                <Pencil className="size-4" />
+                Edytuj
+              </Button>
+            )}
             {onOpenDetails && (
-              <button
-                type="button"
-                onClick={() => onOpenDetails(entry)}
-                className="inline-flex items-center gap-1.5 text-sm font-medium text-primary transition-colors hover:text-primary/80"
-              >
-                <MessagesSquare className="size-4" aria-hidden="true" />
-                {commentCount
-                  ? `Dyskusja: ${commentCount} ${commentCount === 1 ? "komentarz" : commentCount < 5 ? "komentarze" : "komentarzy"}`
-                  : "Dyskusja"}
-              </button>
+              <Button size="sm" onClick={() => onOpenDetails(entry)}>
+                Szczegóły
+              </Button>
             )}
           </div>
-          {canEdit && onEdit && (
-            <Button
-              variant="ghost"
-              size="icon"
-              aria-label="Edytuj wydarzenie"
-              onClick={() => onEdit(entry)}
-            >
-              <Pencil className="size-4" />
-            </Button>
-          )}
         </div>
       </CardContent>
     </Card>
