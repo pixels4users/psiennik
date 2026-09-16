@@ -1,5 +1,5 @@
 import { useMemo, useState } from "react";
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, useNavigate, useRouter } from "@tanstack/react-router";
 import {
   addDays,
   addWeeks,
@@ -63,6 +63,7 @@ function ratingDotSize(count: number) {
 function DogCalendarPage() {
   const { id } = Route.useParams();
   const navigate = useNavigate();
+  const router = useRouter();
   const { data: role } = useDogRole(id);
   const { data: dog } = useDog(id);
   const { data: entries, isLoading } = useEntries(id);
@@ -237,13 +238,15 @@ function DogCalendarPage() {
                     canEdit={!!role?.canEditEntries}
                     canRecommend={!!role?.canRecommend}
                     commentCount={commentCounts?.get(entry.id) ?? 0}
-                    onEdit={(item) =>
-                      navigate({
+                    onEdit={async (item) => {
+                      const destination = {
                         to: "/pies/$id/wydarzenie/$entryId/edytuj",
                         params: { id, entryId: item.id },
                         search: { wroc: "kalendarz" },
-                      })
-                    }
+                      } as const;
+                      await router.preloadRoute(destination);
+                      await navigate(destination);
+                    }}
                     onRecommend={(item) => {
                       setCommentedEntry(item);
                       setCommentDialogOpen(true);

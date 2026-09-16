@@ -53,13 +53,17 @@ export function EntryForm({
   const queryClient = useQueryClient();
   const isEdit = !!entry;
 
-  const [date, setDate] = useState<Date>(new Date());
+  const [date, setDate] = useState<Date>(() => (entry ? parseISO(entry.date) : new Date()));
   const [calendarOpen, setCalendarOpen] = useState(false);
-  const [timesOfDay, setTimesOfDay] = useState<string[]>(["rano"]);
-  const [activityTypes, setActivityTypes] = useState<string[]>(["spacer"]);
-  const [title, setTitle] = useState("");
-  const [description, setDescription] = useState("");
-  const [rating, setRating] = useState<string>("green");
+  const [timesOfDay, setTimesOfDay] = useState<string[]>(() =>
+    entry ? entryTimes(entry) : ["rano"],
+  );
+  const [activityTypes, setActivityTypes] = useState<string[]>(() =>
+    entry ? entryActivities(entry) : ["spacer"],
+  );
+  const [title, setTitle] = useState(() => entry?.title ?? "");
+  const [description, setDescription] = useState(() => entry?.description ?? "");
+  const [rating, setRating] = useState<string>(() => entry?.rating ?? "green");
   const [saving, setSaving] = useState(false);
   const [deleting, setDeleting] = useState(false);
   const [confirmDeleteOpen, setConfirmDeleteOpen] = useState(false);
