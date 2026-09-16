@@ -9,7 +9,8 @@ export const getRouter = () => {
     routeTree,
     context: { queryClient },
     scrollRestoration: true,
-    defaultPreloadStaleTime: 0,
+    // Reuse a freshly preloaded route during the navigation that immediately follows it.
+    defaultPreloadStaleTime: 30_000,
   });
 
   return router;
