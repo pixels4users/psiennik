@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { format, parseISO } from "date-fns";
 import { pl } from "date-fns/locale";
@@ -47,10 +47,13 @@ function EntryDetailsPage() {
     }
   };
 
-  if (!isLoading && !entry) {
-    goBack();
-    return null;
-  }
+  const missing = !isLoading && !entry;
+  useEffect(() => {
+    if (missing) goBack();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [missing]);
+
+  if (missing) return null;
 
   const activities = entry ? entryActivities(entry) : [];
   const times = entry ? entryTimes(entry) : [];
