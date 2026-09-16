@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, useNavigate, useRouter } from "@tanstack/react-router";
 import { format, parseISO } from "date-fns";
 import { pl } from "date-fns/locale";
 import { Plus, UserPlus, Users } from "lucide-react";
@@ -44,6 +44,7 @@ function DogListPage() {
   const { data: commentCounts } = useEntryCommentCounts((entries ?? []).map((e) => e.id));
 
   const navigate = useNavigate();
+  const router = useRouter();
   const [commentedEntry, setCommentedEntry] = useState<Entry | null>(null);
   const [commentDialogOpen, setCommentDialogOpen] = useState(false);
   const [accessOpen, setAccessOpen] = useState(false);
@@ -164,13 +165,15 @@ function DogListPage() {
                     canEdit={!!role?.canEditEntries}
                     canRecommend={!!role?.canRecommend}
                     commentCount={commentCounts?.get(entry.id) ?? 0}
-                    onEdit={(e) =>
-                      navigate({
+                    onEdit={async (e) => {
+                      const destination = {
                         to: "/pies/$id/wydarzenie/$entryId/edytuj",
                         params: { id, entryId: e.id },
                         search: { wroc: undefined },
-                      })
-                    }
+                      } as const;
+                      await router.preloadRoute(destination);
+                      await navigate(destination);
+                    }}
                     onRecommend={(e) => {
                       setCommentedEntry(e);
                       setCommentDialogOpen(true);

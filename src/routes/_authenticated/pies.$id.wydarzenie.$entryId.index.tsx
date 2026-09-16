@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react";
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, useNavigate, useRouter } from "@tanstack/react-router";
 import { format, parseISO } from "date-fns";
 import { pl } from "date-fns/locale";
-import { ArrowLeft, MessageSquarePlus, MessageSquareText, Clock3, Pencil } from "lucide-react";
+import { ArrowLeft, MessageSquarePlus, MessageSquareText, Clock3, Pencil, LoaderCircle } from "lucide-react";
 import { useDog, useEntries, entryActivities, entryTimes, timesLabel, ACTIVITY_TYPES, ACTIVITY_ICONS, labelFor } from "@/lib/dogs";
 import { useDogRole } from "@/lib/auth";
 import { EntryDiscussion } from "@/components/entry-discussion";
@@ -32,10 +32,12 @@ function EntryDetailsPage() {
   const { id, entryId } = Route.useParams();
   const { wroc } = Route.useSearch();
   const navigate = useNavigate();
+  const router = useRouter();
   const { data: dog } = useDog(id);
   const { data: role, isLoading: roleLoading } = useDogRole(id);
   const { data: entries, isLoading } = useEntries(id);
   const [recommendationOpen, setRecommendationOpen] = useState(false);
+  const [openingEdit, setOpeningEdit] = useState(false);
 
   const entry = entries?.find((item) => item.id === entryId) ?? null;
 
@@ -44,6 +46,22 @@ function EntryDetailsPage() {
       void navigate({ to: "/pies/$id/kalendarz", params: { id } });
     } else {
       void navigate({ to: "/pies/$id", params: { id } });
+    }
+  };
+
+  const openEdit = async () => {
+    if (openingEdit) return;
+    setOpeningEdit(true);
+    const destination = {
+      to: "/pies/$id/wydarzenie/$entryId/edytuj",
+      params: { id, entryId },
+      search: { wroc },
+    } as const;
+    try {
+      await router.preloadRoute(destination);
+      await navigate(destination);
+    } finally {
+      setOpeningEdit(false);
     }
   };
 
@@ -80,15 +98,15 @@ function EntryDetailsPage() {
                 <Button
                   variant="outline"
                   size="sm"
-                  onClick={() =>
-                    navigate({
-                      to: "/pies/$id/wydarzenie/$entryId/edytuj",
-                      params: { id, entryId },
-                      search: { wroc },
-                    })
-                  }
+                  onClick={() => void openEdit()}
+                  disabled={openingEdit}
+                  aria-busy={openingEdit}
                 >
-                  <Pencil className="size-4" />
+                  {openingEdit ? (
+                    <LoaderCircle className="size-4 animate-spin" aria-hidden="true" />
+                  ) : (
+                    <Pencil className="size-4" />
+                  )}
                   Edytuj wydarzenie
                 </Button>
               )}

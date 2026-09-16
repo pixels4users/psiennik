@@ -1,4 +1,5 @@
-import { Pencil, MessageSquarePlus, MessageSquareText, MessagesSquare, Clock3 } from "lucide-react";
+import { useState } from "react";
+import { Pencil, MessageSquarePlus, MessageSquareText, MessagesSquare, Clock3, LoaderCircle } from "lucide-react";
 import {
   ACTIVITY_TYPES,
   ACTIVITY_ICONS,
@@ -25,12 +26,23 @@ export function EntryCard({
   canEdit: boolean;
   canRecommend: boolean;
   commentCount?: number;
-  onEdit?: (entry: Entry) => void;
+  onEdit?: (entry: Entry) => void | Promise<void>;
   onRecommend?: (entry: Entry) => void;
   onOpenDetails?: (entry: Entry) => void;
 }) {
   const activities = entryActivities(entry);
   const times = entryTimes(entry);
+  const [openingEdit, setOpeningEdit] = useState(false);
+
+  const handleEdit = async () => {
+    if (!onEdit || openingEdit) return;
+    setOpeningEdit(true);
+    try {
+      await onEdit(entry);
+    } finally {
+      setOpeningEdit(false);
+    }
+  };
 
   return (
     <Card className="shadow-none">
@@ -107,8 +119,18 @@ export function EntryCard({
           </div>
           <div className="flex items-center gap-2">
             {canEdit && onEdit && (
-              <Button variant="outline" size="sm" onClick={() => onEdit(entry)}>
-                <Pencil className="size-4" />
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => void handleEdit()}
+                disabled={openingEdit}
+                aria-busy={openingEdit}
+              >
+                {openingEdit ? (
+                  <LoaderCircle className="size-4 animate-spin" aria-hidden="true" />
+                ) : (
+                  <Pencil className="size-4" />
+                )}
                 Edytuj
               </Button>
             )}
