@@ -22,8 +22,10 @@ export type DogRoleResult = {
   canManage: boolean;
   /** Czy może dodawać/edytować wpisy (właściciel/współwłaściciel, gdy proces nie zakończony). */
   canEditEntries: boolean;
+  /** Czy może pisać w dyskusji — wyłącznie przy aktywnym behawioryście. */
+  canDiscuss: boolean;
   /** Czy może dodawać zalecenia jako aktywny behawiorysta. */
-  canComment: boolean;
+  canRecommend: boolean;
   /** Czy dziennik jest w trybie tylko do odczytu dla zarządzających. */
   isReadOnly: boolean;
   /** Czy użytkownik jest głównym właścicielem psa. */
@@ -214,13 +216,23 @@ export function useDogRole(dogId: string) {
     queryKey: ["dog-role", dogId, user?.id],
     enabled: !!user && !!dogId,
     queryFn: async (): Promise<DogRoleResult> => {
-      const [{ data: dog, error: dogError }, { data: accessRows, error: accessError }] =
-        await Promise.all([
-          supabase.from("dogs").select("owner_id").eq("id", dogId).single(),
-          supabase.from("dog_access").select("role, process_status").eq("dog_id", dogId).eq("user_id", user!.id),
-        ]);
+      const [
+        { data: dog, error: dogError },
+        { data: accessRows, error: accessError },
+        { data: activeBehaviorists, error: behavioristsError },
+      ] = await Promise.all([
+        supabase.from("dogs").select("owner_id").eq("id", dogId).single(),
+        supabase.from("dog_access").select("role, process_status").eq("dog_id", dogId).eq("user_id", user!.id),
+        supabase
+          .from("dog_access")
+          .select("user_id")
+          .eq("dog_id", dogId)
+          .eq("role", "behaviorist")
+          .eq("process_status", "active"),
+      ]);
       if (dogError) throw dogError;
       if (accessError) throw accessError;
+      if (behavioristsError) throw behavioristsError;
 
       const isOwner = dog.owner_id === user!.id;
       const access = accessRows?.[0];
@@ -229,14 +241,18 @@ export function useDogRole(dogId: string) {
       const canManage = role === "owner" || role === "coowner";
       const isReadOnly = processStatus === "completed";
       const canEditEntries = canManage && !isReadOnly;
-      const canComment = role === "behaviorist" && processStatus === "active";
+      const canRecommend = role === "behaviorist" && processStatus === "active";
+      // Dyskusja działa wyłącznie w ramach aktywnego procesu z behawiorystą.
+      const hasActiveBehaviorist = (activeBehaviorists?.length ?? 0) > 0;
+      const canDiscuss = hasActiveBehaviorist && (canManage || canRecommend);
 
       return {
         role,
         processStatus,
         canManage,
         canEditEntries,
-        canComment,
+        canDiscuss,
+        canRecommend,
         isReadOnly,
         isPrimaryOwner: isOwner,
       };

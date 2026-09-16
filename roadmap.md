@@ -1,46 +1,6 @@
-# Roadmap
+# Zadania
 
-- [x] Migracja: tabele dogs + entries (RLS public, grants)
-- [x] Bucket storage na zdjęcia psów (prywatny, signed URLs)
-- [x] Design system w styles.css (motyw botanical z załączników, fonty)
-- [x] Hook roli (właściciel/behawiorysta) + nagłówek
-- [x] Strona `/` — wybór roli
-- [x] Strona `/psy` — lista psów + dodawanie (ze zdjęciem)
-- [x] Strona `/pies/$id` — lista wydarzeń, dodawanie/edycja, komentarz behawiorysty
-- [x] Strona `/pies/$id/kalendarz` — widok tygodniowy + analiza
-- [x] Metadata head() na wszystkich stronach
-- [x] Weryfikacja build + preview
-- [x] Ujednolicić szerokość widoku Lista z Kalendarzem
-- [x] Dodać widok Tabela z sortowaniem i filtrami
-- [x] Zweryfikować nowy widok na komputerze i telefonie
-- [x] Dodać podgląd zdjęcia przy tworzeniu psa
-- [x] Dodać edycję danych oraz zdjęcia istniejącego psa
-- [x] Zweryfikować dodawanie, podmianę i usuwanie zdjęcia
-- [x] Dodać panel szczegółów dnia otwierany z kalendarza
-- [x] Zachować edycję wydarzeń i komentarzy w panelu dnia
-- [x] Zweryfikować panel dnia na komputerze i telefonie
-- [x] Uprościć Kalendarz i dodać trzy wskaźniki ocen na każdym dniu
-- [x] Dodać widok Analiza z podsumowaniami i trzema wykresami
-- [x] Zweryfikować Kalendarz i Analizę na komputerze oraz telefonie
-- [x] Konta: logowanie Google/Apple/e-mail, role, RLS per konto
-- [x] Zaproszenia behawiorystki kodem + lista dostępu
-- [x] Powiadomienia w aplikacji (dzwonek, nowe wpisy/komentarze)
-- [x] Profil użytkownika i wylogowanie
-- [x] Konta demo (tylko tryb deweloperski)
-- [x] Zarządzanie dostępem z poziomu profilu i psa
-- [x] Rola współwłaściciela i główny właściciel
-- [x] Cykl życia współpracy z behawiorystą (active/completed/pending)
-- [x] Stały kod behawiorysty i relacja owner–behaviorist
-- [x] Limity darmowego planu behawiorysty bez blokowania tworzenia psa
-- [x] Dashboard behawiorysty z aktywnymi/zakończonymi/oczekującymi procesami
-- [x] Galeria przykładowych dzienników psów na stronie głównej
-- [x] Ujednolicić nazwy ocen i określenie „zalecenia" w całej aplikacji
-- [x] Dodać zakładkę zbierającą wszystkie zalecenia behawiorysty
-- [x] Dodać indywidualne podglądy linków i wyłączyć prywatne strony z indeksowania
-- [x] Podmienić logo, ikonę i faviconę na nowe materiały oraz odświeżyć podglądy stron
-- [x] Spójne karty wydarzeń, ikony typów aktywności i ostatnie wydarzenia na liście psów
-- [x] Skonfigurować wysyłkę e-maili z notify.psiennik.pl (polskie szablony w stylu marki)
-- [x] Etap A audytu: regulamin, polityka prywatności, stopka, notka przy rejestracji, usuwanie konta, zapis akceptacji regulaminu
-- [ ] Uzupełnić adres e-mail kontaktowy w `src/lib/legal.ts` (dziś placeholder)
-- [ ] Decyzja: hostowanie fontów lokalnie zamiast Google Fonts
-- [ ] Etap B audytu — przed uruchomieniem płatnych kont
+- [ ] Migracja bazy: entry_comments + uszczelnienie entries (SQL z zatwierdzonego planu)
+- [ ] Aplikacja: szczegóły wydarzenia, trasa edycji, dyskusja, RecommendationDialog, liczniki, canDiscuss/canRecommend, eksport
+- [ ] Testy API/RLS (lista z planu) + Playwright 390×844 i desktop
+- [ ] Otwarte przed publikacją: okresy retencji powiadomień, odpowiedź Lovable w sprawie powierzenia

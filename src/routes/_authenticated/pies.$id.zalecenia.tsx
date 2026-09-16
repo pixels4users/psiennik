@@ -101,8 +101,9 @@ function DogRecommendationsPage() {
                       {format(parseISO(entry.commented_at ?? entry.date), "d MMMM yyyy", { locale: pl })}
                     </time>
                     <Link
-                      to="/pies/$id"
-                      params={{ id }}
+                      to="/pies/$id/wydarzenie/$entryId"
+                      params={{ id, entryId: entry.id }}
+                      search={{ wroc: undefined }}
                       className="font-medium text-primary transition-colors hover:text-primary/80"
                     >
                       Zobacz wydarzenie: {entry.title}

@@ -1,4 +1,4 @@
-import { Pencil, MessageSquarePlus, MessageSquareText, Clock3 } from "lucide-react";
+import { Pencil, MessageSquarePlus, MessageSquareText, MessagesSquare, Clock3 } from "lucide-react";
 import {
   ACTIVITY_TYPES,
   ACTIVITY_ICONS,
@@ -15,15 +15,19 @@ import { Button } from "@/components/ui/button";
 export function EntryCard({
   entry,
   canEdit,
-  canComment,
+  canRecommend,
+  commentCount,
   onEdit,
-  onComment,
+  onRecommend,
+  onOpenDetails,
 }: {
   entry: Entry;
   canEdit: boolean;
-  canComment: boolean;
+  canRecommend: boolean;
+  commentCount?: number;
   onEdit?: (entry: Entry) => void;
-  onComment?: (entry: Entry) => void;
+  onRecommend?: (entry: Entry) => void;
+  onOpenDetails?: (entry: Entry) => void;
 }) {
   const activities = entryActivities(entry);
   const times = entryTimes(entry);
@@ -68,8 +72,8 @@ export function EntryCard({
                 <MessageSquareText className="size-3.5" />
                 Zalecenie behawiorysty
               </p>
-              {canComment && onComment && (
-                <Button variant="ghost" size="sm" onClick={() => onComment(entry)}>
+              {canRecommend && onRecommend && (
+                <Button variant="ghost" size="sm" onClick={() => onRecommend(entry)}>
                   Edytuj
                 </Button>
               )}
@@ -79,13 +83,13 @@ export function EntryCard({
             </p>
           </div>
         ) : (
-          canComment &&
-          onComment && (
+          canRecommend &&
+          onRecommend && (
             <Button
               variant="outline"
               size="sm"
               className="w-fit"
-              onClick={() => onComment(entry)}
+              onClick={() => onRecommend(entry)}
             >
               <MessageSquarePlus className="size-4" />
               Dodaj zalecenie
@@ -94,7 +98,21 @@ export function EntryCard({
         )}
 
         <div className="flex items-center justify-between gap-2 border-t pt-3">
-          <RatingBadge rating={entry.rating} />
+          <div className="flex items-center gap-3">
+            <RatingBadge rating={entry.rating} />
+            {onOpenDetails && (
+              <button
+                type="button"
+                onClick={() => onOpenDetails(entry)}
+                className="inline-flex items-center gap-1.5 text-sm font-medium text-primary transition-colors hover:text-primary/80"
+              >
+                <MessagesSquare className="size-4" aria-hidden="true" />
+                {commentCount
+                  ? `Dyskusja: ${commentCount} ${commentCount === 1 ? "komentarz" : commentCount < 5 ? "komentarze" : "komentarzy"}`
+                  : "Dyskusja"}
+              </button>
+            )}
+          </div>
           {canEdit && onEdit && (
             <Button
               variant="ghost"

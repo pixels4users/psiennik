@@ -27,6 +27,7 @@ import { Route as LovableEmailAuthPreviewRouteImport } from './routes/lovable/em
 import { Route as LovableEmailAuthWebhookRouteImport } from './routes/lovable/email/auth/webhook'
 import { Route as AuthenticatedPiesIdWydarzenieEntryIdRouteImport } from './routes/_authenticated/pies.$id.wydarzenie.$entryId'
 import { Route as AuthenticatedPiesIdWydarzenieNoweRouteImport } from './routes/_authenticated/pies.$id.wydarzenie.nowe'
+import { Route as AuthenticatedPiesIdWydarzenieEntryIdEdytujRouteImport } from './routes/_authenticated/pies.$id.wydarzenie.$entryId.edytuj'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -124,6 +125,12 @@ const AuthenticatedPiesIdWydarzenieNoweRoute =
     path: '/wydarzenie/nowe',
     getParentRoute: () => AuthenticatedPiesIdRoute,
   } as any)
+const AuthenticatedPiesIdWydarzenieEntryIdEdytujRoute =
+  AuthenticatedPiesIdWydarzenieEntryIdEdytujRouteImport.update({
+    id: '/edytuj',
+    path: '/edytuj',
+    getParentRoute: () => AuthenticatedPiesIdWydarzenieEntryIdRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -141,8 +148,9 @@ export interface FileRoutesByFullPath {
   '/lovable/email/auth/preview': typeof LovableEmailAuthPreviewRoute
   '/lovable/email/auth/webhook': typeof LovableEmailAuthWebhookRoute
   '/pies/$id/': typeof AuthenticatedPiesIdIndexRoute
-  '/pies/$id/wydarzenie/$entryId': typeof AuthenticatedPiesIdWydarzenieEntryIdRoute
+  '/pies/$id/wydarzenie/$entryId': typeof AuthenticatedPiesIdWydarzenieEntryIdRouteWithChildren
   '/pies/$id/wydarzenie/nowe': typeof AuthenticatedPiesIdWydarzenieNoweRoute
+  '/pies/$id/wydarzenie/$entryId/edytuj': typeof AuthenticatedPiesIdWydarzenieEntryIdEdytujRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -159,8 +167,9 @@ export interface FileRoutesByTo {
   '/lovable/email/auth/preview': typeof LovableEmailAuthPreviewRoute
   '/lovable/email/auth/webhook': typeof LovableEmailAuthWebhookRoute
   '/pies/$id': typeof AuthenticatedPiesIdIndexRoute
-  '/pies/$id/wydarzenie/$entryId': typeof AuthenticatedPiesIdWydarzenieEntryIdRoute
+  '/pies/$id/wydarzenie/$entryId': typeof AuthenticatedPiesIdWydarzenieEntryIdRouteWithChildren
   '/pies/$id/wydarzenie/nowe': typeof AuthenticatedPiesIdWydarzenieNoweRoute
+  '/pies/$id/wydarzenie/$entryId/edytuj': typeof AuthenticatedPiesIdWydarzenieEntryIdEdytujRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -180,8 +189,9 @@ export interface FileRoutesById {
   '/lovable/email/auth/preview': typeof LovableEmailAuthPreviewRoute
   '/lovable/email/auth/webhook': typeof LovableEmailAuthWebhookRoute
   '/_authenticated/pies/$id/': typeof AuthenticatedPiesIdIndexRoute
-  '/_authenticated/pies/$id/wydarzenie/$entryId': typeof AuthenticatedPiesIdWydarzenieEntryIdRoute
+  '/_authenticated/pies/$id/wydarzenie/$entryId': typeof AuthenticatedPiesIdWydarzenieEntryIdRouteWithChildren
   '/_authenticated/pies/$id/wydarzenie/nowe': typeof AuthenticatedPiesIdWydarzenieNoweRoute
+  '/_authenticated/pies/$id/wydarzenie/$entryId/edytuj': typeof AuthenticatedPiesIdWydarzenieEntryIdEdytujRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -203,6 +213,7 @@ export interface FileRouteTypes {
     | '/pies/$id/'
     | '/pies/$id/wydarzenie/$entryId'
     | '/pies/$id/wydarzenie/nowe'
+    | '/pies/$id/wydarzenie/$entryId/edytuj'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -221,6 +232,7 @@ export interface FileRouteTypes {
     | '/pies/$id'
     | '/pies/$id/wydarzenie/$entryId'
     | '/pies/$id/wydarzenie/nowe'
+    | '/pies/$id/wydarzenie/$entryId/edytuj'
   id:
     | '__root__'
     | '/'
@@ -241,6 +253,7 @@ export interface FileRouteTypes {
     | '/_authenticated/pies/$id/'
     | '/_authenticated/pies/$id/wydarzenie/$entryId'
     | '/_authenticated/pies/$id/wydarzenie/nowe'
+    | '/_authenticated/pies/$id/wydarzenie/$entryId/edytuj'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -382,8 +395,30 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedPiesIdWydarzenieNoweRouteImport
       parentRoute: typeof AuthenticatedPiesIdRoute
     }
+    '/_authenticated/pies/$id/wydarzenie/$entryId/edytuj': {
+      id: '/_authenticated/pies/$id/wydarzenie/$entryId/edytuj'
+      path: '/edytuj'
+      fullPath: '/pies/$id/wydarzenie/$entryId/edytuj'
+      preLoaderRoute: typeof AuthenticatedPiesIdWydarzenieEntryIdEdytujRouteImport
+      parentRoute: typeof AuthenticatedPiesIdWydarzenieEntryIdRoute
+    }
   }
 }
+
+interface AuthenticatedPiesIdWydarzenieEntryIdRouteChildren {
+  AuthenticatedPiesIdWydarzenieEntryIdEdytujRoute: typeof AuthenticatedPiesIdWydarzenieEntryIdEdytujRoute
+}
+
+const AuthenticatedPiesIdWydarzenieEntryIdRouteChildren: AuthenticatedPiesIdWydarzenieEntryIdRouteChildren =
+  {
+    AuthenticatedPiesIdWydarzenieEntryIdEdytujRoute:
+      AuthenticatedPiesIdWydarzenieEntryIdEdytujRoute,
+  }
+
+const AuthenticatedPiesIdWydarzenieEntryIdRouteWithChildren =
+  AuthenticatedPiesIdWydarzenieEntryIdRoute._addFileChildren(
+    AuthenticatedPiesIdWydarzenieEntryIdRouteChildren,
+  )
 
 interface AuthenticatedPiesIdRouteChildren {
   AuthenticatedPiesIdAnalizaRoute: typeof AuthenticatedPiesIdAnalizaRoute
@@ -391,7 +426,7 @@ interface AuthenticatedPiesIdRouteChildren {
   AuthenticatedPiesIdTabelaRoute: typeof AuthenticatedPiesIdTabelaRoute
   AuthenticatedPiesIdZaleceniaRoute: typeof AuthenticatedPiesIdZaleceniaRoute
   AuthenticatedPiesIdIndexRoute: typeof AuthenticatedPiesIdIndexRoute
-  AuthenticatedPiesIdWydarzenieEntryIdRoute: typeof AuthenticatedPiesIdWydarzenieEntryIdRoute
+  AuthenticatedPiesIdWydarzenieEntryIdRoute: typeof AuthenticatedPiesIdWydarzenieEntryIdRouteWithChildren
   AuthenticatedPiesIdWydarzenieNoweRoute: typeof AuthenticatedPiesIdWydarzenieNoweRoute
 }
 
@@ -402,7 +437,7 @@ const AuthenticatedPiesIdRouteChildren: AuthenticatedPiesIdRouteChildren = {
   AuthenticatedPiesIdZaleceniaRoute: AuthenticatedPiesIdZaleceniaRoute,
   AuthenticatedPiesIdIndexRoute: AuthenticatedPiesIdIndexRoute,
   AuthenticatedPiesIdWydarzenieEntryIdRoute:
-    AuthenticatedPiesIdWydarzenieEntryIdRoute,
+    AuthenticatedPiesIdWydarzenieEntryIdRouteWithChildren,
   AuthenticatedPiesIdWydarzenieNoweRoute:
     AuthenticatedPiesIdWydarzenieNoweRoute,
 }

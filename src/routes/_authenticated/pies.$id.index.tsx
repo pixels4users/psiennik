@@ -9,7 +9,8 @@ import { useDog, useEntries, type Entry } from "@/lib/dogs";
 import { DogNav } from "@/components/dog-nav";
 import { EntryCard } from "@/components/entry-card";
 
-import { CommentDialog } from "@/components/comment-dialog";
+import { RecommendationDialog } from "@/components/recommendation-dialog";
+import { useEntryCommentCounts } from "@/lib/comments";
 import { AccessDialog } from "@/components/invite-dialog";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -40,6 +41,7 @@ function DogListPage() {
   const { data: role, isLoading: roleLoading } = useDogRole(id);
   const { data: entries, isLoading } = useEntries(id);
   const { data: access } = useDogAccess(id);
+  const { data: commentCounts } = useEntryCommentCounts((entries ?? []).map((e) => e.id));
 
   const navigate = useNavigate();
   const [commentedEntry, setCommentedEntry] = useState<Entry | null>(null);
@@ -160,18 +162,26 @@ function DogListPage() {
                   <EntryCard
                     entry={entry}
                     canEdit={!!role?.canEditEntries}
-                    canComment={!!role?.canComment}
+                    canRecommend={!!role?.canRecommend}
+                    commentCount={commentCounts?.get(entry.id) ?? 0}
                     onEdit={(e) =>
+                      navigate({
+                        to: "/pies/$id/wydarzenie/$entryId/edytuj",
+                        params: { id, entryId: e.id },
+                        search: { wroc: undefined },
+                      })
+                    }
+                    onRecommend={(e) => {
+                      setCommentedEntry(e);
+                      setCommentDialogOpen(true);
+                    }}
+                    onOpenDetails={(e) =>
                       navigate({
                         to: "/pies/$id/wydarzenie/$entryId",
                         params: { id, entryId: e.id },
                         search: { wroc: undefined },
                       })
                     }
-                    onComment={(e) => {
-                      setCommentedEntry(e);
-                      setCommentDialogOpen(true);
-                    }}
                   />
                   </div>
                 ))}
@@ -181,7 +191,7 @@ function DogListPage() {
         </div>
       )}
 
-      <CommentDialog
+      <RecommendationDialog
         entry={commentedEntry}
         open={commentDialogOpen}
         onOpenChange={setCommentDialogOpen}

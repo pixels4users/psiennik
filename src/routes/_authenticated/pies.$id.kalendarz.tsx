@@ -14,7 +14,8 @@ import { useDogRole } from "@/lib/auth";
 import { DogNav } from "@/components/dog-nav";
 import { EntryCard } from "@/components/entry-card";
 
-import { CommentDialog } from "@/components/comment-dialog";
+import { RecommendationDialog } from "@/components/recommendation-dialog";
+import { useEntryCommentCounts } from "@/lib/comments";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import {
@@ -71,6 +72,7 @@ function DogCalendarPage() {
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
   const [commentedEntry, setCommentedEntry] = useState<Entry | null>(null);
   const [commentDialogOpen, setCommentDialogOpen] = useState(false);
+  const { data: commentCounts } = useEntryCommentCounts((entries ?? []).map((e) => e.id));
 
   const byDate = useMemo(() => {
     const map = new Map<string, Entry[]>();
@@ -233,18 +235,26 @@ function DogCalendarPage() {
                     key={entry.id}
                     entry={entry}
                     canEdit={!!role?.canEditEntries}
-                    canComment={!!role?.canComment}
+                    canRecommend={!!role?.canRecommend}
+                    commentCount={commentCounts?.get(entry.id) ?? 0}
                     onEdit={(item) =>
+                      navigate({
+                        to: "/pies/$id/wydarzenie/$entryId/edytuj",
+                        params: { id, entryId: item.id },
+                        search: { wroc: "kalendarz" },
+                      })
+                    }
+                    onRecommend={(item) => {
+                      setCommentedEntry(item);
+                      setCommentDialogOpen(true);
+                    }}
+                    onOpenDetails={(item) =>
                       navigate({
                         to: "/pies/$id/wydarzenie/$entryId",
                         params: { id, entryId: item.id },
                         search: { wroc: "kalendarz" },
                       })
                     }
-                    onComment={(item) => {
-                      setCommentedEntry(item);
-                      setCommentDialogOpen(true);
-                    }}
                   />
                 ))
               )}
@@ -253,7 +263,7 @@ function DogCalendarPage() {
         </SheetContent>
       </Sheet>
 
-      <CommentDialog
+      <RecommendationDialog
         entry={commentedEntry}
         open={commentDialogOpen}
         onOpenChange={setCommentDialogOpen}
