@@ -65,8 +65,9 @@ function RootShell({ children }: { children: React.ReactNode }) {
 
 function RootComponent() {
   const { queryClient } = Route.useRouteContext() as { queryClient: QueryClient };
+  // Ekrany bez nagłówka i stopki: tylko formularze wydarzenia (nowe/edycja).
   const bareScreen = useRouterState({
-    select: (state) => state.location.pathname.includes("/wydarzenie/"),
+    select: (state) => /\/wydarzenie\/(nowe|[^/]+\/edytuj)\/?$/.test(state.location.pathname),
   });
   return (
     <QueryClientProvider client={queryClient}>

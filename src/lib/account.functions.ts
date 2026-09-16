@@ -142,6 +142,31 @@ export const exportMyData = createServerFn({ method: "POST" })
         : { data: [], error: null };
     if (entriesError) throw new Error(entriesError.message);
 
+    // Komentarze z dyskusji przy wpisach (bez treści komentarzy usuniętych).
+    const entryIds = (entries ?? []).map((e) => e.id);
+    const { data: comments, error: commentsError } =
+      entryIds.length > 0
+        ? await supabase
+            .from("entry_comments")
+            .select("entry_id, author_id, author_role, body, created_at, edited_at, deleted_at")
+            .in("entry_id", entryIds)
+            .order("created_at", { ascending: true })
+        : { data: [], error: null };
+    if (commentsError) throw new Error(commentsError.message);
+
+    const commentAuthorIds = [
+      ...new Set(
+        (comments ?? []).map((c) => c.author_id).filter((v): v is string => typeof v === "string"),
+      ),
+    ];
+    const { data: commentAuthors } =
+      commentAuthorIds.length > 0
+        ? await supabase.from("profiles").select("id, display_name, email").in("id", commentAuthorIds)
+        : { data: [] };
+    const authorNameById = new Map(
+      (commentAuthors ?? []).map((p) => [p.id, p.display_name || p.email || "bez nazwy"]),
+    );
+
     const photoPaths: string[] = [];
     for (const dog of dogs ?? []) {
       if (dog.photo_url) photoPaths.push(dog.photo_url);
@@ -183,6 +208,24 @@ export const exportMyData = createServerFn({ method: "POST" })
         lines.push(`      Pora dnia: ${(e.times_of_day ?? []).join(", ")}`);
         if (e.description) lines.push(`      Opis: ${e.description}`);
         if (e.behaviorist_comment) lines.push(`      Zalecenie behawiorysty: ${e.behaviorist_comment}`);
+        const entryComments = (comments ?? []).filter((c) => c.entry_id === e.id);
+        if (entryComments.length > 0) {
+          lines.push(`      Dyskusja (${entryComments.length}):`);
+          for (const c of entryComments) {
+            const author = c.author_id
+              ? (authorNameById.get(c.author_id) ?? "Usunięty użytkownik")
+              : "Usunięty użytkownik";
+            const when = new Date(c.created_at).toLocaleString("pl-PL");
+            if (c.deleted_at) {
+              lines.push(`        - [komentarz usunięty ${new Date(c.deleted_at).toLocaleString("pl-PL")}]`);
+            } else {
+              const edited = c.edited_at
+                ? ` (edytowany ${new Date(c.edited_at).toLocaleString("pl-PL")})`
+                : "";
+              lines.push(`        - ${author}, ${when}${edited}: ${c.body}`);
+            }
+          }
+        }
       }
       lines.push("");
     }
