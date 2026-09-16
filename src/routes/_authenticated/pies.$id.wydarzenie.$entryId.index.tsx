@@ -60,7 +60,7 @@ function EntryDetailsPage() {
     try {
       await router.preloadRoute(destination);
       await navigate(destination);
-    } finally {
+    } catch {
       setOpeningEdit(false);
     }
   };

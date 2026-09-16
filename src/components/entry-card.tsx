@@ -39,7 +39,7 @@ export function EntryCard({
     setOpeningEdit(true);
     try {
       await onEdit(entry);
-    } finally {
+    } catch {
       setOpeningEdit(false);
     }
   };
