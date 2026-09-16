@@ -12,7 +12,7 @@ import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { socialMeta } from "@/lib/seo";
 
-export const Route = createFileRoute("/_authenticated/pies/$id/wydarzenie/$entryId")({
+export const Route = createFileRoute("/_authenticated/pies/$id/wydarzenie/$entryId/")({
   validateSearch: (search: Record<string, unknown>) => ({
     wroc: search["wroc"] === "kalendarz" ? ("kalendarz" as const) : undefined,
   }),

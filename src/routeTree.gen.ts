@@ -27,6 +27,7 @@ import { Route as LovableEmailAuthPreviewRouteImport } from './routes/lovable/em
 import { Route as LovableEmailAuthWebhookRouteImport } from './routes/lovable/email/auth/webhook'
 import { Route as AuthenticatedPiesIdWydarzenieEntryIdRouteImport } from './routes/_authenticated/pies.$id.wydarzenie.$entryId'
 import { Route as AuthenticatedPiesIdWydarzenieNoweRouteImport } from './routes/_authenticated/pies.$id.wydarzenie.nowe'
+import { Route as AuthenticatedPiesIdWydarzenieEntryIdIndexRouteImport } from './routes/_authenticated/pies.$id.wydarzenie.$entryId.index'
 import { Route as AuthenticatedPiesIdWydarzenieEntryIdEdytujRouteImport } from './routes/_authenticated/pies.$id.wydarzenie.$entryId.edytuj'
 
 const IndexRoute = IndexRouteImport.update({
@@ -125,6 +126,12 @@ const AuthenticatedPiesIdWydarzenieNoweRoute =
     path: '/wydarzenie/nowe',
     getParentRoute: () => AuthenticatedPiesIdRoute,
   } as any)
+const AuthenticatedPiesIdWydarzenieEntryIdIndexRoute =
+  AuthenticatedPiesIdWydarzenieEntryIdIndexRouteImport.update({
+    id: '/',
+    path: '/',
+    getParentRoute: () => AuthenticatedPiesIdWydarzenieEntryIdRoute,
+  } as any)
 const AuthenticatedPiesIdWydarzenieEntryIdEdytujRoute =
   AuthenticatedPiesIdWydarzenieEntryIdEdytujRouteImport.update({
     id: '/edytuj',
@@ -151,6 +158,7 @@ export interface FileRoutesByFullPath {
   '/pies/$id/wydarzenie/$entryId': typeof AuthenticatedPiesIdWydarzenieEntryIdRouteWithChildren
   '/pies/$id/wydarzenie/nowe': typeof AuthenticatedPiesIdWydarzenieNoweRoute
   '/pies/$id/wydarzenie/$entryId/edytuj': typeof AuthenticatedPiesIdWydarzenieEntryIdEdytujRoute
+  '/pies/$id/wydarzenie/$entryId/': typeof AuthenticatedPiesIdWydarzenieEntryIdIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -167,9 +175,9 @@ export interface FileRoutesByTo {
   '/lovable/email/auth/preview': typeof LovableEmailAuthPreviewRoute
   '/lovable/email/auth/webhook': typeof LovableEmailAuthWebhookRoute
   '/pies/$id': typeof AuthenticatedPiesIdIndexRoute
-  '/pies/$id/wydarzenie/$entryId': typeof AuthenticatedPiesIdWydarzenieEntryIdRouteWithChildren
   '/pies/$id/wydarzenie/nowe': typeof AuthenticatedPiesIdWydarzenieNoweRoute
   '/pies/$id/wydarzenie/$entryId/edytuj': typeof AuthenticatedPiesIdWydarzenieEntryIdEdytujRoute
+  '/pies/$id/wydarzenie/$entryId': typeof AuthenticatedPiesIdWydarzenieEntryIdIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -192,6 +200,7 @@ export interface FileRoutesById {
   '/_authenticated/pies/$id/wydarzenie/$entryId': typeof AuthenticatedPiesIdWydarzenieEntryIdRouteWithChildren
   '/_authenticated/pies/$id/wydarzenie/nowe': typeof AuthenticatedPiesIdWydarzenieNoweRoute
   '/_authenticated/pies/$id/wydarzenie/$entryId/edytuj': typeof AuthenticatedPiesIdWydarzenieEntryIdEdytujRoute
+  '/_authenticated/pies/$id/wydarzenie/$entryId/': typeof AuthenticatedPiesIdWydarzenieEntryIdIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -214,6 +223,7 @@ export interface FileRouteTypes {
     | '/pies/$id/wydarzenie/$entryId'
     | '/pies/$id/wydarzenie/nowe'
     | '/pies/$id/wydarzenie/$entryId/edytuj'
+    | '/pies/$id/wydarzenie/$entryId/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -230,9 +240,9 @@ export interface FileRouteTypes {
     | '/lovable/email/auth/preview'
     | '/lovable/email/auth/webhook'
     | '/pies/$id'
-    | '/pies/$id/wydarzenie/$entryId'
     | '/pies/$id/wydarzenie/nowe'
     | '/pies/$id/wydarzenie/$entryId/edytuj'
+    | '/pies/$id/wydarzenie/$entryId'
   id:
     | '__root__'
     | '/'
@@ -254,6 +264,7 @@ export interface FileRouteTypes {
     | '/_authenticated/pies/$id/wydarzenie/$entryId'
     | '/_authenticated/pies/$id/wydarzenie/nowe'
     | '/_authenticated/pies/$id/wydarzenie/$entryId/edytuj'
+    | '/_authenticated/pies/$id/wydarzenie/$entryId/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -395,6 +406,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedPiesIdWydarzenieNoweRouteImport
       parentRoute: typeof AuthenticatedPiesIdRoute
     }
+    '/_authenticated/pies/$id/wydarzenie/$entryId/': {
+      id: '/_authenticated/pies/$id/wydarzenie/$entryId/'
+      path: '/'
+      fullPath: '/pies/$id/wydarzenie/$entryId/'
+      preLoaderRoute: typeof AuthenticatedPiesIdWydarzenieEntryIdIndexRouteImport
+      parentRoute: typeof AuthenticatedPiesIdWydarzenieEntryIdRoute
+    }
     '/_authenticated/pies/$id/wydarzenie/$entryId/edytuj': {
       id: '/_authenticated/pies/$id/wydarzenie/$entryId/edytuj'
       path: '/edytuj'
@@ -407,12 +425,15 @@ declare module '@tanstack/react-router' {
 
 interface AuthenticatedPiesIdWydarzenieEntryIdRouteChildren {
   AuthenticatedPiesIdWydarzenieEntryIdEdytujRoute: typeof AuthenticatedPiesIdWydarzenieEntryIdEdytujRoute
+  AuthenticatedPiesIdWydarzenieEntryIdIndexRoute: typeof AuthenticatedPiesIdWydarzenieEntryIdIndexRoute
 }
 
 const AuthenticatedPiesIdWydarzenieEntryIdRouteChildren: AuthenticatedPiesIdWydarzenieEntryIdRouteChildren =
   {
     AuthenticatedPiesIdWydarzenieEntryIdEdytujRoute:
       AuthenticatedPiesIdWydarzenieEntryIdEdytujRoute,
+    AuthenticatedPiesIdWydarzenieEntryIdIndexRoute:
+      AuthenticatedPiesIdWydarzenieEntryIdIndexRoute,
   }
 
 const AuthenticatedPiesIdWydarzenieEntryIdRouteWithChildren =
