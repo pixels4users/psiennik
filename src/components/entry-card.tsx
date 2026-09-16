@@ -112,10 +112,15 @@ export function EntryCard({
         <div className="flex flex-wrap items-center justify-between gap-3 border-t pt-3">
           <div className="flex items-center gap-3">
             <RatingBadge rating={entry.rating} />
-            <span className="inline-flex items-center gap-1.5 text-sm text-muted-foreground">
+            <button
+              type="button"
+              onClick={() => onOpenDetails?.(entry)}
+              disabled={!onOpenDetails}
+              className="inline-flex cursor-pointer items-center gap-1.5 rounded text-sm text-muted-foreground transition-colors hover:text-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring disabled:cursor-default disabled:hover:text-muted-foreground"
+            >
               <MessagesSquare className="size-4" aria-hidden="true" />
               Komentarze ({commentCount ?? 0})
-            </span>
+            </button>
           </div>
           <div className="flex items-center gap-2">
             {canEdit && onEdit && (
