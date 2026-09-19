@@ -37,11 +37,8 @@ export function DogNav({ dog, active }: { dog: Dog; active: (typeof VIEWS)[numbe
   const { user } = useAuth();
   const { data: role, isLoading } = useDogRole(dog.id);
   const { data: isBehaviorist } = useIsBehaviorist();
-  const { data: dogs } = useDogs();
   const { data: access } = useDogAccess(dog.id);
-  const navigate = useNavigate();
   const [editOpen, setEditOpen] = useState(false);
-  const [addOpen, setAddOpen] = useState(false);
   const [accessOpen, setAccessOpen] = useState(false);
   const hasCoOwner =
     access?.some((row) => row.role === "owner" && row.user_id !== dog.owner_id) ?? false;
