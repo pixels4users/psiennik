@@ -6,4 +6,5 @@
 - [x] Płynne przejście do gotowego formularza edycji wydarzenia
 - [x] Poprawki po audycie b934070: stany strony psa (niedostępny/błąd/offline), walidacja kodów zaproszeń w bazie (własny kod behawiorysty, kod własnego psa, duplikaty)
 - [x] Nawigacja górna: imiona psów właściciela, Ustawienia i uproszczona sekcja konta
+- [x] Nagłówek strony psa: bez „Twoje psy" i „Dodaj psa" (przeniesione do nawigacji), bez „Wasza wspólna historia", lżejsza sekcja bez zielonego tła
 - [ ] Otwarte przed publikacją: okresy retencji powiadomień, odpowiedź Lovable w sprawie powierzenia
