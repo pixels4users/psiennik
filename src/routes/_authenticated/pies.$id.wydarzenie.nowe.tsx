@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { ArrowLeft } from "lucide-react";
 import { useDog } from "@/lib/dogs";
@@ -37,10 +38,13 @@ function NewEntryPage() {
     }
   };
 
-  if (!roleLoading && role && !role.canEditEntries) {
-    goBack();
-    return null;
-  }
+  const blocked = !roleLoading && !role?.canEditEntries;
+  useEffect(() => {
+    if (blocked) goBack();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [blocked]);
+
+  if (blocked) return null;
 
   return (
     <div className="mx-auto max-w-2xl px-5 py-8">

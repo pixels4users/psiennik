@@ -10,6 +10,7 @@ import { RecommendationDialog } from "@/components/recommendation-dialog";
 import { RatingBadge } from "@/components/rating-badge";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
+import { EntriesErrorNotice } from "@/components/dog-state";
 import { socialMeta } from "@/lib/seo";
 
 export const Route = createFileRoute("/_authenticated/pies/$id/wydarzenie/$entryId/")({
@@ -35,7 +36,12 @@ function EntryDetailsPage() {
   const router = useRouter();
   const { data: dog } = useDog(id);
   const { data: role, isLoading: roleLoading } = useDogRole(id);
-  const { data: entries, isLoading } = useEntries(id);
+  const {
+    data: entries,
+    isLoading,
+    isError: entriesError,
+    refetch: refetchEntries,
+  } = useEntries(id);
   const [recommendationOpen, setRecommendationOpen] = useState(false);
   const [openingEdit, setOpeningEdit] = useState(false);
 
@@ -65,7 +71,7 @@ function EntryDetailsPage() {
     }
   };
 
-  const missing = !isLoading && !entry;
+  const missing = !isLoading && !entriesError && !entry;
   useEffect(() => {
     if (missing) goBack();
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -83,7 +89,9 @@ function EntryDetailsPage() {
         {wroc === "kalendarz" ? "Wróć do kalendarza" : dog?.name ? `Wróć do dziennika: ${dog.name}` : "Wróć"}
       </Button>
 
-      {!entry || roleLoading ? (
+      {entriesError ? (
+        <EntriesErrorNotice onRetry={() => void refetchEntries()} />
+      ) : !entry || roleLoading ? (
         <div className="grid gap-3">
           <Skeleton className="h-10 w-48" />
           <Skeleton className="h-32 w-full rounded-xl" />
