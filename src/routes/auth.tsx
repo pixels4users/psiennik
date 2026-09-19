@@ -13,7 +13,7 @@ import { useServerFn } from "@tanstack/react-start";
 import { supabase } from "@/integrations/supabase/client";
 import { lovable } from "@/integrations/lovable";
 import { useAuth } from "@/lib/auth";
-import { useRedeemInvite } from "@/lib/access";
+import { inviteErrorMessage, useRedeemInvite } from "@/lib/access";
 import { claimBehavioristRole } from "@/lib/role.functions";
 
 import {
