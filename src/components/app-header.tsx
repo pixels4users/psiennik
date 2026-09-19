@@ -1,13 +1,20 @@
 import { useState } from "react";
 import { Link, useNavigate } from "@tanstack/react-router";
 import { useQueryClient } from "@tanstack/react-query";
+import { formatDistanceToNow } from "date-fns";
+import { pl } from "date-fns/locale";
 import { Bell, ChevronDown, LogOut, PawPrint, Plus, Settings, User, UserPlus } from "lucide-react";
 import logoAsset from "@/assets/psiennik-logo-3.webp.asset.json";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth, useProfile } from "@/lib/auth";
 import { useIsBehaviorist } from "@/lib/access";
 import { useDogs } from "@/lib/dogs";
-import { useNews } from "@/lib/notifications";
+import {
+  useMarkAllNotificationsRead,
+  useMarkNotificationRead,
+  useNotifications,
+  type AppNotification,
+} from "@/lib/notifications";
 import { InviteClientDialog } from "@/components/behaviorist-invite";
 import { DogFormDialog } from "@/components/dog-form-dialog";
 import { Button } from "@/components/ui/button";
@@ -20,17 +27,45 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 
+function formatStamp(iso: string) {
+  try {
+    return formatDistanceToNow(new Date(iso), { addSuffix: true, locale: pl });
+  } catch {
+    return "";
+  }
+}
+
 export function AppHeader() {
   const { user } = useAuth();
   const { data: profile } = useProfile();
   const { data: isBehaviorist } = useIsBehaviorist();
-  const { data: news } = useNews();
+  const { data: notifications } = useNotifications();
+  const markRead = useMarkNotificationRead();
+  const markAllRead = useMarkAllNotificationsRead();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const [inviteOpen, setInviteOpen] = useState(false);
   const [addDogOpen, setAddDogOpen] = useState(false);
 
-  const total = (news ?? []).reduce((sum, item) => sum + item.count, 0);
+  const items = notifications ?? [];
+  const unread = items.filter((item) => !item.read_at).length;
+
+  const openNotification = (item: AppNotification) => {
+    if (!item.read_at) markRead.mutate(item.id);
+    if (item.dog_id && item.entry_id) {
+      navigate({
+        to: "/pies/$id/wydarzenie/$entryId",
+        params: { id: item.dog_id, entryId: item.entry_id },
+        search: { wroc: undefined },
+      });
+      return;
+    }
+    if (item.dog_id) {
+      navigate({ to: "/pies/$id", params: { id: item.dog_id } });
+      return;
+    }
+    navigate({ to: "/psy" });
+  };
 
   const signOut = async () => {
     await queryClient.cancelQueries();
@@ -113,30 +148,60 @@ export function AppHeader() {
               <DropdownMenuTrigger asChild>
                 <Button variant="ghost" size="icon" className="relative" aria-label="Powiadomienia">
                   <Bell className="size-5" />
-                  {total > 0 && (
+                  {unread > 0 && (
                     <span className="absolute top-1 right-1 flex size-4 items-center justify-center rounded-full bg-primary text-[10px] leading-none text-primary-foreground">
-                      {total > 9 ? "9+" : total}
+                      {unread > 9 ? "9+" : unread}
                     </span>
                   )}
                 </Button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-64">
-                <DropdownMenuLabel>
-                  {isBehaviorist ? "Nowe wpisy" : "Nowe zalecenia"}
-                </DropdownMenuLabel>
+              <DropdownMenuContent align="end" className="w-80">
+                <div className="flex items-center justify-between gap-2 px-2 py-1.5">
+                  <DropdownMenuLabel className="p-0">Powiadomienia</DropdownMenuLabel>
+                  {unread > 0 && (
+                    <button
+                      type="button"
+                      className="text-xs text-muted-foreground underline-offset-2 hover:text-foreground hover:underline"
+                      onClick={(e) => {
+                        e.preventDefault();
+                        markAllRead.mutate();
+                      }}
+                    >
+                      Oznacz wszystkie
+                    </button>
+                  )}
+                </div>
                 <DropdownMenuSeparator />
-                {total === 0 ? (
+                {items.length === 0 ? (
                   <div className="px-2 py-3 text-sm text-muted-foreground">Brak nowości</div>
                 ) : (
-                  news!.map((item) => (
-                    <DropdownMenuItem
-                      key={item.dogId}
-                      onClick={() => navigate({ to: "/pies/$id", params: { id: item.dogId } })}
-                    >
-                      <span className="flex-1">{item.dogName}</span>
-                      <span className="text-muted-foreground">{item.count}</span>
-                    </DropdownMenuItem>
-                  ))
+                  <div className="max-h-96 overflow-y-auto">
+                    {items.map((item) => (
+                      <DropdownMenuItem
+                        key={item.id}
+                        className="items-start gap-2"
+                        onClick={() => openNotification(item)}
+                      >
+                        {!item.read_at && (
+                          <span
+                            aria-hidden="true"
+                            className="mt-1.5 size-2 shrink-0 rounded-full bg-primary"
+                          />
+                        )}
+                        <span className={`min-w-0 flex-1 ${item.read_at ? "opacity-70" : ""}`}>
+                          <span className="block text-sm whitespace-normal">{item.title}</span>
+                          {item.body && (
+                            <span className="block truncate text-xs text-muted-foreground">
+                              {item.body}
+                            </span>
+                          )}
+                          <span className="block text-xs text-muted-foreground">
+                            {formatStamp(item.created_at)}
+                          </span>
+                        </span>
+                      </DropdownMenuItem>
+                    ))}
+                  </div>
                 )}
               </DropdownMenuContent>
             </DropdownMenu>

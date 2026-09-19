@@ -19,6 +19,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Switch } from "@/components/ui/switch";
 
 import { Skeleton } from "@/components/ui/skeleton";
 
@@ -56,6 +57,22 @@ const STATUS_LABELS: Record<string, string> = {
   pending: "oczekująca",
 };
 
+const NOTIFY_KINDS = [
+  { key: "notify_entries", label: "Nowe wydarzenia w dzienniku" },
+  { key: "notify_comments", label: "Nowe komentarze" },
+  { key: "notify_recommendations", label: "Nowe zalecenia behawiorysty" },
+  { key: "notify_access", label: "Zaproszenia i dostęp" },
+] as const;
+
+type NotifyKey = (typeof NOTIFY_KINDS)[number]["key"];
+
+/** Adres, na który realnie warto wysyłać powiadomienia. */
+function isUsableEmail(value: string) {
+  const email = value.trim().toLowerCase();
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return false;
+  return !email.endsWith("privaterelay.appleid.com");
+}
+
 function ProfilePage() {
   const { user } = useAuth();
   const { data: profile, isLoading } = useProfile();
@@ -66,6 +83,12 @@ function ProfilePage() {
   const [displayName, setDisplayName] = useState("");
   const [email, setEmail] = useState("");
   const [notifications, setNotifications] = useState(false);
+  const [kinds, setKinds] = useState<Record<NotifyKey, boolean>>({
+    notify_entries: true,
+    notify_comments: true,
+    notify_recommendations: true,
+    notify_access: true,
+  });
   const [saving, setSaving] = useState(false);
   const [joinOpen, setJoinOpen] = useState(false);
 
@@ -74,18 +97,30 @@ function ProfilePage() {
     setDisplayName(profile.display_name ?? "");
     setEmail(profile.email ?? "");
     setNotifications(profile.email_notifications);
+    setKinds({
+      notify_entries: profile.notify_entries,
+      notify_comments: profile.notify_comments,
+      notify_recommendations: profile.notify_recommendations,
+      notify_access: profile.notify_access,
+    });
   }, [profile]);
 
   const save = async (e: React.FormEvent) => {
     e.preventDefault();
+    const trimmedEmail = email.trim();
+    if (trimmedEmail && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(trimmedEmail)) {
+      toast.error("Podaj poprawny adres e-mail");
+      return;
+    }
     setSaving(true);
     try {
       const { error } = await supabase
         .from("profiles")
         .update({
           display_name: displayName.trim() || null,
-          email: email.trim() || null,
+          email: trimmedEmail || null,
           email_notifications: notifications,
+          ...kinds,
         })
         .eq("id", user!.id);
       if (error) throw error;
@@ -141,7 +176,7 @@ function ProfilePage() {
                 />
               </div>
               <div className="grid gap-2">
-                <Label htmlFor="profile-email">Adres e-mail</Label>
+                <Label htmlFor="profile-email">Adres do powiadomień</Label>
                 <Input
                   id="profile-email"
                   type="email"
@@ -150,10 +185,51 @@ function ProfilePage() {
                   placeholder="adres do powiadomień"
                 />
                 <p className="text-xs text-muted-foreground">
-                  Uzupełnij, jeśli logowanie nie przekazało Twojego adresu.
+                  Tu wysyłamy powiadomienia. Sposób logowania pozostaje bez zmian.
                 </p>
+                {notifications && !isUsableEmail(email) && (
+                  <p className="text-xs text-primary">
+                    Podaj adres, z którego korzystasz na co dzień — inaczej powiadomienia mogą do
+                    Ciebie nie dotrzeć.
+                  </p>
+                )}
               </div>
-              {/* Przełącznik powiadomień e-mail ukryty do czasu uruchomienia wysyłki. */}
+
+              <div className="grid gap-3 rounded-lg border border-primary/10 p-4">
+                <div className="flex items-center justify-between gap-4">
+                  <Label htmlFor="notify-all" className="font-medium">
+                    Powiadomienia e-mail
+                  </Label>
+                  <Switch
+                    id="notify-all"
+                    checked={notifications}
+                    onCheckedChange={setNotifications}
+                  />
+                </div>
+                <p className="text-xs text-muted-foreground">
+                  Powiadomienia w aplikacji (dzwonek) działają zawsze.
+                </p>
+                <div className="grid gap-2.5">
+                  {NOTIFY_KINDS.map((kind) => (
+                    <div key={kind.key} className="flex items-center justify-between gap-4">
+                      <Label
+                        htmlFor={`notify-${kind.key}`}
+                        className={`text-sm font-normal ${notifications ? "" : "text-muted-foreground"}`}
+                      >
+                        {kind.label}
+                      </Label>
+                      <Switch
+                        id={`notify-${kind.key}`}
+                        disabled={!notifications}
+                        checked={kinds[kind.key]}
+                        onCheckedChange={(value) =>
+                          setKinds((prev) => ({ ...prev, [kind.key]: value }))
+                        }
+                      />
+                    </div>
+                  ))}
+                </div>
+              </div>
 
               <div className="flex flex-wrap justify-between gap-2 pt-2">
                 <Button type="button" variant="outline" onClick={signOut}>
