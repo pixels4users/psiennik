@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Link, useNavigate } from "@tanstack/react-router";
+import { Link } from "@tanstack/react-router";
 import {
   ArrowLeft,
   ArrowRight,
@@ -24,13 +24,6 @@ import { DogFormDialog } from "@/components/dog-form-dialog";
 import { AccessDialog } from "@/components/invite-dialog";
 import { Paw } from "@/components/dog-motifs";
 import { Button } from "@/components/ui/button";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 
 const VIEWS = [
   { key: "dziennik", label: "Dziennik", path: "/pies/$id", icon: BookOpen },
