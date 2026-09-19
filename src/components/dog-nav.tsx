@@ -42,6 +42,8 @@ export function DogNav({ dog, active }: { dog: Dog; active: (typeof VIEWS)[numbe
   const [accessOpen, setAccessOpen] = useState(false);
   const hasCoOwner =
     access?.some((row) => row.role === "owner" && row.user_id !== dog.owner_id) ?? false;
+  const coOwner = access?.find((row) => row.role === "owner" && row.user_id !== dog.owner_id);
+  const coOwnerName = coOwner?.profile?.display_name || coOwner?.profile?.email;
   const behaviorist = access?.find((row) => row.role === "behaviorist");
   const behavioristName = behaviorist?.profile?.display_name || behaviorist?.profile?.email;
 
@@ -67,8 +69,8 @@ export function DogNav({ dog, active }: { dog: Dog; active: (typeof VIEWS)[numbe
         className="dog-masthead relative isolate overflow-hidden px-1 py-2 sm:px-2 sm:py-4"
       >
         <Paw className="pointer-events-none absolute -right-4 -top-5 -z-10 w-44 rotate-[22deg] text-sage/50" />
-        <div className="flex flex-wrap items-center justify-between gap-4 sm:gap-6">
-          <div className="flex min-w-0 max-w-full items-center gap-4 sm:gap-6">
+        <div className="grid min-w-0 gap-5 lg:grid-cols-[auto_minmax(0,1fr)_minmax(13rem,auto)_auto] lg:items-center lg:gap-8">
+          <div className="flex min-w-0 items-center gap-4 sm:gap-6 lg:contents">
             <DogAvatar dog={dog} className="size-20 sm:size-24" />
             <div className="min-w-0">
               <div className="flex min-w-0 items-center gap-2">
@@ -92,9 +94,33 @@ export function DogNav({ dog, active }: { dog: Dog; active: (typeof VIEWS)[numbe
             </div>
           </div>
           {role?.canManage && (
-            <div className="flex w-full flex-wrap gap-2 sm:w-auto sm:max-w-sm sm:justify-end">
+            <>
+              <div className="grid min-w-0 gap-2 text-sm">
+                <p className="min-w-0 text-muted-foreground">
+                  Behawiorysta:{" "}
+                  <span className="font-medium text-foreground [overflow-wrap:anywhere]">
+                    {behavioristName || (behaviorist ? "Bez podanej nazwy" : "Brak")}
+                  </span>
+                </p>
+                <p className="min-w-0 text-muted-foreground">
+                  Współwłaściciel:{" "}
+                  <span className="font-medium text-foreground [overflow-wrap:anywhere]">
+                    {coOwnerName || (hasCoOwner ? "Bez podanej nazwy" : "Brak")}
+                  </span>
+                </p>
+                <Button
+                  variant="link"
+                  size="sm"
+                  className="h-auto w-fit justify-start px-0"
+                  onClick={() => setAccessOpen(true)}
+                >
+                  <Users aria-hidden="true" />
+                  Zarządzaj dostępem
+                  <ArrowRight aria-hidden="true" />
+                </Button>
+              </div>
               {role.canEditEntries && (
-                <Button asChild className="grow sm:grow-0">
+                <Button asChild className="w-full sm:w-fit lg:justify-self-end">
                   <Link
                     to="/pies/$id/wydarzenie/nowe"
                     params={{ id: dog.id }}
@@ -105,26 +131,25 @@ export function DogNav({ dog, active }: { dog: Dog; active: (typeof VIEWS)[numbe
                   </Link>
                 </Button>
               )}
-              <Button
-                variant={behaviorist ? "ghost" : "outline"}
-                className={cn("max-w-full", !behaviorist && "bg-background/80")}
-                onClick={() => setAccessOpen(true)}
-              >
-                {!behaviorist && <UserPlus aria-hidden="true" />}
-                <span className="truncate">
-                  {behaviorist
-                    ? behavioristName
-                      ? `Behawiorysta: ${behavioristName}`
-                      : "Behawiorysta"
-                    : "Dodaj behawiorystę"}
-                </span>
-                {behaviorist && <ArrowRight aria-hidden="true" />}
-              </Button>
-              <Button variant="ghost" size="sm" onClick={() => setAccessOpen(true)}>
-                <Users />
-                {role.isPrimaryOwner && !hasCoOwner
-                  ? "Dodaj współwłaściciela"
-                  : "Zarządzaj dostępem"}
+            </>
+          )}
+          {!role?.canManage && (
+            <div className="hidden lg:block" aria-hidden="true" />
+          )}
+          {!role?.canManage && role?.canEditEntries && (
+            <div className="hidden lg:block" aria-hidden="true" />
+          )}
+          {!role?.canManage && role?.canEditEntries && (
+            <div>
+              <Button asChild className="w-full sm:w-fit">
+                <Link
+                  to="/pies/$id/wydarzenie/nowe"
+                  params={{ id: dog.id }}
+                  search={{ wroc: active === "kalendarz" ? "kalendarz" : undefined }}
+                >
+                  <Plus />
+                  Dodaj wydarzenie
+                </Link>
               </Button>
             </div>
           )}
@@ -133,7 +158,7 @@ export function DogNav({ dog, active }: { dog: Dog; active: (typeof VIEWS)[numbe
 
       <nav
         aria-label="Widoki dziennika psa"
-        className="dog-view-nav flex max-w-full gap-1 overflow-x-auto border-b border-primary/15 pb-2"
+        className="dog-view-nav flex max-w-full gap-1 overflow-x-auto pb-2"
       >
         {VIEWS.map(({ key, label, path, icon: Icon }) => (
           <Link

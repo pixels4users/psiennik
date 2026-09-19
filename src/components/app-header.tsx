@@ -28,6 +28,7 @@ export function AppHeader() {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const [inviteOpen, setInviteOpen] = useState(false);
+  const [addDogOpen, setAddDogOpen] = useState(false);
 
   const total = (news ?? []).reduce((sum, item) => sum + item.count, 0);
 
@@ -55,7 +56,7 @@ export function AppHeader() {
           {user && (
             <nav className="flex min-w-0 items-center gap-1" aria-label="Główna nawigacja">
               {isBehaviorist === false ? (
-                <OwnerDogNavigation />
+                <OwnerDogNavigation onAddDog={() => setAddDogOpen(true)} />
               ) : (
                 <Link
                   to="/psy"
@@ -85,6 +86,18 @@ export function AppHeader() {
 
         {user ? (
           <div className="flex shrink-0 items-center gap-1">
+            {isBehaviorist === false && (
+              <Button
+                variant="ghost"
+                size="sm"
+                className="mr-1 hidden gap-1.5 lg:inline-flex"
+                onClick={() => setAddDogOpen(true)}
+              >
+                Dodaj psa
+                <Plus className="size-4" aria-hidden="true" />
+              </Button>
+            )}
+
             {isBehaviorist && (
               <Button
                 size="sm"
@@ -128,23 +141,21 @@ export function AppHeader() {
               </DropdownMenuContent>
             </DropdownMenu>
 
-            <Link
-              to="/profil"
-              aria-label="Ustawienia konta"
-              className="flex min-h-10 items-center gap-2 rounded-full px-2 text-sm transition-colors hover:bg-secondary md:hidden lg:flex lg:px-3"
-              activeProps={{ className: "bg-secondary font-medium text-primary" }}
-            >
+            <div className="hidden min-h-10 items-center gap-2 px-2 text-sm md:flex lg:px-3">
               <User className="size-4 shrink-0" aria-hidden="true" />
               <span className="hidden max-w-28 truncate lg:inline">
                 {profile?.display_name || profile?.email || "Konto"}
               </span>
-            </Link>
+            </div>
 
             <Button variant="ghost" size="icon" aria-label="Wyloguj się" onClick={signOut}>
               <LogOut className="size-4" />
             </Button>
 
             {isBehaviorist && <InviteClientDialog open={inviteOpen} onOpenChange={setInviteOpen} />}
+            {isBehaviorist === false && (
+              <DogFormDialog open={addDogOpen} onOpenChange={setAddDogOpen} />
+            )}
           </div>
         ) : (
           <Button asChild variant="default" size="sm">
@@ -156,10 +167,9 @@ export function AppHeader() {
   );
 }
 
-function OwnerDogNavigation() {
+function OwnerDogNavigation({ onAddDog }: { onAddDog: () => void }) {
   const { data: dogs, isLoading } = useDogs();
   const compact = (dogs?.length ?? 0) >= 4;
-  const [addOpen, setAddOpen] = useState(false);
 
   if (isLoading) {
     return (
@@ -197,16 +207,6 @@ function OwnerDogNavigation() {
             {dog.name}
           </Link>
         ))}
-        <Button
-          variant="ghost"
-          size="icon"
-          className="size-8"
-          aria-label="Dodaj psa"
-          title="Dodaj psa"
-          onClick={() => setAddOpen(true)}
-        >
-          <Plus className="size-4" />
-        </Button>
       </div>
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
@@ -227,13 +227,12 @@ function OwnerDogNavigation() {
             </DropdownMenuItem>
           ))}
           <DropdownMenuSeparator />
-          <DropdownMenuItem onSelect={() => setAddOpen(true)}>
+          <DropdownMenuItem onSelect={onAddDog}>
             <Plus className="size-4" aria-hidden="true" />
             Dodaj psa
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
-      <DogFormDialog open={addOpen} onOpenChange={setAddOpen} />
     </>
   );
 }
