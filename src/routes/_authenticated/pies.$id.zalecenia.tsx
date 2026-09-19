@@ -32,7 +32,12 @@ export const Route = createFileRoute("/_authenticated/pies/$id/zalecenia")({
 function DogRecommendationsPage() {
   const { id } = Route.useParams();
   const { data: dog } = useDog(id);
-  const { data: entries, isLoading } = useEntries(id);
+  const {
+    data: entries,
+    isLoading,
+    isError: entriesError,
+    refetch: refetchEntries,
+  } = useEntries(id);
   const [sort, setSort] = useState("newest");
 
   const recommendations = useMemo(() => {

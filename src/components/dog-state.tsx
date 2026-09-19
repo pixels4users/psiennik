@@ -73,6 +73,18 @@ export function DogErrorNotice({ onRetry }: { onRetry?: () => void }) {
   );
 }
 
+/** Błąd pobrania wpisów dziennika. */
+export function EntriesErrorNotice({ onRetry }: { onRetry?: () => void }) {
+  return (
+    <DogNotice
+      icon={<TriangleAlert className="size-6" aria-hidden="true" />}
+      title="Nie udało się wczytać wpisów"
+      description="Coś poszło nie tak podczas pobierania dziennika. Spróbuj jeszcze raz."
+      onRetry={onRetry}
+    />
+  );
+}
+
 /** Brak połączenia z internetem. */
 export function DogOfflineNotice() {
   return (

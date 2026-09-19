@@ -58,7 +58,12 @@ const RATING_WEIGHT: Record<string, number> = { red: 3, amber: 2, green: 1 };
 function DogTablePage() {
   const { id } = Route.useParams();
   const { data: dog } = useDog(id);
-  const { data: entries, isLoading } = useEntries(id);
+  const {
+    data: entries,
+    isLoading,
+    isError: entriesError,
+    refetch: refetchEntries,
+  } = useEntries(id);
   const [sort, setSort] = useState("newest");
   const [activity, setActivity] = useState("all");
   const [timeOfDay, setTimeOfDay] = useState("all");

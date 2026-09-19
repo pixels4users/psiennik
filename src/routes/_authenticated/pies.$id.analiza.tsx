@@ -118,7 +118,12 @@ function keywordCounts(entries: Entry[]): [string, number][] {
 function DogAnalysisPage() {
   const { id } = Route.useParams();
   const { data: dog } = useDog(id);
-  const { data: entries, isLoading } = useEntries(id);
+  const {
+    data: entries,
+    isLoading,
+    isError: entriesError,
+    refetch: refetchEntries,
+  } = useEntries(id);
 
   const analysis = useMemo(() => {
     const all = entries ?? [];

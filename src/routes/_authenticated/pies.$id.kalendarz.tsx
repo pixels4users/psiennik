@@ -60,7 +60,12 @@ function DogCalendarPage() {
   const router = useRouter();
   const { data: role } = useDogRole(id);
   const { data: dog } = useDog(id);
-  const { data: entries, isLoading } = useEntries(id);
+  const {
+    data: entries,
+    isLoading,
+    isError: entriesError,
+    refetch: refetchEntries,
+  } = useEntries(id);
   const [weekStart, setWeekStart] = useState(() => startOfWeek(new Date(), { weekStartsOn: 1 }));
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
   const [commentedEntry, setCommentedEntry] = useState<Entry | null>(null);
