@@ -4,9 +4,7 @@
 
 **Opcja 1 (imiona psów w nagłówku) — rekomendowana.** Pasuje do realnego użycia: właściciel ma 1–2 psy i chce jednym kliknięciem wejść do właściwego dziennika. Jest też zgodna z tym, co już robimy (właściciel z psami i tak jest przekierowywany z listy prosto do psa).
 
-**Opcja 2 (Dziennik / Zalecenia / Analiza w górnej nawigacji) — odradzam.** Zalecenia i Analiza zawsze dotyczą konkretnego psa, więc górne zakładki musiałyby domyślać się, „o którym psie mówimy". Przy dwóch psach to źródło pomyłek: klikasz „Analiza" i nie wiesz, czyja. Poza tym te same zakładki już są na stronie psa — powstałyby dwa poziomy tej samej nawigacji.
-
-Twoje spostrzeżenie, że **Lista / Kalendarz / Tabela to tylko sposoby patrzenia na te same dane**, jest trafne — ale to zmiana wewnątrz strony psa i lepiej zrobić ją osobno, na wypełnionym dzienniku (to był odłożony punkt 2 z wcześniejszego planu). Tu jej nie ruszam.
+**Wybieramy Opcję 1 i tylko ją obejmuje ten plan.** Górna nawigacja właściciela opiera się na jego psach, bez przenoszenia do niej funkcji dziennika. Gdy właściciel nie ma jeszcze żadnego psa, zamiast pustej listy imion zobaczy link **„Psy"** prowadzący do obecnego ekranu startowego z wyraźnym działaniem **„Dodaj psa"**. Dzięki temu nagłówek pozostaje zrozumiały od pierwszego logowania, a po dodaniu pierwszego psa automatycznie zaczyna pokazywać jego imię.
 
 **Ustawienia i uproszczony awatar — tak, zgadzam się w całości.** Trzy pozycje nie zasługują na rozwijane menu, a etykieta „Behawiorysta / Właściciel" faktycznie nic użytkownikowi nie mówi.
 
