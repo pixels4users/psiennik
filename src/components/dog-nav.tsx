@@ -6,7 +6,6 @@ import {
   Pencil,
   Plus,
   Users,
-  UserPlus,
   AlertCircle,
   BookOpen,
   CalendarDays,
@@ -132,26 +131,6 @@ export function DogNav({ dog, active }: { dog: Dog; active: (typeof VIEWS)[numbe
                 </Button>
               )}
             </>
-          )}
-          {!role?.canManage && (
-            <div className="hidden lg:block" aria-hidden="true" />
-          )}
-          {!role?.canManage && role?.canEditEntries && (
-            <div className="hidden lg:block" aria-hidden="true" />
-          )}
-          {!role?.canManage && role?.canEditEntries && (
-            <div>
-              <Button asChild className="w-full sm:w-fit">
-                <Link
-                  to="/pies/$id/wydarzenie/nowe"
-                  params={{ id: dog.id }}
-                  search={{ wroc: active === "kalendarz" ? "kalendarz" : undefined }}
-                >
-                  <Plus />
-                  Dodaj wydarzenie
-                </Link>
-              </Button>
-            </div>
           )}
         </div>
       </section>
