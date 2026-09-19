@@ -48,11 +48,8 @@ export const Route = createFileRoute("/api/public/notifications/send")({
   server: {
     handlers: {
       POST: async ({ request }) => {
-        const secret = process.env["NOTIFY_WEBHOOK_SECRET"];
         const provided = request.headers.get("x-notify-secret") ?? "";
-        if (!secret || !safeEqual(provided, secret)) {
-          return new Response("Unauthorized", { status: 401 });
-        }
+        if (!provided) return new Response("Unauthorized", { status: 401 });
 
         let notificationId: unknown;
         try {
@@ -65,6 +62,12 @@ export const Route = createFileRoute("/api/public/notifications/send")({
         }
 
         const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+
+        // Klucz żyje wyłącznie w bazie — czyta go tylko zaufany kod serwera.
+        const { data: secret } = await supabaseAdmin.rpc("notify_dispatch_secret");
+        if (typeof secret !== "string" || !safeEqual(provided, secret)) {
+          return new Response("Unauthorized", { status: 401 });
+        }
 
         const { data: notification, error } = await supabaseAdmin
           .from("notifications")
