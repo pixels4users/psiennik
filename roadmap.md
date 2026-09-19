@@ -7,4 +7,5 @@
 - [x] Poprawki po audycie b934070: stany strony psa (niedostępny/błąd/offline), walidacja kodów zaproszeń w bazie (własny kod behawiorysty, kod własnego psa, duplikaty)
 - [x] Nawigacja górna: imiona psów właściciela, Ustawienia i uproszczona sekcja konta
 - [x] Nagłówek strony psa: bez „Twoje psy" i „Dodaj psa" (przeniesione do nawigacji), bez „Wasza wspólna historia", lżejsza sekcja bez zielonego tła
+- [x] Nawigacja i nagłówek psa: „Dodaj psa” po prawej, statyczna tożsamość, uporządkowana opieka i zakładki bez separatora
 - [ ] Otwarte przed publikacją: okresy retencji powiadomień, odpowiedź Lovable w sprawie powierzenia
