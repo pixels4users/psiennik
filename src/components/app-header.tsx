@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Link, useNavigate } from "@tanstack/react-router";
 import { useQueryClient } from "@tanstack/react-query";
-import { Bell, ChevronDown, LogOut, PawPrint, Settings, User, UserPlus } from "lucide-react";
+import { Bell, ChevronDown, LogOut, PawPrint, Plus, Settings, User, UserPlus } from "lucide-react";
 import logoAsset from "@/assets/psiennik-logo-3.webp.asset.json";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth, useProfile } from "@/lib/auth";
@@ -9,6 +9,7 @@ import { useIsBehaviorist } from "@/lib/access";
 import { useDogs } from "@/lib/dogs";
 import { useNews } from "@/lib/notifications";
 import { InviteClientDialog } from "@/components/behaviorist-invite";
+import { DogFormDialog } from "@/components/dog-form-dialog";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -158,6 +159,7 @@ export function AppHeader() {
 function OwnerDogNavigation() {
   const { data: dogs, isLoading } = useDogs();
   const compact = (dogs?.length ?? 0) >= 4;
+  const [addOpen, setAddOpen] = useState(false);
 
   if (isLoading) {
     return (
@@ -195,6 +197,16 @@ function OwnerDogNavigation() {
             {dog.name}
           </Link>
         ))}
+        <Button
+          variant="ghost"
+          size="icon"
+          className="size-8"
+          aria-label="Dodaj psa"
+          title="Dodaj psa"
+          onClick={() => setAddOpen(true)}
+        >
+          <Plus className="size-4" />
+        </Button>
       </div>
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
@@ -214,8 +226,14 @@ function OwnerDogNavigation() {
               </Link>
             </DropdownMenuItem>
           ))}
+          <DropdownMenuSeparator />
+          <DropdownMenuItem onSelect={() => setAddOpen(true)}>
+            <Plus className="size-4" aria-hidden="true" />
+            Dodaj psa
+          </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
+      <DogFormDialog open={addOpen} onOpenChange={setAddOpen} />
     </>
   );
 }

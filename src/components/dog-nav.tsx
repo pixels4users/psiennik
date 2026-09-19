@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Link, useNavigate } from "@tanstack/react-router";
+import { Link } from "@tanstack/react-router";
 import {
   ArrowLeft,
   ArrowRight,
@@ -24,13 +24,6 @@ import { DogFormDialog } from "@/components/dog-form-dialog";
 import { AccessDialog } from "@/components/invite-dialog";
 import { Paw } from "@/components/dog-motifs";
 import { Button } from "@/components/ui/button";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 
 const VIEWS = [
   { key: "dziennik", label: "Dziennik", path: "/pies/$id", icon: BookOpen },
@@ -44,11 +37,8 @@ export function DogNav({ dog, active }: { dog: Dog; active: (typeof VIEWS)[numbe
   const { user } = useAuth();
   const { data: role, isLoading } = useDogRole(dog.id);
   const { data: isBehaviorist } = useIsBehaviorist();
-  const { data: dogs } = useDogs();
   const { data: access } = useDogAccess(dog.id);
-  const navigate = useNavigate();
   const [editOpen, setEditOpen] = useState(false);
-  const [addOpen, setAddOpen] = useState(false);
   const [accessOpen, setAccessOpen] = useState(false);
   const hasCoOwner =
     access?.some((row) => row.role === "owner" && row.user_id !== dog.owner_id) ?? false;
@@ -61,65 +51,28 @@ export function DogNav({ dog, active }: { dog: Dog; active: (typeof VIEWS)[numbe
 
   return (
     <div className="grid min-w-0 gap-5">
-      <div className="flex flex-wrap items-center justify-between gap-3">
-        {isBehaviorist ? (
+      {isBehaviorist && (
+        <div className="flex items-center">
           <Link
             to="/psy"
             className="inline-flex min-h-11 items-center gap-2 rounded-full text-sm text-muted-foreground hover:text-primary"
           >
             <ArrowLeft className="size-4" /> Wszystkie psy
           </Link>
-        ) : (
-          <div className="flex min-w-0 items-center gap-3">
-            <label htmlFor="dog-switcher" className="shrink-0 text-sm text-muted-foreground">
-              Twoje psy
-            </label>
-            <Select
-              value={dog.id}
-              onValueChange={(id) => {
-                void navigate({
-                  to: VIEWS.find((view) => view.key === active)!.path,
-                  params: { id },
-                });
-              }}
-            >
-              <SelectTrigger id="dog-switcher" className="w-40 sm:w-52">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                {(dogs?.some((item) => item.id === dog.id) ? dogs : [dog])?.map((item) => (
-                  <SelectItem key={item.id} value={item.id}>
-                    {item.name}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-        )}
-        {isBehaviorist === false && (
-          <div className="flex flex-wrap gap-1">
-            <Button variant="outline" size="sm" onClick={() => setAddOpen(true)}>
-              <Plus />
-              Dodaj psa
-            </Button>
-          </div>
-        )}
-      </div>
+        </div>
+      )}
 
       <section
         aria-label={`Profil psa ${dog.name}`}
-        className="dog-masthead relative isolate overflow-hidden rounded-3xl bg-secondary p-5 sm:p-8"
+        className="dog-masthead relative isolate overflow-hidden px-1 py-2 sm:px-2 sm:py-4"
       >
         <Paw className="pointer-events-none absolute -right-4 -top-5 -z-10 w-44 rotate-[22deg] text-sage/50" />
-        <div className="flex flex-wrap items-center justify-between gap-6">
+        <div className="flex flex-wrap items-center justify-between gap-4 sm:gap-6">
           <div className="flex min-w-0 max-w-full items-center gap-4 sm:gap-6">
-            <DogAvatar dog={dog} className="size-24 border-4 border-background sm:size-32" />
+            <DogAvatar dog={dog} className="size-20 sm:size-24" />
             <div className="min-w-0">
-              <p className="eyebrow mb-1">
-                {isBehaviorist ? "Dziennik podopiecznego" : "Wasza wspólna historia"}
-              </p>
               <div className="flex min-w-0 items-center gap-2">
-                <h1 className="min-w-0 text-4xl leading-none [overflow-wrap:anywhere] sm:text-6xl">
+                <h1 className="min-w-0 text-3xl leading-none [overflow-wrap:anywhere] sm:text-5xl">
                   {dog.name}
                 </h1>
                 {!isLoading && role?.canManage && (
@@ -133,7 +86,7 @@ export function DogNav({ dog, active }: { dog: Dog; active: (typeof VIEWS)[numbe
                   </Button>
                 )}
               </div>
-              <p className="mt-3 text-sm text-muted-foreground sm:text-base">
+              <p className="mt-2 text-sm text-muted-foreground sm:text-base">
                 {[dog.breed, dog.age, dog.sex].filter(Boolean).join(" · ")}
               </p>
             </div>
@@ -208,7 +161,6 @@ export function DogNav({ dog, active }: { dog: Dog; active: (typeof VIEWS)[numbe
         </div>
       )}
       <DogFormDialog dog={dog} open={editOpen} onOpenChange={setEditOpen} />
-      <DogFormDialog open={addOpen} onOpenChange={setAddOpen} />
       <AccessDialog dog={dog} open={accessOpen} onOpenChange={setAccessOpen} />
     </div>
   );

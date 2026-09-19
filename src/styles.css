@@ -240,9 +240,6 @@
 .entry-card:hover {
   border-color: color-mix(in oklch, var(--primary) 25%, transparent);
 }
-.dog-masthead .eyebrow {
-  max-width: 20rem;
-}
 .dog-view-nav {
   scrollbar-width: thin;
   scroll-padding-inline: 1rem;
@@ -315,9 +312,5 @@
 @media (max-width: 420px) {
   .hero-title {
     font-size: clamp(2rem, 9.8vw, 2.5rem);
-  }
-  .dog-masthead .eyebrow {
-    font-size: 0.6rem;
-    letter-spacing: 0.06em;
   }
 }
