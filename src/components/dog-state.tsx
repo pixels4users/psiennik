@@ -31,7 +31,7 @@ export function DogNotice({
   icon: React.ReactNode;
   title: string;
   description: string;
-  onRetry?: () => void;
+  onRetry?: (() => void) | undefined;
 }) {
   return (
     <div className="mx-auto max-w-xl px-5 py-16 text-center">
