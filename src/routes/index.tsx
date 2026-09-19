@@ -1,13 +1,6 @@
 import { useEffect } from "react";
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import {
-  ArrowDown,
-  ArrowUpRight,
-  CalendarRange,
-  Check,
-  MessageSquareText,
-  PawPrint,
-} from "lucide-react";
+import { ArrowDown, ArrowUpRight, CalendarRange, Check, MessageSquareText, PawPrint } from "lucide-react";
 import { useAuth } from "@/lib/auth";
 import { Button } from "@/components/ui/button";
 import { DogDoodle, Paw, PawTrail } from "@/components/dog-motifs";
@@ -58,8 +51,7 @@ const JOURNAL_PREVIEWS = [
     imageUrl: dogProfile1Asset.url,
     imageAlt: "Humus odpoczywający z głową na poduszce",
     activity: "Spokojny spacer",
-    description:
-      "Minęliśmy dwa psy bez szczekania. Pomogło zwiększenie dystansu i spokojna komenda.",
+    description: "Minęliśmy dwa psy bez szczekania. Pomogło zwiększenie dystansu i spokojna komenda.",
     timeOfDay: "Rano",
     rating: "good" as const,
     ratingLabel: "Dobrze",
@@ -69,8 +61,7 @@ const JOURNAL_PREVIEWS = [
     imageUrl: dogProfile2Asset.url,
     imageAlt: "Lunka jako czarny szczeniak z białymi łapkami",
     activity: "Trening zostawania",
-    description:
-      "Trzy krótkie serie po dwie minuty. Coraz łatwiej wraca na swoje miejsce po przerwie.",
+    description: "Trzy krótkie serie po dwie minuty. Coraz łatwiej wraca na swoje miejsce po przerwie.",
     timeOfDay: "Południe",
     rating: "warn" as const,
     ratingLabel: "Wyzwanie",
@@ -80,8 +71,7 @@ const JOURNAL_PREVIEWS = [
     imageUrl: dogProfile3Asset.url,
     imageAlt: "Luna odpoczywająca na kanapie",
     activity: "Wyciszenie w domu",
-    description:
-      "Po wizycie gości potrzebowała więcej czasu na odpoczynek, ale samodzielnie wybrała legowisko.",
+    description: "Po wizycie gości potrzebowała więcej czasu na odpoczynek, ale samodzielnie wybrała legowisko.",
     timeOfDay: "Wieczór",
     rating: "good" as const,
     ratingLabel: "Dobrze",
@@ -104,12 +94,12 @@ function LandingPage() {
           Dla ludzi, którzy chcą lepiej rozumieć swoje psy
         </p>
         <h1 className="hero-title mx-auto mt-6 max-w-5xl">
-          Lepsza współpraca.
+          Zgrana paczka:
           <br />
-          Szybsze postępy psa.
+          Ty, Twój pies i specjalista.
         </h1>
         <p className="mx-auto mt-7 max-w-xl text-base leading-relaxed text-muted-foreground sm:text-lg">
-          Wspólny dziennik treningowy dla Ciebie i behawiorysty.
+          Wspólny dziennik treningowy dla Ciebie i specjalisty.
           <br className="hidden sm:block" /> Wiedza i instrukcje, które nigdy nie giną.
         </p>
         <div className="mt-8 flex flex-col justify-center gap-3 sm:flex-row">
@@ -135,10 +125,7 @@ function LandingPage() {
         <PawTrail className="hero-paws hidden lg:block" />
       </section>
 
-      <section
-        id="dziennik-w-praktyce"
-        className="showcase-section mx-auto max-w-6xl scroll-mt-8 px-5 sm:px-8"
-      >
+      <section id="dziennik-w-praktyce" className="showcase-section mx-auto max-w-6xl scroll-mt-8 px-5 sm:px-8">
         <div className="relative">
           <div className="showcase-frame grid gap-0 overflow-hidden rounded-[2rem] border border-primary/15 bg-secondary lg:grid-cols-[1.05fr_1fr]">
             <div className="relative min-h-72 overflow-hidden">
@@ -161,9 +148,7 @@ function LandingPage() {
             <div className="flex flex-col justify-center p-5 text-left sm:p-9">
               <div className="mb-6 flex items-center justify-between gap-3">
                 <p className="eyebrow">Tak wygląda Wasz dziennik</p>
-                <span className="rounded-full border border-primary/20 px-2.5 py-1 text-xs text-primary">
-                  Przykład
-                </span>
+                <span className="rounded-full border border-primary/20 px-2.5 py-1 text-xs text-primary">Przykład</span>
               </div>
               <div className="flex items-center gap-3">
                 <img
@@ -175,15 +160,10 @@ function LandingPage() {
                 />
                 <div>
                   <p className="font-display text-3xl leading-none text-primary">Humus</p>
-                  <p className="mt-1 text-xs text-muted-foreground">
-                    Małe kroki, zapisane na co dzień
-                  </p>
+                  <p className="mt-1 text-xs text-muted-foreground">Małe kroki, zapisane na co dzień</p>
                 </div>
               </div>
-              <Reveal
-                distance="sm"
-                className="mt-5 rounded-2xl border border-primary/10 bg-background p-5"
-              >
+              <Reveal distance="sm" className="mt-5 rounded-2xl border border-primary/10 bg-background p-5">
                 <div className="flex items-center justify-between gap-2">
                   <span className="text-xs text-muted-foreground">Dziś · rano</span>
                   <span className="inline-flex items-center gap-1.5 text-xs text-primary">
@@ -265,8 +245,8 @@ function LandingPage() {
               </h2>
             </div>
             <p className="max-w-sm text-sm leading-relaxed text-muted-foreground">
-              Zapisuj wydarzenia, reakcje i postępy. Ty i behawiorysta widzicie ten sam,
-              uporządkowany obraz codzienności psa.
+              Zapisuj wydarzenia, reakcje i postępy. Ty i behawiorysta widzicie ten sam, uporządkowany obraz
+              codzienności psa.
             </p>
           </Reveal>
           <div className="grid gap-5 md:grid-cols-3">
@@ -310,8 +290,8 @@ function LandingPage() {
               <em>I brudnych łapach.</em>
             </h2>
             <p className="mt-6 max-w-md text-base leading-relaxed text-muted-foreground">
-              Spacery, treningi i trudne sytuacje. To z takich chwil powstaje historia Twojego psa —
-              i wskazówki do dalszej pracy z behawiorystą.
+              Spacery, treningi i trudne sytuacje. To z takich chwil powstaje historia Twojego psa — i wskazówki do
+              dalszej pracy z behawiorystą.
             </p>
           </Reveal>
         </div>
