@@ -43,7 +43,7 @@ export const Route = createFileRoute("/_authenticated/psy")({
   component: DogsPage,
 });
 
-function DogCard({ dog }: { dog: DogWithAccess }) {
+function DogCard({ dog, canResume = false }: { dog: DogWithAccess; canResume?: boolean }) {
   const status = dog.dog_access?.[0]?.process_status ?? "active";
   const isPending = status === "pending";
   return (
@@ -67,7 +67,19 @@ function DogCard({ dog }: { dog: DogWithAccess }) {
             {[dog.breed, dog.age, dog.sex].filter(Boolean).join(" · ") ||
               "Brak dodatkowych informacji"}
           </p>
-          <span className="border-t pt-3 text-xs font-medium text-primary">Otwórz dziennik</span>
+          {canResume ? (
+            <div className="border-t pt-3">
+              <ResumeProcessButton
+                dogId={dog.id}
+                dogName={dog.name}
+                variant="outline"
+                size="sm"
+                className="w-full"
+              />
+            </div>
+          ) : (
+            <span className="border-t pt-3 text-xs font-medium text-primary">Otwórz dziennik</span>
+          )}
         </CardContent>
       </Card>
     </Link>

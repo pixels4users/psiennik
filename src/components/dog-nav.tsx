@@ -21,6 +21,7 @@ import { rememberSelectedDog } from "@/lib/selected-dog";
 import { DogAvatar } from "@/components/dog-avatar";
 import { DogFormDialog } from "@/components/dog-form-dialog";
 import { AccessDialog } from "@/components/invite-dialog";
+import { ResumeProcessButton } from "@/components/resume-process-button";
 import { Paw } from "@/components/dog-motifs";
 import { Button } from "@/components/ui/button";
 
@@ -159,9 +160,14 @@ export function DogNav({ dog, active }: { dog: Dog; active: (typeof VIEWS)[numbe
       </nav>
 
       {role?.isReadOnly && (
-        <div className="flex items-center gap-2 rounded-xl border border-warn/30 bg-warn/10 px-4 py-3 text-sm text-foreground">
-          <AlertCircle className="size-4 shrink-0 text-warn" />
-          Współpraca z behawiorystą została zakończona — dziennik jest w trybie tylko do odczytu.
+        <div className="flex flex-wrap items-center gap-3 rounded-xl border border-warn/30 bg-warn/10 px-4 py-3 text-sm text-foreground">
+          <span className="flex min-w-0 flex-1 items-center gap-2">
+            <AlertCircle className="size-4 shrink-0 text-warn" />
+            Współpraca z behawiorystą została zakończona — dziennik jest w trybie tylko do odczytu.
+          </span>
+          {role.role === "behaviorist" && (
+            <ResumeProcessButton dogId={dog.id} dogName={dog.name} size="sm" />
+          )}
         </div>
       )}
       <DogFormDialog dog={dog} open={editOpen} onOpenChange={setEditOpen} />
