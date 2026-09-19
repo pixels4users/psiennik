@@ -161,7 +161,6 @@ export function DogNav({ dog, active }: { dog: Dog; active: (typeof VIEWS)[numbe
         </div>
       )}
       <DogFormDialog dog={dog} open={editOpen} onOpenChange={setEditOpen} />
-      <DogFormDialog open={addOpen} onOpenChange={setAddOpen} />
       <AccessDialog dog={dog} open={accessOpen} onOpenChange={setAccessOpen} />
     </div>
   );
