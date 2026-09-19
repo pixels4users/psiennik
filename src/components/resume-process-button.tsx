@@ -1,8 +1,13 @@
 import { useState } from "react";
-import { RefreshCw } from "lucide-react";
+import { CheckCircle2, RefreshCw } from "lucide-react";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
-import { resumeErrorMessage, useResumeProcess, useSubscriptionLimits } from "@/lib/access";
+import {
+  resumeErrorMessage,
+  useCompleteProcess,
+  useResumeProcess,
+  useSubscriptionLimits,
+} from "@/lib/access";
 import { Button } from "@/components/ui/button";
 import {
   AlertDialog,
@@ -84,6 +89,54 @@ export function ResumeProcessButton({
               }}
             >
               Wznów współpracę
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+    </>
+  );
+}
+
+/** Zakończenie aktywnej współpracy — widoczne dla behawiorysty przy danym psie. */
+export function CompleteProcessButton({ dogId, dogName }: { dogId: string; dogName: string }) {
+  const [open, setOpen] = useState(false);
+  const complete = useCompleteProcess(dogId);
+
+  return (
+    <>
+      <Button variant="outline" size="sm" onClick={() => setOpen(true)}>
+        <CheckCircle2 className="size-4" />
+        Zakończ współpracę
+      </Button>
+
+      <AlertDialog open={open} onOpenChange={setOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Zakończyć współpracę przy psie {dogName}?</AlertDialogTitle>
+            <AlertDialogDescription>
+              Dziennik przejdzie w tryb tylko do odczytu. Historia zostaje, a współpracę możesz
+              później wznowić.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={complete.isPending}>Anuluj</AlertDialogCancel>
+            <AlertDialogAction
+              disabled={complete.isPending}
+              onClick={(event) => {
+                event.preventDefault();
+                complete.mutate(undefined, {
+                  onSuccess: () => {
+                    toast.success("Współpraca została zakończona");
+                    setOpen(false);
+                  },
+                  onError: (err) =>
+                    toast.error(
+                      err instanceof Error ? err.message : "Nie udało się zakończyć współpracy.",
+                    ),
+                });
+              }}
+            >
+              Zakończ współpracę
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
