@@ -91,3 +91,51 @@ export function ResumeProcessButton({
     </>
   );
 }
+
+/** Zakończenie aktywnej współpracy — widoczne dla behawiorysty przy danym psie. */
+export function CompleteProcessButton({ dogId, dogName }: { dogId: string; dogName: string }) {
+  const [open, setOpen] = useState(false);
+  const complete = useCompleteProcess(dogId);
+
+  return (
+    <>
+      <Button variant="outline" size="sm" onClick={() => setOpen(true)}>
+        <CheckCircle2 className="size-4" />
+        Zakończ współpracę
+      </Button>
+
+      <AlertDialog open={open} onOpenChange={setOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Zakończyć współpracę przy psie {dogName}?</AlertDialogTitle>
+            <AlertDialogDescription>
+              Dziennik przejdzie w tryb tylko do odczytu. Historia zostaje, a współpracę możesz
+              później wznowić.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={complete.isPending}>Anuluj</AlertDialogCancel>
+            <AlertDialogAction
+              disabled={complete.isPending}
+              onClick={(event) => {
+                event.preventDefault();
+                complete.mutate(undefined, {
+                  onSuccess: () => {
+                    toast.success("Współpraca została zakończona");
+                    setOpen(false);
+                  },
+                  onError: (err) =>
+                    toast.error(
+                      err instanceof Error ? err.message : "Nie udało się zakończyć współpracy.",
+                    ),
+                });
+              }}
+            >
+              Zakończ współpracę
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+    </>
+  );
+}
