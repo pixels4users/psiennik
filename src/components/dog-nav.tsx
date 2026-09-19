@@ -64,16 +64,13 @@ export function DogNav({ dog, active }: { dog: Dog; active: (typeof VIEWS)[numbe
 
       <section
         aria-label={`Profil psa ${dog.name}`}
-        className="dog-masthead relative isolate overflow-hidden rounded-3xl bg-secondary p-5 sm:p-8"
+        className="dog-masthead relative isolate overflow-hidden px-1 py-2 sm:px-2 sm:py-4"
       >
         <Paw className="pointer-events-none absolute -right-4 -top-5 -z-10 w-44 rotate-[22deg] text-sage/50" />
-        <div className="flex flex-wrap items-center justify-between gap-6">
+        <div className="flex flex-wrap items-center justify-between gap-4 sm:gap-6">
           <div className="flex min-w-0 max-w-full items-center gap-4 sm:gap-6">
-            <DogAvatar dog={dog} className="size-24 border-4 border-background sm:size-32" />
+            <DogAvatar dog={dog} className="size-20 sm:size-24" />
             <div className="min-w-0">
-              <p className="eyebrow mb-1">
-                {isBehaviorist ? "Dziennik podopiecznego" : "Wasza wspólna historia"}
-              </p>
               <div className="flex min-w-0 items-center gap-2">
                 <h1 className="min-w-0 text-4xl leading-none [overflow-wrap:anywhere] sm:text-6xl">
                   {dog.name}
