@@ -1,40 +1,49 @@
-# Widoczne, jednokrotne animacje Psiennika
+# Nawigacja górna: psy po imieniu, Ustawienia, prostszy awatar
 
-## Ustalenie
-Animacje są obecne w aktualnym kodzie i działają przy świeżym wejściu na stronę od samej góry. Test przeglądarkowy potwierdził zmianę elementu spoza ekranu z `opacity: 0` i przesunięcia 16 px do pełnej widoczności w 550 ms oraz brak powtórki po ponownym przewinięciu.
+## Moja ocena Twojej koncepcji
 
-Problem dotyczy sposobu wejścia widocznego obecnie w Preview: adres kończy się `#dziennik-w-praktyce`. Po bezpośrednim przeskoku do tej sekcji obecny mechanizm celowo nie ukrywa treści, która jest już w ekranie podczas uruchamiania strony. W efekcie użytkownik może nie zobaczyć żadnego ujawnienia, mimo że kolejne sekcje mają animacje. Sam ruch jest też bardzo subtelny (8–16 px i zanikanie), więc łatwo go przeoczyć.
+**Opcja 1 (imiona psów w nagłówku) — rekomendowana.** Pasuje do realnego użycia: właściciel ma 1–2 psy i chce jednym kliknięciem wejść do właściwego dziennika. Jest też zgodna z tym, co już robimy (właściciel z psami i tak jest przekierowywany z listy prosto do psa).
 
-## Plan zmian
-1. **Ujednolicić mechanizm ujawniania strony głównej**
-   - Zachować treść widoczną w HTML przed uruchomieniem skryptów i podczas ładowania.
-   - Po uruchomieniu strony przygotowywać wyłącznie elementy, które rzeczywiście czekają poniżej ekranu.
-   - Dla wejścia przez odnośnik `#dziennik-w-praktyce` uruchomić jedno krótkie ujawnienie sekcji docelowej po zakończeniu przewinięcia, zamiast pomijać je jako „już widoczne”.
-   - Zachować zasadę `once`: powrót w górę i ponowne przewinięcie nie odtworzą animacji.
+**Opcja 2 (Dziennik / Zalecenia / Analiza w górnej nawigacji) — odradzam.** Zalecenia i Analiza zawsze dotyczą konkretnego psa, więc górne zakładki musiałyby domyślać się, „o którym psie mówimy". Przy dwóch psach to źródło pomyłek: klikasz „Analiza" i nie wiesz, czyja. Poza tym te same zakładki już są na stronie psa — powstałyby dwa poziomy tej samej nawigacji.
 
-2. **Poprawić czytelność bez zmiany projektu**
-   - Pozostawić istniejące tempo i kierunek, ale skorygować próg obserwacji tak, aby wejście zaczynało się w widocznej części ekranu, a nie kończyło przed zauważeniem go przez użytkownika.
-   - Zachować sekwencję kolumn i kart na komputerze; na telefonie bloki będą wchodziły osobno bez opóźniającej kolejki.
-   - Nie animować rozmiaru ani położenia układu, dzięki czemu nie pojawią się przesunięcia treści.
+Twoje spostrzeżenie, że **Lista / Kalendarz / Tabela to tylko sposoby patrzenia na te same dane**, jest trafne — ale to zmiana wewnątrz strony psa i lepiej zrobić ją osobno, na wypełnionym dzienniku (to był odłożony punkt 2 z wcześniejszego planu). Tu jej nie ruszam.
 
-3. **Zachować krótkie przejścia części zalogowanej**
-   - Potwierdzić przejścia dziennika, kalendarza, tabeli, zaleceń i analizy po zmianie zakładki i psa.
-   - Klucz animacji pozostanie związany z psem/widokiem, nie z ponownym pobraniem danych, aby odświeżenie nie animowało całej listy ani wykresów.
-   - Nie dodawać animacji poszczególnym wpisom ani metryczce psa.
+**Ustawienia i uproszczony awatar — tak, zgadzam się w całości.** Trzy pozycje nie zasługują na rozwijane menu, a etykieta „Behawiorysta / Właściciel" faktycznie nic użytkownikowi nie mówi.
 
-4. **Dostępność i wydajność**
-   - Ustawienie ograniczonego ruchu pokaże całą treść natychmiast, również po zmianie preferencji w otwartej stronie.
-   - Fokus klawiatury nadal natychmiast ujawni element, aby żaden aktywny odnośnik nie był niewidoczny.
-   - Bez animacji ciągłych; dekoracyjne łapy pojawią się tylko raz.
+## Co zrobimy
 
-## Odbiór
-- Świeża strona od góry: kolejne sekcje ujawniają się podczas przewijania.
-- Kliknięcie „Zajrzyj do dziennika” i bezpośrednie wejście z `#dziennik-w-praktyce`: docelowa sekcja ma widoczne, jednorazowe wejście.
-- Przewinięcie góra–dół: brak powtórek.
-- Telefon 320, 390 i 643 px oraz komputer: brak poziomego przewijania, przesunięć układu i ukrytej treści.
-- Ograniczony ruch od startu i po zmianie ustawienia: treść od razu widoczna.
-- Dziennik i pięć zakładek: krótkie przejście po nawigacji; zwykłe odświeżenie danych bez ponownej animacji list i wykresów.
-- Kontrola konsoli, błędów działania oraz końcowego stanu kompilacji i testów.
+### Nagłówek — właściciel
+Zamiast jednego linku „Twoje psy":
 
-## Zakres
-Tylko animacje i ich testy. Bez zmian danych, uprawnień, tekstów, układu funkcjonalnego i bez publikacji.
+- 1–3 psy: imiona jako osobne linki, np. `Luna` · `Hummus`. Aktywny pies wyróżniony.
+- 4 i więcej psów: jeden przycisk „Psy" rozwijający listę imion (żeby nagłówek się nie rozjechał).
+- Telefon: zawsze jeden przycisk „Psy" z listą imion.
+- Na końcu listy pozycja „Wszystkie psy" prowadząca na dotychczasową stronę listy.
+
+### Nagłówek — behawiorysta
+Bez zmian w paradygmacie: zostaje „Psy pod opieką" (klient może mieć kilkunastu podopiecznych, imiona nie mają sensu) plus „Zaproś klienta".
+
+### Ustawienia
+- Nowa pozycja w nagłówku: **Ustawienia** → prowadzi na dotychczasową stronę profilu (`/profil`), dla obu ról.
+- Nagłówek strony zmienia się z „Mój profil" na „Ustawienia".
+- Adres `/profil` zostaje taki sam — żadne linki i zakładki nie przestaną działać.
+
+### Awatar zamiast rozwijanego menu
+Po prawej: `[ikona] [Imię]` (link do Ustawień) + `Wyloguj`. Rozwijane menu konta znika.
+Pozycja „Wpisz kod zaproszenia" przenosi się z menu na stronę Ustawień (tam już istnieje jej odpowiednik) oraz zostaje na stronie listy psów, gdzie jest dziś.
+
+### Etykieta roli
+Napis „Behawiorysta / Właściciel" w menu konta znika razem z menu. W Ustawieniach pokażemy ją wyłącznie w środowisku roboczym (podgląd/dev), na psiennik.pl nie będzie widoczna.
+
+## Nakład pracy i ryzyko
+
+- **Praca:** mała–średnia. Realnie jeden plik nagłówka (`src/components/app-header.tsx`), drobna zmiana tytułu w `src/routes/_authenticated/profil.tsx` i przeniesienie okna „Wpisz kod zaproszenia".
+- **Skomplikowanie:** niskie. Nie ruszamy bazy, uprawnień, tras ani logiki psów — imiona bierzemy z zapytania, które nagłówek i tak może wykonać.
+- **Ryzyko:** niskie, ograniczone do warstwy prezentacji. Największe uwagi: (1) nagłówek zacznie pobierać listę psów, więc trzeba obsłużyć stan ładowania i brak psów bez migotania; (2) długie imiona i telefon 320 px — przycinanie tekstu; (3) fokus klawiatury po zamknięciu okna zaproszenia, które przenosimy.
+- **Nie ruszamy:** przekierowania właściciela z `/psy` na psa, zakładek na stronie psa, ról, RLS, zaproszeń.
+
+## Technicznie
+
+- `src/components/app-header.tsx`: `useDogs()` + `useIsBehaviorist()`; dla właściciela render imion (`<Link to="/pies/$id" params>` z `activeProps`) albo `DropdownMenu` przy ≥4 psach i na mobile; usunięcie `DropdownMenu` konta na rzecz `Link` do `/profil` i przycisku wylogowania; `JoinDialog` usuwany z nagłówka.
+- `src/routes/_authenticated/profil.tsx`: tytuł i `head()` → „Ustawienia"; dodanie karty/pozycji „Wpisz kod zaproszenia” (`JoinDialog`) dla obu ról; etykieta roli za warunkiem `import.meta.env.DEV` lub hosta podglądu.
+- Bez zmian w `routeTree`, bazie i uprawnieniach.
