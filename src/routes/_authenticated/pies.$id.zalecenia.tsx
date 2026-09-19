@@ -13,6 +13,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Skeleton } from "@/components/ui/skeleton";
+import { EntriesErrorNotice } from "@/components/dog-state";
 import { useDog, useEntries } from "@/lib/dogs";
 import { socialMeta } from "@/lib/seo";
 
@@ -32,7 +33,12 @@ export const Route = createFileRoute("/_authenticated/pies/$id/zalecenia")({
 function DogRecommendationsPage() {
   const { id } = Route.useParams();
   const { data: dog } = useDog(id);
-  const { data: entries, isLoading } = useEntries(id);
+  const {
+    data: entries,
+    isLoading,
+    isError: entriesError,
+    refetch: refetchEntries,
+  } = useEntries(id);
   const [sort, setSort] = useState("newest");
 
   const recommendations = useMemo(() => {
@@ -88,6 +94,10 @@ function DogRecommendationsPage() {
           <div className="mt-5 grid gap-3">
             <Skeleton className="h-32 w-full rounded-xl" />
             <Skeleton className="h-32 w-full rounded-xl" />
+          </div>
+        ) : entriesError ? (
+          <div className="mt-5">
+            <EntriesErrorNotice onRetry={() => void refetchEntries()} />
           </div>
         ) : recommendations.length === 0 ? (
           <div className="mt-5 rounded-lg bg-keylime px-5 py-12 text-center">

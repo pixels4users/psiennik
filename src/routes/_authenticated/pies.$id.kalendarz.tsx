@@ -20,6 +20,7 @@ import {
   SheetTitle,
 } from "@/components/ui/sheet";
 import { Skeleton } from "@/components/ui/skeleton";
+import { EntriesErrorNotice } from "@/components/dog-state";
 import { cn } from "@/lib/utils";
 import { socialMeta } from "@/lib/seo";
 
@@ -60,7 +61,12 @@ function DogCalendarPage() {
   const router = useRouter();
   const { data: role } = useDogRole(id);
   const { data: dog } = useDog(id);
-  const { data: entries, isLoading } = useEntries(id);
+  const {
+    data: entries,
+    isLoading,
+    isError: entriesError,
+    refetch: refetchEntries,
+  } = useEntries(id);
   const [weekStart, setWeekStart] = useState(() => startOfWeek(new Date(), { weekStartsOn: 1 }));
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
   const [commentedEntry, setCommentedEntry] = useState<Entry | null>(null);
@@ -102,6 +108,10 @@ function DogCalendarPage() {
         <div className="mt-8 grid gap-6">
           <Skeleton className="h-32 w-full rounded-xl" />
           <Skeleton className="h-64 w-full rounded-xl" />
+        </div>
+      ) : entriesError ? (
+        <div className="mt-8">
+          <EntriesErrorNotice onRetry={() => void refetchEntries()} />
         </div>
       ) : (
         <section key={id} className="content-enter mt-10">

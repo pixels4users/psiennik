@@ -18,6 +18,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Skeleton } from "@/components/ui/skeleton";
+import { EntriesErrorNotice } from "@/components/dog-state";
 import {
   Table,
   TableBody,
@@ -58,7 +59,12 @@ const RATING_WEIGHT: Record<string, number> = { red: 3, amber: 2, green: 1 };
 function DogTablePage() {
   const { id } = Route.useParams();
   const { data: dog } = useDog(id);
-  const { data: entries, isLoading } = useEntries(id);
+  const {
+    data: entries,
+    isLoading,
+    isError: entriesError,
+    refetch: refetchEntries,
+  } = useEntries(id);
   const [sort, setSort] = useState("newest");
   const [activity, setActivity] = useState("all");
   const [timeOfDay, setTimeOfDay] = useState("all");
@@ -195,6 +201,10 @@ function DogTablePage() {
 
         {isLoading ? (
           <Skeleton className="mt-5 h-72 w-full rounded-xl" />
+        ) : entriesError ? (
+          <div className="mt-5">
+            <EntriesErrorNotice onRetry={() => void refetchEntries()} />
+          </div>
         ) : visibleEntries.length === 0 ? (
           <div className="mt-5 rounded-lg bg-keylime p-10 text-center">
             <h3 className="text-2xl">Brak pasujących wpisów</h3>

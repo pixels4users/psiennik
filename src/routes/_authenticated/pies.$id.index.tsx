@@ -5,6 +5,7 @@ import { pl } from "date-fns/locale";
 import { useDogRole } from "@/lib/auth";
 import { useDog, useEntries, type Entry } from "@/lib/dogs";
 import { DogNav } from "@/components/dog-nav";
+import { DogNotice } from "@/components/dog-state";
 import { EntryCard } from "@/components/entry-card";
 
 import { RecommendationDialog } from "@/components/recommendation-dialog";
@@ -33,8 +34,18 @@ function DogListPage() {
   const { id } = Route.useParams();
   const { wpis } = Route.useSearch();
   const { data: dog } = useDog(id);
-  const { data: role, isLoading: roleLoading } = useDogRole(id);
-  const { data: entries, isLoading } = useEntries(id);
+  const {
+    data: role,
+    isLoading: roleLoading,
+    isError: roleError,
+    refetch: refetchRole,
+  } = useDogRole(id);
+  const {
+    data: entries,
+    isLoading,
+    isError: entriesError,
+    refetch: refetchEntries,
+  } = useEntries(id);
   const { data: commentCounts } = useEntryCommentCounts((entries ?? []).map((e) => e.id));
 
   const navigate = useNavigate();
@@ -94,6 +105,18 @@ function DogListPage() {
                 </CardContent>
               </Card>
             ))}
+          </div>
+        ) : entriesError || roleError ? (
+          <div className="mt-8">
+            <DogNotice
+              icon={null}
+              title={roleError ? "Nie udało się sprawdzić uprawnień" : "Nie udało się wczytać wpisów"}
+              description="Spróbuj jeszcze raz — jeśli problem się powtarza, wróć do listy psów."
+              onRetry={() => {
+                if (roleError) void refetchRole();
+                if (entriesError) void refetchEntries();
+              }}
+            />
           </div>
         ) : grouped.length === 0 ? (
           <div className="mt-8 rounded-xl bg-keylime p-12 text-center">

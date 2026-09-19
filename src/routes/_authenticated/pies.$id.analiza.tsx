@@ -14,6 +14,7 @@ import {
   type ChartConfig,
 } from "@/components/ui/chart";
 import { Skeleton } from "@/components/ui/skeleton";
+import { EntriesErrorNotice } from "@/components/dog-state";
 import {
   ACTIVITY_TYPES,
   entryActivities,
@@ -118,7 +119,12 @@ function keywordCounts(entries: Entry[]): [string, number][] {
 function DogAnalysisPage() {
   const { id } = Route.useParams();
   const { data: dog } = useDog(id);
-  const { data: entries, isLoading } = useEntries(id);
+  const {
+    data: entries,
+    isLoading,
+    isError: entriesError,
+    refetch: refetchEntries,
+  } = useEntries(id);
 
   const analysis = useMemo(() => {
     const all = entries ?? [];
@@ -207,6 +213,10 @@ function DogAnalysisPage() {
         <div className="mt-8 grid gap-5 sm:grid-cols-2">
           <Skeleton className="h-36 w-full rounded-xl" />
           <Skeleton className="h-72 w-full rounded-xl" />
+        </div>
+      ) : entriesError ? (
+        <div className="mt-8">
+          <EntriesErrorNotice onRetry={() => void refetchEntries()} />
         </div>
       ) : (
         <div key={id} className="content-enter flow-root">

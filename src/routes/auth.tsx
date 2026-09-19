@@ -13,7 +13,7 @@ import { useServerFn } from "@tanstack/react-start";
 import { supabase } from "@/integrations/supabase/client";
 import { lovable } from "@/integrations/lovable";
 import { useAuth } from "@/lib/auth";
-import { useRedeemInvite } from "@/lib/access";
+import { inviteErrorMessage, useRedeemInvite } from "@/lib/access";
 import { claimBehavioristRole } from "@/lib/role.functions";
 
 import {
@@ -35,7 +35,6 @@ const searchSchema = z.object({
 });
 
 const PENDING_ROLE_KEY = "psiennik.pending-role";
-
 
 export const Route = createFileRoute("/auth")({
   ssr: false,
@@ -100,7 +99,7 @@ function AuthPage() {
           }
         },
         onError: (err) => {
-          toast.error(err instanceof Error ? err.message : "Nie udało się użyć kodu");
+          toast.error(inviteErrorMessage(err));
           navigate({ to: "/psy", replace: true });
         },
       });
@@ -108,7 +107,6 @@ function AuthPage() {
       navigate({ to: "/psy", replace: true });
     }
   }, [loading, user, searchCode, navigate, redeem]);
-
 
   const oauth = async (provider: "google" | "apple", chosenRole?: "owner" | "behaviorist") => {
     setBusy(true);
@@ -197,9 +195,7 @@ function AuthPage() {
             <CircleCheckBig className="size-8" aria-hidden="true" />
           </div>
           <h1 className="mt-6 text-4xl">Potwierdź adres e-mail</h1>
-          <p className="mt-4 text-lg text-muted-foreground">
-            Wysłaliśmy link na:
-          </p>
+          <p className="mt-4 text-lg text-muted-foreground">Wysłaliśmy link na:</p>
           <p className="mt-2 break-words font-semibold text-foreground">{registeredEmail}</p>
           <div className="mt-8 flex items-start gap-3 rounded-lg bg-muted p-5 text-left">
             <Mail className="mt-0.5 size-5 shrink-0 text-primary" aria-hidden="true" />
@@ -306,13 +302,8 @@ function AuthPage() {
                   </div>
                 </fieldset>
                 <div className="grid gap-2">
-
                   <Label htmlFor="reg-name">Imię</Label>
-                  <Input
-                    id="reg-name"
-                    value={name}
-                    onChange={(e) => setName(e.target.value)}
-                  />
+                  <Input id="reg-name" value={name} onChange={(e) => setName(e.target.value)} />
                 </div>
                 <div className="grid gap-2">
                   <Label htmlFor="reg-email">E-mail</Label>

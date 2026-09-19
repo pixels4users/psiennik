@@ -6,6 +6,7 @@ import { useDogRole } from "@/lib/auth";
 import { EntryForm } from "@/components/entry-form";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
+import { EntriesErrorNotice } from "@/components/dog-state";
 import { socialMeta } from "@/lib/seo";
 
 export const Route = createFileRoute("/_authenticated/pies/$id/wydarzenie/$entryId/edytuj")({
@@ -30,7 +31,12 @@ function EditEntryPage() {
   const navigate = useNavigate();
   const { data: dog } = useDog(id);
   const { data: role, isLoading: roleLoading } = useDogRole(id);
-  const { data: entries, isLoading } = useEntries(id);
+  const {
+    data: entries,
+    isLoading,
+    isError: entriesError,
+    refetch: refetchEntries,
+  } = useEntries(id);
 
   const entry = entries?.find((item) => item.id === entryId) ?? null;
 
@@ -42,7 +48,8 @@ function EditEntryPage() {
     });
   };
 
-  const blocked = (!roleLoading && !!role && !role.canEditEntries) || (!isLoading && !entry);
+  const blocked =
+    (!roleLoading && !role?.canEditEntries) || (!isLoading && !entriesError && !entry);
   useEffect(() => {
     if (blocked) goBack();
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -57,7 +64,9 @@ function EditEntryPage() {
         {dog?.name ? `Wróć do wydarzenia: ${dog.name}` : "Wróć"}
       </Button>
       <h1 className="mb-6 font-display text-3xl font-light text-primary">Edytuj wydarzenie</h1>
-      {entry ? (
+      {entriesError ? (
+        <EntriesErrorNotice onRetry={() => void refetchEntries()} />
+      ) : entry ? (
         <EntryForm dogId={id} entry={entry} onDone={goBack} onCancel={goBack} />
       ) : (
         <div className="grid gap-3">

@@ -1,7 +1,7 @@
 import { useState, type RefObject } from "react";
 import { useNavigate } from "@tanstack/react-router";
 import { toast } from "sonner";
-import { useRedeemInvite } from "@/lib/access";
+import { inviteErrorMessage, useRedeemInvite } from "@/lib/access";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -50,11 +50,7 @@ export function JoinDialog({
         changeOpen(false);
       }
     } catch (err) {
-      const message =
-        err && typeof err === "object" && "message" in err && typeof err.message === "string"
-          ? err.message
-          : "Nie udało się użyć kodu. Spróbuj ponownie.";
-      setError(message);
+      setError(inviteErrorMessage(err));
     }
   };
 
