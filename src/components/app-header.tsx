@@ -159,6 +159,7 @@ export function AppHeader() {
 function OwnerDogNavigation() {
   const { data: dogs, isLoading } = useDogs();
   const compact = (dogs?.length ?? 0) >= 4;
+  const [addOpen, setAddOpen] = useState(false);
 
   if (isLoading) {
     return (
@@ -196,6 +197,16 @@ function OwnerDogNavigation() {
             {dog.name}
           </Link>
         ))}
+        <Button
+          variant="ghost"
+          size="icon"
+          className="size-8"
+          aria-label="Dodaj psa"
+          title="Dodaj psa"
+          onClick={() => setAddOpen(true)}
+        >
+          <Plus className="size-4" />
+        </Button>
       </div>
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
@@ -215,8 +226,14 @@ function OwnerDogNavigation() {
               </Link>
             </DropdownMenuItem>
           ))}
+          <DropdownMenuSeparator />
+          <DropdownMenuItem onSelect={() => setAddOpen(true)}>
+            <Plus className="size-4" aria-hidden="true" />
+            Dodaj psa
+          </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
+      <DogFormDialog open={addOpen} onOpenChange={setAddOpen} />
     </>
   );
 }
