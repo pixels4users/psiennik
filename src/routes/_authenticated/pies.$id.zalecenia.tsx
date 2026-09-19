@@ -94,6 +94,10 @@ function DogRecommendationsPage() {
             <Skeleton className="h-32 w-full rounded-xl" />
             <Skeleton className="h-32 w-full rounded-xl" />
           </div>
+        ) : entriesError ? (
+          <div className="mt-5">
+            <EntriesErrorNotice onRetry={() => void refetchEntries()} />
+          </div>
         ) : recommendations.length === 0 ? (
           <div className="mt-5 rounded-lg bg-keylime px-5 py-12 text-center">
             <MessageSquareText className="mx-auto size-7 text-primary" aria-hidden="true" />

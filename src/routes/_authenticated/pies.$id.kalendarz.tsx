@@ -108,6 +108,10 @@ function DogCalendarPage() {
           <Skeleton className="h-32 w-full rounded-xl" />
           <Skeleton className="h-64 w-full rounded-xl" />
         </div>
+      ) : entriesError ? (
+        <div className="mt-8">
+          <EntriesErrorNotice onRetry={() => void refetchEntries()} />
+        </div>
       ) : (
         <section key={id} className="content-enter mt-10">
           <div className="flex flex-wrap items-center justify-between gap-3">

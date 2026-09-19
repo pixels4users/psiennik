@@ -200,6 +200,10 @@ function DogTablePage() {
 
         {isLoading ? (
           <Skeleton className="mt-5 h-72 w-full rounded-xl" />
+        ) : entriesError ? (
+          <div className="mt-5">
+            <EntriesErrorNotice onRetry={() => void refetchEntries()} />
+          </div>
         ) : visibleEntries.length === 0 ? (
           <div className="mt-5 rounded-lg bg-keylime p-10 text-center">
             <h3 className="text-2xl">Brak pasujących wpisów</h3>
