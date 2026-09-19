@@ -158,6 +158,39 @@ export function useCompleteProcess(dogId: string) {
   });
 }
 
+/** Wznawia zakończoną współpracę behawiorysty z psem. */
+export function useResumeProcess(dogId: string) {
+  const queryClient = useQueryClient();
+  const { user } = useAuth();
+  return useMutation({
+    mutationFn: async () => {
+      if (!user) throw new Error("Musisz być zalogowany");
+      const { error } = await supabase.rpc("resume_behavioral_process", { p_dog_id: dogId });
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["dog-access", dogId] });
+      queryClient.invalidateQueries({ queryKey: ["dog-role", dogId] });
+      queryClient.invalidateQueries({ queryKey: ["dogs"] });
+      queryClient.invalidateQueries({ queryKey: ["behaviorist-access"] });
+      queryClient.invalidateQueries({ queryKey: ["subscription-limits"] });
+    },
+  });
+}
+
+/** Czytelny komunikat błędu wznowienia współpracy. */
+export function resumeErrorMessage(err: unknown, dogName: string): string {
+  const message =
+    err && typeof err === "object" && "message" in err && typeof err.message === "string"
+      ? err.message
+      : "";
+  if (message.includes("limit")) return message;
+  if (message.includes("Poproś")) {
+    return `Nie możesz wznowić współpracy. Poproś właściciela, aby ponownie zaprosił Cię do psa ${dogName}.`;
+  }
+  return "Nie udało się wznowić współpracy. Spróbuj ponownie.";
+}
+
 /** Kod zapraszający zalogowanego behawiorysty. */
 export function useBehavioristLink() {
   const { user } = useAuth();

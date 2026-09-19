@@ -9,7 +9,8 @@ type NotificationKind =
   | "recommendation"
   | "access_granted"
   | "access_revoked"
-  | "process_completed";
+  | "process_completed"
+  | "process_resumed";
 
 const TEMPLATE_BY_KIND: Record<NotificationKind, string> = {
   entry: "notify-entry",
@@ -18,6 +19,7 @@ const TEMPLATE_BY_KIND: Record<NotificationKind, string> = {
   access_granted: "notify-access",
   access_revoked: "notify-access",
   process_completed: "notify-access",
+  process_resumed: "notify-access",
 };
 
 const PREF_BY_KIND: Record<NotificationKind, string> = {
@@ -27,6 +29,7 @@ const PREF_BY_KIND: Record<NotificationKind, string> = {
   access_granted: "notify_access",
   access_revoked: "notify_access",
   process_completed: "notify_access",
+  process_resumed: "notify_access",
 };
 
 const SITE_URL = "https://psiennik.pl";
