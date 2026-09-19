@@ -14,6 +14,7 @@ import {
   type ChartConfig,
 } from "@/components/ui/chart";
 import { Skeleton } from "@/components/ui/skeleton";
+import { EntriesErrorNotice } from "@/components/dog-state";
 import {
   ACTIVITY_TYPES,
   entryActivities,

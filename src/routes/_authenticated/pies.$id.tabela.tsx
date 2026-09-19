@@ -18,6 +18,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Skeleton } from "@/components/ui/skeleton";
+import { EntriesErrorNotice } from "@/components/dog-state";
 import {
   Table,
   TableBody,

@@ -20,6 +20,7 @@ import {
   SheetTitle,
 } from "@/components/ui/sheet";
 import { Skeleton } from "@/components/ui/skeleton";
+import { EntriesErrorNotice } from "@/components/dog-state";
 import { cn } from "@/lib/utils";
 import { socialMeta } from "@/lib/seo";
 
