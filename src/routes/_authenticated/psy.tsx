@@ -23,6 +23,7 @@ import { DogFormDialog } from "@/components/dog-form-dialog";
 import { InviteClientDialog } from "@/components/behaviorist-invite";
 import { DogAvatar } from "@/components/dog-avatar";
 import { RatingBadge } from "@/components/rating-badge";
+import { ResumeProcessButton } from "@/components/resume-process-button";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -348,7 +349,13 @@ function DogsPage() {
                         : "Brak zakończonych procesów."}
                   </p>
                 ) : (
-                  grouped[key].map((dog) => <DogCard key={dog.id} dog={dog} />)
+                  grouped[key].map((dog) => (
+                    <DogCard
+                      key={dog.id}
+                      dog={dog}
+                      canResume={key === "completed" && !!isBehaviorist}
+                    />
+                  ))
                 )}
               </div>
             </TabsContent>
