@@ -110,11 +110,23 @@ export function useDogs() {
   });
 }
 
-export function useDog(id: string) {
+const DOG_ID_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
+/** Sprawdza format identyfikatora psa przed wysłaniem zapytania. */
+export function isValidDogId(id: string): boolean {
+  return DOG_ID_PATTERN.test(id);
+}
+
+/**
+ * Pies po identyfikatorze. Brak wiersza (brak psa lub brak dostępu) → `null`,
+ * błąd zapytania → stan błędu. Dzięki temu UI rozróżnia „niedostępny" od awarii.
+ */
+export function useDog(id: string | null) {
   return useQuery({
     queryKey: ["dogs", id],
-    queryFn: async (): Promise<Dog> => {
-      const { data, error } = await supabase.from("dogs").select("*").eq("id", id).single();
+    enabled: !!id && isValidDogId(id),
+    queryFn: async (): Promise<Dog | null> => {
+      const { data, error } = await supabase.from("dogs").select("*").eq("id", id!).maybeSingle();
       if (error) throw error;
       return data;
     },
