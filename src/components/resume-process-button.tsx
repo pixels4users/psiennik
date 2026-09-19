@@ -1,8 +1,13 @@
 import { useState } from "react";
-import { RefreshCw } from "lucide-react";
+import { CheckCircle2, RefreshCw } from "lucide-react";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
-import { resumeErrorMessage, useResumeProcess, useSubscriptionLimits } from "@/lib/access";
+import {
+  resumeErrorMessage,
+  useCompleteProcess,
+  useResumeProcess,
+  useSubscriptionLimits,
+} from "@/lib/access";
 import { Button } from "@/components/ui/button";
 import {
   AlertDialog,
