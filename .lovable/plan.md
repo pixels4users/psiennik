@@ -38,6 +38,17 @@ Ustawienia użytkownika (ekran Ustawienia):
 
 Preferencje trafiają do profilu (cztery nowe pola obok istniejącego `email_notifications`), domyślnie włączone.
 
+### Adres kontaktowy (logowanie przez Apple i „ukryj mój e-mail")
+
+Tak — użytkownik powinien mieć możliwość podania własnego adresu. Dziś w Ustawieniach jest już pole „E-mail", zapisywane w profilu; to jest adres kontaktowy do powiadomień i on będzie używany przy wysyłce. Adres logowania (ten z Apple, także `…@privaterelay.appleid.com`) pozostaje osobny i niezmieniony — tak ma być, bo na nim opiera się logowanie.
+
+Dopracowanie w ramach tego zadania:
+- pole nazywamy jasno „Adres do powiadomień", z podpowiedzią, że nie zmienia sposobu logowania,
+- gdy adres jest pusty lub jest to adres przekazujący Apple, a powiadomienia e-mail są włączone, pokazujemy krótką prośbę o podanie własnego adresu (Apple przekazuje pocztę dalej, ale tylko dopóki użytkownik tego nie wyłączy),
+- adres walidujemy i zapisujemy tylko poprawny.
+
+Zmiana hasła: to osobna sprawa od powiadomień i nie każdy ma hasło — osoby zalogowane przez Apple lub Google konta z hasłem nie mają. Proponuję zostawić poza tym zadaniem i zrobić jako kolejny krok: w Ustawieniach sekcja „Logowanie" z ustawieniem/zmianą hasła (wysyłka linku na adres logowania, bo tylko on jest potwierdzony) oraz informacją, przez co użytkownik się loguje. Jeśli wolisz, dołożę to do tego samego zakresu.
+
 Droga wysyłki: baza po utworzeniu powiadomienia woła wewnętrzny adres aplikacji (chroniony sekretem), a ten renderuje szablon i wysyła go przez wbudowaną obsługę e-maili Lovable. Szablony (React Email, styl Psiennika): nowe wydarzenie, nowy komentarz, nowe zalecenie, zmiana dostępu — każdy z imieniem psa, autorem, fragmentem treści i przyciskiem prowadzącym prosto do wpisu.
 
 Zabezpieczenia: klucz idempotencji na powiadomienie (retry nie dubluje maila), brak maila gdy odbiorca sam wywołał zdarzenie, wypisanie się i odbicia obsługuje platforma.
