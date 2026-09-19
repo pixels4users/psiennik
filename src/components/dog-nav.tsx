@@ -21,7 +21,7 @@ import { rememberSelectedDog } from "@/lib/selected-dog";
 import { DogAvatar } from "@/components/dog-avatar";
 import { DogFormDialog } from "@/components/dog-form-dialog";
 import { AccessDialog } from "@/components/invite-dialog";
-import { ResumeProcessButton } from "@/components/resume-process-button";
+import { CompleteProcessButton, ResumeProcessButton } from "@/components/resume-process-button";
 import { Paw } from "@/components/dog-motifs";
 import { Button } from "@/components/ui/button";
 
@@ -132,6 +132,11 @@ export function DogNav({ dog, active }: { dog: Dog; active: (typeof VIEWS)[numbe
                 </Button>
               )}
             </>
+          )}
+          {role?.role === "behaviorist" && role.processStatus === "active" && (
+            <div className="lg:col-start-4 lg:justify-self-end">
+              <CompleteProcessButton dogId={dog.id} dogName={dog.name} />
+            </div>
           )}
         </div>
       </section>
