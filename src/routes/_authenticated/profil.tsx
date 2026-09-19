@@ -40,7 +40,7 @@ import {
 export const Route = createFileRoute("/_authenticated/profil")({
   head: () => ({
     meta: socialMeta({
-      title: "Mój profil — Psiennik",
+      title: "Ustawienia — Psiennik",
       description: "Ustawienia konta w Psienniku: nazwa, adres e-mail, powiadomienia i dostęp.",
       path: "/profil",
       image: "app",
@@ -59,6 +59,7 @@ const STATUS_LABELS: Record<string, string> = {
 function ProfilePage() {
   const { user } = useAuth();
   const { data: profile, isLoading } = useProfile();
+  const { data: isBehaviorist } = useIsBehaviorist();
   const queryClient = useQueryClient();
   const navigate = useNavigate();
 
@@ -107,7 +108,14 @@ function ProfilePage() {
   return (
     <div className="mx-auto max-w-2xl px-5 py-12">
       <div className="flex flex-wrap items-center justify-between gap-3">
-        <h1 className="text-4xl">Mój profil</h1>
+        <div>
+          <h1 className="text-4xl">Ustawienia</h1>
+          {import.meta.env.DEV && (
+            <p className="mt-1 text-xs text-muted-foreground">
+              Tryb testowy · {isBehaviorist ? "Behawiorysta" : "Właściciel"}
+            </p>
+          )}
+        </div>
         <Button variant="ghost" onClick={() => setJoinOpen(true)}>
           <Ticket aria-hidden="true" />
           Wpisz kod zaproszenia
