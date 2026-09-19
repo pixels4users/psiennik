@@ -72,7 +72,7 @@ export function DogNav({ dog, active }: { dog: Dog; active: (typeof VIEWS)[numbe
             <DogAvatar dog={dog} className="size-20 sm:size-24" />
             <div className="min-w-0">
               <div className="flex min-w-0 items-center gap-2">
-                <h1 className="min-w-0 text-4xl leading-none [overflow-wrap:anywhere] sm:text-6xl">
+                <h1 className="min-w-0 text-3xl leading-none [overflow-wrap:anywhere] sm:text-5xl">
                   {dog.name}
                 </h1>
                 {!isLoading && role?.canManage && (
@@ -86,7 +86,7 @@ export function DogNav({ dog, active }: { dog: Dog; active: (typeof VIEWS)[numbe
                   </Button>
                 )}
               </div>
-              <p className="mt-3 text-sm text-muted-foreground sm:text-base">
+              <p className="mt-2 text-sm text-muted-foreground sm:text-base">
                 {[dog.breed, dog.age, dog.sex].filter(Boolean).join(" · ")}
               </p>
             </div>
