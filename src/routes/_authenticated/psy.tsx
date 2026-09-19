@@ -23,6 +23,7 @@ import { DogFormDialog } from "@/components/dog-form-dialog";
 import { InviteClientDialog } from "@/components/behaviorist-invite";
 import { DogAvatar } from "@/components/dog-avatar";
 import { RatingBadge } from "@/components/rating-badge";
+import { ResumeProcessButton } from "@/components/resume-process-button";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -43,7 +44,7 @@ export const Route = createFileRoute("/_authenticated/psy")({
   component: DogsPage,
 });
 
-function DogCard({ dog }: { dog: DogWithAccess }) {
+function DogCard({ dog, canResume = false }: { dog: DogWithAccess; canResume?: boolean }) {
   const status = dog.dog_access?.[0]?.process_status ?? "active";
   const isPending = status === "pending";
   return (
@@ -67,7 +68,19 @@ function DogCard({ dog }: { dog: DogWithAccess }) {
             {[dog.breed, dog.age, dog.sex].filter(Boolean).join(" · ") ||
               "Brak dodatkowych informacji"}
           </p>
-          <span className="border-t pt-3 text-xs font-medium text-primary">Otwórz dziennik</span>
+          {canResume ? (
+            <div className="border-t pt-3">
+              <ResumeProcessButton
+                dogId={dog.id}
+                dogName={dog.name}
+                variant="outline"
+                size="sm"
+                className="w-full"
+              />
+            </div>
+          ) : (
+            <span className="border-t pt-3 text-xs font-medium text-primary">Otwórz dziennik</span>
+          )}
         </CardContent>
       </Card>
     </Link>
@@ -336,7 +349,13 @@ function DogsPage() {
                         : "Brak zakończonych procesów."}
                   </p>
                 ) : (
-                  grouped[key].map((dog) => <DogCard key={dog.id} dog={dog} />)
+                  grouped[key].map((dog) => (
+                    <DogCard
+                      key={dog.id}
+                      dog={dog}
+                      canResume={key === "completed" && !!isBehaviorist}
+                    />
+                  ))
                 )}
               </div>
             </TabsContent>

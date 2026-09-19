@@ -8,7 +8,8 @@ export type NotificationKind =
   | "recommendation"
   | "access_granted"
   | "access_revoked"
-  | "process_completed";
+  | "process_completed"
+  | "process_resumed";
 
 export type AppNotification = {
   id: string;

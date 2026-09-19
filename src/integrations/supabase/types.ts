@@ -500,6 +500,10 @@ export type Database = {
           isSetofReturn: false
         }
       }
+      resume_behavioral_process: {
+        Args: { p_dog_id: string }
+        Returns: undefined
+      }
     }
     Enums: {
       app_role: "owner" | "behaviorist"
