@@ -51,50 +51,16 @@ export function DogNav({ dog, active }: { dog: Dog; active: (typeof VIEWS)[numbe
 
   return (
     <div className="grid min-w-0 gap-5">
-      <div className="flex flex-wrap items-center justify-between gap-3">
-        {isBehaviorist ? (
+      {isBehaviorist && (
+        <div className="flex items-center">
           <Link
             to="/psy"
             className="inline-flex min-h-11 items-center gap-2 rounded-full text-sm text-muted-foreground hover:text-primary"
           >
             <ArrowLeft className="size-4" /> Wszystkie psy
           </Link>
-        ) : (
-          <div className="flex min-w-0 items-center gap-3">
-            <label htmlFor="dog-switcher" className="shrink-0 text-sm text-muted-foreground">
-              Twoje psy
-            </label>
-            <Select
-              value={dog.id}
-              onValueChange={(id) => {
-                void navigate({
-                  to: VIEWS.find((view) => view.key === active)!.path,
-                  params: { id },
-                });
-              }}
-            >
-              <SelectTrigger id="dog-switcher" className="w-40 sm:w-52">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                {(dogs?.some((item) => item.id === dog.id) ? dogs : [dog])?.map((item) => (
-                  <SelectItem key={item.id} value={item.id}>
-                    {item.name}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-        )}
-        {isBehaviorist === false && (
-          <div className="flex flex-wrap gap-1">
-            <Button variant="outline" size="sm" onClick={() => setAddOpen(true)}>
-              <Plus />
-              Dodaj psa
-            </Button>
-          </div>
-        )}
-      </div>
+        </div>
+      )}
 
       <section
         aria-label={`Profil psa ${dog.name}`}
