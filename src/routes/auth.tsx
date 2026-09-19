@@ -100,7 +100,7 @@ function AuthPage() {
           }
         },
         onError: (err) => {
-          toast.error(err instanceof Error ? err.message : "Nie udało się użyć kodu");
+          toast.error(inviteErrorMessage(err));
           navigate({ to: "/psy", replace: true });
         },
       });
