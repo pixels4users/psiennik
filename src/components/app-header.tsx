@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Link, useNavigate } from "@tanstack/react-router";
 import { useQueryClient } from "@tanstack/react-query";
-import { Bell, ChevronDown, LogOut, PawPrint, Settings, User, UserPlus } from "lucide-react";
+import { Bell, ChevronDown, LogOut, PawPrint, Plus, Settings, User, UserPlus } from "lucide-react";
 import logoAsset from "@/assets/psiennik-logo-3.webp.asset.json";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth, useProfile } from "@/lib/auth";
@@ -9,6 +9,7 @@ import { useIsBehaviorist } from "@/lib/access";
 import { useDogs } from "@/lib/dogs";
 import { useNews } from "@/lib/notifications";
 import { InviteClientDialog } from "@/components/behaviorist-invite";
+import { DogFormDialog } from "@/components/dog-form-dialog";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
