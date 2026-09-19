@@ -489,6 +489,7 @@ export type Database = {
         Args: { p_behaviorist_id: string; p_dog_id: string }
         Returns: undefined
       }
+      notify_dispatch_secret: { Args: never; Returns: string }
       redeem_dog_invite: {
         Args: { _code: string }
         Returns: Database["public"]["CompositeTypes"]["redeem_result"]
