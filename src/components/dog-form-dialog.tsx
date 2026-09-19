@@ -1,16 +1,11 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate } from "@tanstack/react-router";
 import { useQueryClient } from "@tanstack/react-query";
 import { ImagePlus, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { deleteDogPhoto, uploadDogPhoto, useDogPhotoUrl, type Dog } from "@/lib/dogs";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -38,6 +33,7 @@ export function DogFormDialog({
   const [breed, setBreed] = useState("");
   const [sex, setSex] = useState<string>("");
   const [photo, setPhoto] = useState<File | null>(null);
+  const photoInputRef = useRef<HTMLInputElement>(null);
   const [removePhoto, setRemovePhoto] = useState(false);
   const [saving, setSaving] = useState(false);
   const { data: currentPhotoUrl } = useDogPhotoUrl(dog?.photo_url ?? null);
@@ -142,7 +138,6 @@ export function DogFormDialog({
               value={name}
               onChange={(e) => setName(e.target.value)}
               placeholder="np. Lucy"
-              autoFocus
             />
           </div>
           <div className="grid grid-cols-2 gap-4">
@@ -156,9 +151,9 @@ export function DogFormDialog({
               />
             </div>
             <div className="grid gap-2">
-              <Label>Płeć</Label>
+              <Label htmlFor="dog-sex">Płeć</Label>
               <Select value={sex} onValueChange={setSex}>
-                <SelectTrigger>
+                <SelectTrigger id="dog-sex">
                   <SelectValue placeholder="Wybierz" />
                 </SelectTrigger>
                 <SelectContent>
@@ -178,8 +173,10 @@ export function DogFormDialog({
             />
           </div>
           <div className="grid gap-2">
-            <Label htmlFor="dog-photo">Zdjęcie (opcjonalnie)</Label>
-            <div className="flex items-center gap-4 rounded-lg border border-border p-3">
+            <Label id="dog-photo-label" htmlFor="dog-photo">
+              Zdjęcie (opcjonalnie)
+            </Label>
+            <div className="flex flex-col items-start gap-3 rounded-xl border border-primary/15 p-3 sm:flex-row sm:items-center">
               {photoPreview || (!removePhoto && currentPhotoUrl) ? (
                 <img
                   src={photoPreview ?? currentPhotoUrl}
@@ -191,27 +188,45 @@ export function DogFormDialog({
                   <ImagePlus className="size-7 text-primary" />
                 </div>
               )}
-              <div className="grid min-w-0 flex-1 gap-2">
-                <Input
+              <div className="grid w-full min-w-0 flex-1 gap-2">
+                <input
+                  ref={photoInputRef}
                   id="dog-photo"
                   type="file"
                   accept="image/*"
+                  className="hidden"
                   onChange={(e) => {
                     const file = e.target.files?.[0] ?? null;
-                    if (file && !file.type.startsWith("image/")) {
+                    e.target.value = "";
+                    if (!file) return;
+                    if (!file.type.startsWith("image/")) {
                       toast.error("Wybierz plik graficzny");
-                      e.target.value = "";
                       return;
                     }
-                    if (file && file.size > 10 * 1024 * 1024) {
+                    if (file.size > 10 * 1024 * 1024) {
                       toast.error("Zdjęcie może mieć maksymalnie 10 MB");
-                      e.target.value = "";
                       return;
                     }
                     setPhoto(file);
                     setRemovePhoto(false);
                   }}
                 />
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="sm"
+                  className="w-fit"
+                  aria-describedby="dog-photo-label"
+                  onClick={() => photoInputRef.current?.click()}
+                >
+                  <ImagePlus className="size-4" />
+                  Wybierz plik
+                </Button>
+                {photo && (
+                  <p className="break-all px-4 text-xs text-muted-foreground" role="status">
+                    {photo.name}
+                  </p>
+                )}
                 {(photo || (!removePhoto && dog?.photo_url)) && (
                   <Button
                     type="button"

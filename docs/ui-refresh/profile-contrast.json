@@ -1,0 +1,5 @@
+{
+  "method": "WCAG relative luminance from observed OKLCH values",
+  "errorOnBackground": 5.65,
+  "textOnBackground": 16.44
+}

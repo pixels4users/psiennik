@@ -1,5 +1,12 @@
 import { useState } from "react";
-import { Pencil, MessageSquarePlus, MessageSquareText, MessagesSquare, Clock3, LoaderCircle } from "lucide-react";
+import {
+  Pencil,
+  MessageSquarePlus,
+  MessageSquareText,
+  MessagesSquare,
+  Clock3,
+  LoaderCircle,
+} from "lucide-react";
 import {
   ACTIVITY_TYPES,
   ACTIVITY_ICONS,
@@ -45,8 +52,8 @@ export function EntryCard({
   };
 
   return (
-    <Card className="shadow-none">
-      <CardContent className="grid gap-3 p-5">
+    <Card className="entry-card shadow-none">
+      <CardContent className="grid gap-4 p-5 sm:p-6">
         <div className="flex items-start justify-between gap-3">
           <div className="grid min-w-0 gap-1.5">
             <h3 className="font-display text-xl font-semibold leading-tight text-primary">

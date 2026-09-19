@@ -1,138 +1,214 @@
-import { useState } from "react";
-import { Link } from "@tanstack/react-router";
-import { ArrowLeft, Pencil, Users, AlertCircle } from "lucide-react";
+import { useEffect, useState } from "react";
+import { Link, useNavigate } from "@tanstack/react-router";
+import {
+  ArrowLeft,
+  ArrowRight,
+  Pencil,
+  Plus,
+  Users,
+  UserPlus,
+  AlertCircle,
+  BookOpen,
+  CalendarDays,
+  Table2,
+  MessageSquareText,
+  ChartNoAxesCombined,
+} from "lucide-react";
 import { cn } from "@/lib/utils";
-import type { Dog } from "@/lib/dogs";
-import { useDogRole } from "@/lib/auth";
+import { useDogs, type Dog } from "@/lib/dogs";
+import { useAuth, useDogRole } from "@/lib/auth";
+import { useDogAccess, useIsBehaviorist } from "@/lib/access";
+import { rememberSelectedDog } from "@/lib/selected-dog";
 import { DogAvatar } from "@/components/dog-avatar";
 import { DogFormDialog } from "@/components/dog-form-dialog";
 import { AccessDialog } from "@/components/invite-dialog";
+import { Paw } from "@/components/dog-motifs";
 import { Button } from "@/components/ui/button";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
-export function DogNav({
-  dog,
-  active,
-}: {
-  dog: Dog;
-  active: "dziennik" | "kalendarz" | "tabela" | "zalecenia" | "analiza";
-}) {
+const VIEWS = [
+  { key: "dziennik", label: "Dziennik", path: "/pies/$id", icon: BookOpen },
+  { key: "kalendarz", label: "Kalendarz", path: "/pies/$id/kalendarz", icon: CalendarDays },
+  { key: "tabela", label: "Tabela", path: "/pies/$id/tabela", icon: Table2 },
+  { key: "zalecenia", label: "Zalecenia", path: "/pies/$id/zalecenia", icon: MessageSquareText },
+  { key: "analiza", label: "Analiza", path: "/pies/$id/analiza", icon: ChartNoAxesCombined },
+] as const;
+
+export function DogNav({ dog, active }: { dog: Dog; active: (typeof VIEWS)[number]["key"] }) {
+  const { user } = useAuth();
   const { data: role, isLoading } = useDogRole(dog.id);
+  const { data: isBehaviorist } = useIsBehaviorist();
+  const { data: dogs } = useDogs();
+  const { data: access } = useDogAccess(dog.id);
+  const navigate = useNavigate();
   const [editOpen, setEditOpen] = useState(false);
+  const [addOpen, setAddOpen] = useState(false);
   const [accessOpen, setAccessOpen] = useState(false);
+  const hasCoOwner =
+    access?.some((row) => row.role === "owner" && row.user_id !== dog.owner_id) ?? false;
+  const behaviorist = access?.find((row) => row.role === "behaviorist");
+  const behavioristName = behaviorist?.profile?.display_name || behaviorist?.profile?.email;
+
+  useEffect(() => {
+    if (isBehaviorist === false) rememberSelectedDog(dog.id, user?.id);
+  }, [dog.id, user?.id, isBehaviorist]);
 
   return (
-    <div className="grid gap-4">
-      <Link
-        to="/psy"
-        className="flex w-fit items-center gap-1.5 text-sm text-muted-foreground transition-colors hover:text-foreground"
+    <div className="grid min-w-0 gap-5">
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        {isBehaviorist ? (
+          <Link
+            to="/psy"
+            className="inline-flex min-h-11 items-center gap-2 rounded-full text-sm text-muted-foreground hover:text-primary"
+          >
+            <ArrowLeft className="size-4" /> Wszystkie psy
+          </Link>
+        ) : (
+          <div className="flex min-w-0 items-center gap-3">
+            <label htmlFor="dog-switcher" className="shrink-0 text-sm text-muted-foreground">
+              Twoje psy
+            </label>
+            <Select
+              value={dog.id}
+              onValueChange={(id) => {
+                void navigate({
+                  to: VIEWS.find((view) => view.key === active)!.path,
+                  params: { id },
+                });
+              }}
+            >
+              <SelectTrigger id="dog-switcher" className="w-40 sm:w-52">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                {(dogs?.some((item) => item.id === dog.id) ? dogs : [dog])?.map((item) => (
+                  <SelectItem key={item.id} value={item.id}>
+                    {item.name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+        )}
+        {isBehaviorist === false && (
+          <div className="flex flex-wrap gap-1">
+            <Button variant="outline" size="sm" onClick={() => setAddOpen(true)}>
+              <Plus />
+              Dodaj psa
+            </Button>
+          </div>
+        )}
+      </div>
+
+      <section
+        aria-label={`Profil psa ${dog.name}`}
+        className="dog-masthead relative isolate overflow-hidden rounded-3xl bg-secondary p-5 sm:p-8"
       >
-        <ArrowLeft className="size-4" />
-        Wszystkie psy
-      </Link>
-      <div className="grid min-w-0 gap-4 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-end">
-        <div className="flex min-w-0 items-center gap-4">
-          <DogAvatar dog={dog} className="size-20" />
-          <div className="min-w-0">
-            <div className="flex min-w-0 items-center gap-2">
-              <h1 className="truncate text-4xl">{dog.name}</h1>
-              {!isLoading && role?.canManage && (
-                <>
+        <Paw className="pointer-events-none absolute -right-4 -top-5 -z-10 w-44 rotate-[22deg] text-sage/50" />
+        <div className="flex flex-wrap items-center justify-between gap-6">
+          <div className="flex min-w-0 max-w-full items-center gap-4 sm:gap-6">
+            <DogAvatar dog={dog} className="size-24 border-4 border-background sm:size-32" />
+            <div className="min-w-0">
+              <p className="eyebrow mb-1">
+                {isBehaviorist ? "Dziennik podopiecznego" : "Wasza wspólna historia"}
+              </p>
+              <div className="flex min-w-0 items-center gap-2">
+                <h1 className="min-w-0 text-4xl leading-none [overflow-wrap:anywhere] sm:text-6xl">
+                  {dog.name}
+                </h1>
+                {!isLoading && role?.canManage && (
                   <Button
                     variant="ghost"
                     size="icon"
                     aria-label="Edytuj psa"
                     onClick={() => setEditOpen(true)}
                   >
-                    <Pencil className="size-4" />
+                    <Pencil />
                   </Button>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    aria-label="Zarządzaj dostępem"
-                    onClick={() => setAccessOpen(true)}
-                  >
-                    <Users className="size-4" />
-                  </Button>
-                </>
-              )}
+                )}
+              </div>
+              <p className="mt-3 text-sm text-muted-foreground sm:text-base">
+                {[dog.breed, dog.age, dog.sex].filter(Boolean).join(" · ")}
+              </p>
             </div>
-            <p className="mt-1 truncate text-muted-foreground">
-              {[dog.breed, dog.age, dog.sex].filter(Boolean).join(" · ")}
-            </p>
           </div>
+          {role?.canManage && (
+            <div className="flex w-full flex-wrap gap-2 sm:w-auto sm:max-w-sm sm:justify-end">
+              {role.canEditEntries && (
+                <Button asChild className="grow sm:grow-0">
+                  <Link
+                    to="/pies/$id/wydarzenie/nowe"
+                    params={{ id: dog.id }}
+                    search={{ wroc: active === "kalendarz" ? "kalendarz" : undefined }}
+                  >
+                    <Plus />
+                    Dodaj wydarzenie
+                  </Link>
+                </Button>
+              )}
+              <Button
+                variant={behaviorist ? "ghost" : "outline"}
+                className={cn("max-w-full", !behaviorist && "bg-background/80")}
+                onClick={() => setAccessOpen(true)}
+              >
+                {!behaviorist && <UserPlus aria-hidden="true" />}
+                <span className="truncate">
+                  {behaviorist
+                    ? behavioristName
+                      ? `Behawiorysta: ${behavioristName}`
+                      : "Behawiorysta"
+                    : "Dodaj behawiorystę"}
+                </span>
+                {behaviorist && <ArrowRight aria-hidden="true" />}
+              </Button>
+              <Button variant="ghost" size="sm" onClick={() => setAccessOpen(true)}>
+                <Users />
+                {role.isPrimaryOwner && !hasCoOwner
+                  ? "Dodaj współwłaściciela"
+                  : "Zarządzaj dostępem"}
+              </Button>
+            </div>
+          )}
         </div>
-        <div className="flex max-w-full gap-1 overflow-x-auto rounded-full bg-secondary p-1">
+      </section>
+
+      <nav
+        aria-label="Widoki dziennika psa"
+        className="dog-view-nav flex max-w-full gap-1 overflow-x-auto border-b border-primary/15 pb-2"
+      >
+        {VIEWS.map(({ key, label, path, icon: Icon }) => (
           <Link
-            to="/pies/$id"
+            key={key}
+            to={path}
             params={{ id: dog.id }}
+            aria-current={active === key ? "page" : undefined}
             className={cn(
-              "rounded-full px-4 py-1.5 text-sm transition-colors",
-              active === "dziennik"
+              "flex min-h-11 shrink-0 items-center justify-center gap-2 rounded-full px-4 text-sm font-medium transition-colors sm:flex-1",
+              active === key
                 ? "bg-primary text-primary-foreground"
-                : "text-secondary-foreground hover:bg-accent/60",
+                : "text-muted-foreground hover:bg-secondary hover:text-primary",
             )}
           >
-            Dziennik
+            <Icon className="size-4" aria-hidden="true" />
+            {label}
           </Link>
-          <Link
-            to="/pies/$id/kalendarz"
-            params={{ id: dog.id }}
-            className={cn(
-              "rounded-full px-4 py-1.5 text-sm transition-colors",
-              active === "kalendarz"
-                ? "bg-primary text-primary-foreground"
-                : "text-secondary-foreground hover:bg-accent/60",
-            )}
-          >
-            Kalendarz
-          </Link>
-          <Link
-            to="/pies/$id/tabela"
-            params={{ id: dog.id }}
-            className={cn(
-              "rounded-full px-4 py-1.5 text-sm transition-colors",
-              active === "tabela"
-                ? "bg-primary text-primary-foreground"
-                : "text-secondary-foreground hover:bg-accent/60",
-            )}
-          >
-            Tabela
-          </Link>
-          <Link
-            to="/pies/$id/zalecenia"
-            params={{ id: dog.id }}
-            className={cn(
-              "rounded-full px-4 py-1.5 text-sm transition-colors",
-              active === "zalecenia"
-                ? "bg-primary text-primary-foreground"
-                : "text-secondary-foreground hover:bg-accent/60",
-            )}
-          >
-            Zalecenia
-          </Link>
-          <Link
-            to="/pies/$id/analiza"
-            params={{ id: dog.id }}
-            className={cn(
-              "rounded-full px-4 py-1.5 text-sm transition-colors",
-              active === "analiza"
-                ? "bg-primary text-primary-foreground"
-                : "text-secondary-foreground hover:bg-accent/60",
-            )}
-          >
-            Analiza
-          </Link>
-        </div>
-      </div>
+        ))}
+      </nav>
 
       {role?.isReadOnly && (
-        <div className="flex items-center gap-2 rounded-lg bg-warn/10 px-4 py-3 text-sm text-warn">
-          <AlertCircle className="size-4 shrink-0" />
+        <div className="flex items-center gap-2 rounded-xl border border-warn/30 bg-warn/10 px-4 py-3 text-sm text-foreground">
+          <AlertCircle className="size-4 shrink-0 text-warn" />
           Współpraca z behawiorystą została zakończona — dziennik jest w trybie tylko do odczytu.
         </div>
       )}
-
       <DogFormDialog dog={dog} open={editOpen} onOpenChange={setEditOpen} />
+      <DogFormDialog open={addOpen} onOpenChange={setAddOpen} />
       <AccessDialog dog={dog} open={accessOpen} onOpenChange={setAccessOpen} />
     </div>
   );

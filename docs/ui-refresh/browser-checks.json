@@ -1,0 +1,139 @@
+{
+  "date": "2026-09-18",
+  "environment": "Lokalny interfejs z serwerem danych w pamięci; nie jest to weryfikacja produkcyjnego RLS.",
+  "checks": [
+    {
+      "number": 1,
+      "scenario": "Zmiana psa zachowuje kalendarz",
+      "passed": true
+    },
+    {
+      "number": 2,
+      "scenario": "Twoje psy otwiera ostatnio wybranego psa",
+      "passed": true
+    },
+    {
+      "number": 3,
+      "scenario": "Dialog psa zamyka się Escape",
+      "passed": false,
+      "resolution": "Pierwotny odczyt wykonano przed zakończeniem animacji wyjścia. Ponowiony test z oczekiwaniem na ukrycie dialogu przeszedł."
+    },
+    {
+      "number": 4,
+      "scenario": "Dodanie wydarzenia i powrót do psa",
+      "passed": true
+    },
+    {
+      "number": 5,
+      "scenario": "Edycja wydarzenia zachowuje szczegóły",
+      "passed": true
+    },
+    {
+      "number": 6,
+      "scenario": "Komentarz do wydarzenia",
+      "passed": true
+    },
+    {
+      "number": 7,
+      "scenario": "Tabela zachowuje wpisy i filtry",
+      "passed": true
+    },
+    {
+      "number": 8,
+      "scenario": "Zalecenia widoczne",
+      "passed": true
+    },
+    {
+      "number": 9,
+      "scenario": "Analiza pokazuje bilans i wykresy",
+      "passed": true
+    },
+    {
+      "number": 10,
+      "scenario": "Behawiorysta pozostaje na liście",
+      "passed": true
+    },
+    {
+      "number": 11,
+      "scenario": "Zakończona współpraca: brak akcji zapisu w UI",
+      "passed": true
+    },
+    {
+      "number": 12,
+      "scenario": "Siatka behawiorysty bez poziomego overflow przy 390 px",
+      "passed": false,
+      "resolution": "Poprawiono szerokości kart; późniejszy test 390 px przeszedł."
+    },
+    {
+      "number": 13,
+      "scenario": "Karty wydarzeń behawiorysty mieszczą się przy 390 px po poprawce",
+      "passed": true
+    },
+    {
+      "number": 14,
+      "scenario": "Aktywny behawiorysta: zalecenia dostępne, brak dodawania wydarzeń i edycji psa",
+      "passed": true
+    },
+    {
+      "number": 15,
+      "scenario": "Zapis zalecenia behawiorysty na danych lokalnych",
+      "passed": true
+    },
+    {
+      "number": 16,
+      "scenario": "Właściciel jednego psa: logowanie prowadzi bezpośrednio do dziennika",
+      "passed": true
+    },
+    {
+      "number": 17,
+      "scenario": "Dialog psa: Escape zamyka i zwraca fokus na wywołujący przycisk",
+      "passed": false,
+      "resolution": "Pierwotny odczyt wykonano przed zakończeniem animacji wyjścia. Ponowiony test z oczekiwaniem na ukrycie dialogu przeszedł."
+    },
+    {
+      "number": 18,
+      "scenario": "Brak psów: widoczna zachęta i przycisk dodawania",
+      "passed": true
+    },
+    {
+      "number": 19,
+      "scenario": "Dialog psa: zamknięcie Escape po animacji i zwrot fokusu",
+      "passed": true
+    },
+    {
+      "number": 20,
+      "scenario": "Strona główna mieści się przy 320 px",
+      "passed": true
+    },
+    {
+      "number": 21,
+      "scenario": "Mobilny landing po przewinięciu: brak poziomego overflow",
+      "passed": true
+    },
+    {
+      "number": 22,
+      "scenario": "Dodanie pierwszego psa otwiera jego dziennik",
+      "passed": true
+    },
+    {
+      "number": 23,
+      "scenario": "Długa nazwa psa: brak poziomego overflow przy 390 px",
+      "passed": true
+    },
+    {
+      "number": 24,
+      "scenario": "Przeniesiona akcja behawiorysty otwiera istniejący dialog dostępu",
+      "passed": true
+    },
+    {
+      "number": 25,
+      "scenario": "Behawiorysta: cztery karty w jednym rzędzie przy 1280 px",
+      "passed": true
+    },
+    {
+      "number": 26,
+      "scenario": "Pierwszy Tab to pominięcie nagłówka, Enter przenosi fokus do treści",
+      "passed": true
+    }
+  ]
+}

@@ -34,13 +34,8 @@ export function DogJournalPreviewCard({
   return (
     <Card className="h-full overflow-hidden border bg-card shadow-none">
       <div className="relative aspect-[4/3] overflow-hidden bg-muted">
-        <img
-          src={imageUrl}
-          alt={imageAlt}
-          loading="lazy"
-          className="size-full object-cover transition-transform duration-500 motion-safe:hover:scale-[1.03]"
-        />
-        <div className="absolute right-4 bottom-4 rounded-md bg-background/95 px-3 py-1.5 font-display text-xl leading-none text-primary shadow-sm">
+        <img src={imageUrl} alt={imageAlt} loading="lazy" className="size-full object-cover" />
+        <div className="absolute right-4 bottom-4 rounded-full bg-background/95 px-3 py-1.5 font-display text-xl leading-none text-primary">
           {name}
         </div>
       </div>

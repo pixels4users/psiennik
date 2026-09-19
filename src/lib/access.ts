@@ -109,14 +109,21 @@ export function useRedeemInvite() {
       const { data, error } = await supabase.rpc("redeem_dog_invite", { _code: code });
       if (error) throw error;
       const result = data as { dog_id: string | null; behaviorist_id: string | null } | null;
+      if (!result?.dog_id && !result?.behaviorist_id) {
+        throw new Error("Nie udało się użyć kodu. Spróbuj ponownie.");
+      }
       return { dogId: result?.dog_id ?? null, behavioristId: result?.behaviorist_id ?? null };
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["dogs"] });
       queryClient.invalidateQueries({ queryKey: ["dog-access"] });
       queryClient.invalidateQueries({ queryKey: ["owner-behaviorists"] });
+      queryClient.invalidateQueries({ queryKey: ["behaviorist-owners"] });
       queryClient.invalidateQueries({ queryKey: ["behaviorist-link"] });
       queryClient.invalidateQueries({ queryKey: ["subscription-limits"] });
+      queryClient.invalidateQueries({ queryKey: ["dog-role"] });
+      queryClient.invalidateQueries({ queryKey: ["is-owner"] });
+      queryClient.invalidateQueries({ queryKey: ["is-behaviorist"] });
     },
   });
 }
@@ -188,6 +195,16 @@ export type OwnerBehavioristWithProfile = OwnerBehaviorist & {
   link: { invite_code: string; is_active: boolean } | null;
 };
 
+async function readCollaborationProfiles(ids: string[]) {
+  // Keep the same profile visibility rules as the dog page; no extra RPC is required.
+  const { data, error } = await supabase
+    .from("profiles")
+    .select("id, display_name, email")
+    .in("id", ids);
+  if (error) throw error;
+  return data;
+}
+
 /** Lista behawiorystów powiązanych z właścicielem. */
 export function useOwnerBehaviorists() {
   const { user } = useAuth();
@@ -203,13 +220,8 @@ export function useOwnerBehaviorists() {
       if (error) throw error;
 
       const behavioristIds = rows.map((r) => r.behaviorist_id);
-      const [{ data: profiles }, { data: links }] = await Promise.all([
-        behavioristIds.length
-          ? supabase
-              .from("profiles")
-              .select("id, display_name, email")
-              .in("id", behavioristIds)
-          : { data: [] as { id: string; display_name: string | null; email: string | null }[] },
+      const [profiles, { data: links }] = await Promise.all([
+        behavioristIds.length ? readCollaborationProfiles(behavioristIds) : [],
         behavioristIds.length
           ? supabase
               .from("behaviorist_links")
@@ -242,13 +254,8 @@ export function useBehavioristOwners() {
       if (error) throw error;
 
       const ownerIds = rows.map((r) => r.owner_id);
-      const [{ data: profiles }, { data: links }] = await Promise.all([
-        ownerIds.length
-          ? supabase
-              .from("profiles")
-              .select("id, display_name, email")
-              .in("id", ownerIds)
-          : { data: [] as { id: string; display_name: string | null; email: string | null }[] },
+      const [profiles, { data: links }] = await Promise.all([
+        ownerIds.length ? readCollaborationProfiles(ownerIds) : [],
         ownerIds.length
           ? supabase
               .from("behaviorist_links")
@@ -332,7 +339,6 @@ export function useIsBehaviorist() {
     },
   });
 }
-
 
 /** Limity aktywnych procesów dla behawiorysty. */
 export function useSubscriptionLimits() {

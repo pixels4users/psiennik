@@ -1,13 +1,14 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { Link, useNavigate } from "@tanstack/react-router";
 import { useQueryClient } from "@tanstack/react-query";
-import { Bell, PawPrint, User, UserPlus } from "lucide-react";
+import { Bell, PawPrint, Ticket, User, UserPlus } from "lucide-react";
 import logoAsset from "@/assets/psiennik-logo-3.webp.asset.json";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth, useProfile } from "@/lib/auth";
 import { useIsBehaviorist } from "@/lib/access";
 import { useNews } from "@/lib/notifications";
 import { InviteClientDialog } from "@/components/behaviorist-invite";
+import { JoinDialog } from "@/components/join-dialog";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -26,6 +27,8 @@ export function AppHeader() {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const [inviteOpen, setInviteOpen] = useState(false);
+  const [joinOpen, setJoinOpen] = useState(false);
+  const accountButtonRef = useRef<HTMLButtonElement>(null);
 
   const total = (news ?? []).reduce((sum, item) => sum + item.count, 0);
 
@@ -37,8 +40,8 @@ export function AppHeader() {
   };
 
   return (
-    <header className="border-b border-border bg-background">
-      <div className="mx-auto flex max-w-5xl items-center justify-between gap-3 px-5 py-4">
+    <header className="border-b border-primary/10 bg-background">
+      <div className="mx-auto flex max-w-7xl items-center justify-between gap-3 px-5 py-4 sm:px-8">
         <div className="flex min-w-0 items-center gap-2 sm:gap-6">
           <Link to={user ? "/psy" : "/"} aria-label="Psiennik — strona główna">
             <img
@@ -46,7 +49,7 @@ export function AppHeader() {
               alt="Psiennik"
               width={152}
               height={56}
-              className="h-10 w-auto"
+              className="h-11 w-auto"
             />
           </Link>
 
@@ -115,7 +118,12 @@ export function AppHeader() {
 
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="ghost" className="gap-2 px-2 sm:px-3">
+                <Button
+                  ref={accountButtonRef}
+                  variant="ghost"
+                  aria-label="Moje konto"
+                  className="gap-2 px-2 sm:px-3"
+                >
                   <User className="size-4" />
                   <span className="hidden max-w-32 truncate sm:inline">
                     {profile?.display_name || profile?.email || "Moje konto"}
@@ -135,12 +143,21 @@ export function AppHeader() {
                 <DropdownMenuItem onClick={() => navigate({ to: "/profil" })}>
                   Mój profil
                 </DropdownMenuItem>
+                <DropdownMenuItem onSelect={() => setJoinOpen(true)}>
+                  <Ticket className="mr-2 size-4" aria-hidden="true" />
+                  Wpisz kod zaproszenia
+                </DropdownMenuItem>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem onClick={signOut}>Wyloguj się</DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
 
             {isBehaviorist && <InviteClientDialog open={inviteOpen} onOpenChange={setInviteOpen} />}
+            <JoinDialog
+              open={joinOpen}
+              onOpenChange={setJoinOpen}
+              returnFocusRef={accountButtonRef}
+            />
           </div>
         ) : (
           <Button asChild variant="default" size="sm">

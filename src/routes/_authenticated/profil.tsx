@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { Download, Trash2 } from "lucide-react";
+import { Download, Ticket, Trash2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth, useProfile } from "@/lib/auth";
 import {
@@ -14,6 +14,7 @@ import {
   type OwnerBehavioristWithProfile,
 } from "@/lib/access";
 import { BehavioristInviteCard } from "@/components/behaviorist-invite";
+import { JoinDialog } from "@/components/join-dialog";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -55,7 +56,6 @@ const STATUS_LABELS: Record<string, string> = {
   pending: "oczekująca",
 };
 
-
 function ProfilePage() {
   const { user } = useAuth();
   const { data: profile, isLoading } = useProfile();
@@ -66,6 +66,7 @@ function ProfilePage() {
   const [email, setEmail] = useState("");
   const [notifications, setNotifications] = useState(false);
   const [saving, setSaving] = useState(false);
+  const [joinOpen, setJoinOpen] = useState(false);
 
   useEffect(() => {
     if (!profile) return;
@@ -105,7 +106,13 @@ function ProfilePage() {
 
   return (
     <div className="mx-auto max-w-2xl px-5 py-12">
-      <h1 className="text-4xl">Mój profil</h1>
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <h1 className="text-4xl">Mój profil</h1>
+        <Button variant="ghost" onClick={() => setJoinOpen(true)}>
+          <Ticket aria-hidden="true" />
+          Wpisz kod zaproszenia
+        </Button>
+      </div>
 
       <Card className="mt-8 shadow-none">
         <CardContent className="p-6">
@@ -158,6 +165,7 @@ function ProfilePage() {
       <OwnerBehavioristsCard />
       <BehavioristOwnersCard />
       <DeleteAccountCard />
+      <JoinDialog open={joinOpen} onOpenChange={setJoinOpen} />
     </div>
   );
 }
@@ -187,9 +195,11 @@ function ExportDataCard() {
 
       // Zdjęcia pobieramy osobno jako oryginalne pliki.
       for (const path of data.photoPaths) {
-        const { data: signed, error } = await supabase.storage.from("dog-photos").createSignedUrl(path, 60, {
-          download: path.split("/").pop() ?? "zdjecie.jpg",
-        });
+        const { data: signed, error } = await supabase.storage
+          .from("dog-photos")
+          .createSignedUrl(path, 60, {
+            download: path.split("/").pop() ?? "zdjecie.jpg",
+          });
         if (error || !signed) continue;
         triggerDownload(signed.signedUrl, path.split("/").pop() ?? "zdjecie.jpg");
         await new Promise((r) => setTimeout(r, 300));
@@ -213,7 +223,12 @@ function ExportDataCard() {
           Możesz pobrać kopię swoich danych: psy, wpisy, zalecenia oraz zdjęcia w oryginalnych
           formatach. Plik tekstowy zawiera czytelny opis Twoich psów, wpisów i zaleceń.
         </p>
-        <Button variant="outline" className="justify-self-start" disabled={exporting} onClick={() => void download()}>
+        <Button
+          variant="outline"
+          className="justify-self-start"
+          disabled={exporting}
+          onClick={() => void download()}
+        >
           <Download className="mr-2 size-4" />
           {exporting ? "Pobieranie…" : "Pobierz moje dane"}
         </Button>
@@ -236,7 +251,10 @@ function DeleteAccountCard() {
     enabled: !!user,
     queryFn: async () => {
       const userId = user!.id;
-      const { data: dogs, error: dogsError } = await supabase.from("dogs").select("id, name").eq("owner_id", userId);
+      const { data: dogs, error: dogsError } = await supabase
+        .from("dogs")
+        .select("id, name")
+        .eq("owner_id", userId);
       if (dogsError) throw dogsError;
 
       const dogIds = (dogs ?? []).map((d) => d.id);
@@ -280,7 +298,9 @@ function DeleteAccountCard() {
           <p>Usunięcie konta jest nieodwracalne. Skasujemy:</p>
           <ul className="mt-2 list-disc pl-5">
             <li>Twój profil i dane logowania,</li>
-            <li>psy, których jesteś głównym właścicielem — razem z wpisami, zaleceniami i zdjęciami,</li>
+            <li>
+              psy, których jesteś głównym właścicielem — razem z wpisami, zaleceniami i zdjęciami,
+            </li>
             <li>Twoje dostępy do cudzych psów oraz powiązania z behawiorystami.</li>
           </ul>
           {impactLoading ? (
@@ -292,7 +312,8 @@ function DeleteAccountCard() {
                 <>
                   {" "}
                   Dostęp straci {impact.otherPeople}{" "}
-                  {impact.otherPeople === 1 ? "osoba" : impact.otherPeople < 5 ? "osoby" : "osób"}, którym udostępniłeś/aś te dzienniki.
+                  {impact.otherPeople === 1 ? "osoba" : impact.otherPeople < 5 ? "osoby" : "osób"},
+                  którym udostępniłeś/aś te dzienniki.
                 </>
               )}
             </p>
@@ -303,7 +324,11 @@ function DeleteAccountCard() {
         </div>
         <AlertDialog open={open} onOpenChange={setOpen}>
           <AlertDialogTrigger asChild>
-            <Button variant="outline" className="justify-self-start text-destructive" disabled={deleting}>
+            <Button
+              variant="outline"
+              className="justify-self-start text-destructive"
+              disabled={deleting}
+            >
               <Trash2 className="mr-2 size-4" />
               Usuń konto
             </Button>
@@ -350,7 +375,7 @@ function BehavioristCodeCard() {
 }
 
 function OwnerBehavioristsCard() {
-  const { data: rows, isLoading } = useOwnerBehaviorists();
+  const { data: rows, isLoading, isError, refetch } = useOwnerBehaviorists();
   const remove = useRemoveOwnerBehaviorist();
 
   if (isLoading) {
@@ -366,6 +391,10 @@ function OwnerBehavioristsCard() {
     );
   }
 
+  if (isError) {
+    return <CollaborationErrorCard title="Twoi behawioryści" onRetry={() => void refetch()} />;
+  }
+
   if (!rows?.length) return null;
 
   return (
@@ -375,7 +404,11 @@ function OwnerBehavioristsCard() {
       </CardHeader>
       <CardContent className="grid gap-3">
         {rows.map((row) => (
-          <BehavioristRow key={row.id} row={row} onRemove={() => remove.mutate(row.behaviorist_id)} />
+          <BehavioristRow
+            key={row.id}
+            row={row}
+            onRemove={() => remove.mutate(row.behaviorist_id)}
+          />
         ))}
       </CardContent>
     </Card>
@@ -383,7 +416,7 @@ function OwnerBehavioristsCard() {
 }
 
 function BehavioristOwnersCard() {
-  const { data: rows, isLoading } = useBehavioristOwners();
+  const { data: rows, isLoading, isError, refetch } = useBehavioristOwners();
   const limits = useSubscriptionLimits();
   const remove = useRemoveOwnerBehaviorist();
 
@@ -398,6 +431,10 @@ function BehavioristOwnersCard() {
         </CardContent>
       </Card>
     );
+  }
+
+  if (isError) {
+    return <CollaborationErrorCard title="Twoi klienci" onRetry={() => void refetch()} />;
   }
 
   if (!rows?.length) return null;
@@ -422,6 +459,24 @@ function BehavioristOwnersCard() {
   );
 }
 
+function CollaborationErrorCard({ title, onRetry }: { title: string; onRetry: () => void }) {
+  return (
+    <Card className="mt-6 shadow-none">
+      <CardHeader>
+        <CardTitle className="text-xl">{title}</CardTitle>
+      </CardHeader>
+      <CardContent className="grid justify-items-start gap-3">
+        <p role="alert" className="text-sm text-muted-foreground">
+          Nie udało się wczytać listy.
+        </p>
+        <Button variant="outline" size="sm" onClick={onRetry}>
+          Spróbuj ponownie
+        </Button>
+      </CardContent>
+    </Card>
+  );
+}
+
 function BehavioristRow({
   row,
   onRemove,
@@ -429,31 +484,32 @@ function BehavioristRow({
   row: OwnerBehavioristWithProfile;
   onRemove: () => void;
 }) {
+  const name = row.profile?.display_name || row.profile?.email;
   return (
     <div className="flex items-center justify-between gap-3 rounded-lg border border-border px-4 py-2.5">
-      <div>
-        <p className="text-sm font-medium">
-          {row.profile?.display_name || row.profile?.email || "Behawiorysta"}
+      <div className="min-w-0">
+        <p className="break-words text-sm font-medium">
+          {name ? `Behawiorysta: ${name}` : "Behawiorysta"}
         </p>
         <p className="text-xs text-muted-foreground">
           Współpraca {STATUS_LABELS[row.process_status] ?? row.process_status}
           {row.link && ` · kod ${row.link.invite_code}`}
         </p>
       </div>
-      <Button variant="ghost" size="icon" aria-label="Usuń powiązanie" onClick={onRemove}>
+      <Button
+        variant="ghost"
+        size="icon"
+        className="shrink-0"
+        aria-label={name ? `Usuń powiązanie: ${name}` : "Usuń powiązanie"}
+        onClick={onRemove}
+      >
         <Trash2 className="size-4" />
       </Button>
     </div>
   );
 }
 
-function OwnerRow({
-  row,
-  onRemove,
-}: {
-  row: OwnerBehavioristWithProfile;
-  onRemove: () => void;
-}) {
+function OwnerRow({ row, onRemove }: { row: OwnerBehavioristWithProfile; onRemove: () => void }) {
   return (
     <div className="flex items-center justify-between gap-3 rounded-lg border border-border px-4 py-2.5">
       <div>

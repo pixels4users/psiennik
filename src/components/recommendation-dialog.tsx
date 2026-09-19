@@ -58,9 +58,7 @@ export function RecommendationDialog({
           <DialogTitle className="font-display text-2xl font-light text-primary">
             Zalecenie behawiorysty
           </DialogTitle>
-          <DialogDescription>
-            {entry ? `Wydarzenie: ${entry.title}` : ""}
-          </DialogDescription>
+          <DialogDescription>{entry ? `Wydarzenie: ${entry.title}` : ""}</DialogDescription>
         </DialogHeader>
         <form onSubmit={handleSubmit} className="grid gap-4">
           <div className="grid gap-2">
@@ -71,7 +69,6 @@ export function RecommendationDialog({
               onChange={(e) => setComment(e.target.value)}
               placeholder="np. Powtarzać ćwiczenie z miską, skrócić spacer do 30 min…"
               rows={4}
-              autoFocus
             />
           </div>
           <div className="flex justify-end gap-2 pt-2">

@@ -1,0 +1,10 @@
+{
+  "method": "WCAG relative luminance, OKLCH converted to linear sRGB with channel clamping",
+  "ratios": {
+    "forest/cream": 11.99,
+    "muted/cream": 6.74,
+    "muted/keylime": 5.84,
+    "input/cream": 3.32,
+    "sage/forest": 8.17
+  }
+}

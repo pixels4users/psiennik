@@ -43,7 +43,8 @@ export const Route = createFileRoute("/_authenticated/pies/$id/tabela")({
   head: ({ params }) => ({
     meta: socialMeta({
       title: "Tabela wydarzeń — Psiennik",
-      description: "Tabela wydarzeń psa z sortowaniem oraz filtrami dat, aktywności, pory dnia i oceny.",
+      description:
+        "Tabela wydarzeń psa z sortowaniem oraz filtrami dat, aktywności, pory dnia i oceny.",
       path: `/pies/${params.id}/tabela`,
       image: "app",
       privatePage: true,
@@ -113,10 +114,17 @@ function DogTablePage() {
     <div className="mx-auto max-w-5xl px-5 py-10">
       <DogNav dog={dog} active="tabela" />
 
-      <section className="mt-8" aria-labelledby="table-heading">
+      <section
+        key={id}
+        className="content-enter mt-8"
+        data-ready={!isLoading}
+        aria-labelledby="table-heading"
+      >
         <div className="grid grid-cols-[minmax(0,1fr)_auto] items-end gap-4">
           <div className="min-w-0">
-            <h2 id="table-heading" className="text-2xl">Wszystkie wydarzenia</h2>
+            <h2 id="table-heading" className="text-2xl">
+              Wszystkie wydarzenia
+            </h2>
             <p className="mt-1 text-sm text-muted-foreground">
               {visibleEntries.length} z {entries?.length ?? 0} wpisów
             </p>
@@ -153,17 +161,29 @@ function DogTablePage() {
 
           <FilterSelect label="Typ aktywności" value={activity} onChange={setActivity}>
             <SelectItem value="all">Wszystkie</SelectItem>
-            {ACTIVITY_TYPES.map((item) => <SelectItem key={item.value} value={item.value}>{item.label}</SelectItem>)}
+            {ACTIVITY_TYPES.map((item) => (
+              <SelectItem key={item.value} value={item.value}>
+                {item.label}
+              </SelectItem>
+            ))}
           </FilterSelect>
 
           <FilterSelect label="Pora dnia" value={timeOfDay} onChange={setTimeOfDay}>
             <SelectItem value="all">Wszystkie</SelectItem>
-            {TIMES_OF_DAY.map((item) => <SelectItem key={item.value} value={item.value}>{item.label}</SelectItem>)}
+            {TIMES_OF_DAY.map((item) => (
+              <SelectItem key={item.value} value={item.value}>
+                {item.label}
+              </SelectItem>
+            ))}
           </FilterSelect>
 
           <FilterSelect label="Ocena" value={rating} onChange={setRating}>
             <SelectItem value="all">Wszystkie</SelectItem>
-            {RATINGS.map((item) => <SelectItem key={item.value} value={item.value}>{item.label}</SelectItem>)}
+            {RATINGS.map((item) => (
+              <SelectItem key={item.value} value={item.value}>
+                {item.label}
+              </SelectItem>
+            ))}
           </FilterSelect>
 
           <FilterSelect label="Sortuj" value={sort} onChange={setSort}>
@@ -178,7 +198,9 @@ function DogTablePage() {
         ) : visibleEntries.length === 0 ? (
           <div className="mt-5 rounded-lg bg-keylime p-10 text-center">
             <h3 className="text-2xl">Brak pasujących wpisów</h3>
-            <p className="mt-2 text-sm text-muted-foreground">Zmień filtry lub wyczyść wybrany zakres.</p>
+            <p className="mt-2 text-sm text-muted-foreground">
+              Zmień filtry lub wyczyść wybrany zakres.
+            </p>
           </div>
         ) : (
           <div className="mt-5 overflow-hidden rounded-lg border border-border">
@@ -201,11 +223,19 @@ function DogTablePage() {
                       {format(parseISO(entry.date), "d MMM yyyy", { locale: pl })}
                     </TableCell>
                     <TableCell className="align-top font-medium">{entry.title}</TableCell>
-                    <TableCell className="align-top">{labelsFor(ACTIVITY_TYPES, entryActivities(entry))}</TableCell>
+                    <TableCell className="align-top">
+                      {labelsFor(ACTIVITY_TYPES, entryActivities(entry))}
+                    </TableCell>
                     <TableCell className="align-top">{timesLabel(entryTimes(entry))}</TableCell>
-                    <TableCell className="align-top"><RatingBadge rating={entry.rating} /></TableCell>
-                    <TableCell className="align-top text-foreground/80">{entry.description || "—"}</TableCell>
-                    <TableCell className="pr-4 align-top text-foreground/80">{entry.behaviorist_comment || "—"}</TableCell>
+                    <TableCell className="align-top">
+                      <RatingBadge rating={entry.rating} />
+                    </TableCell>
+                    <TableCell className="align-top text-foreground/80">
+                      {entry.description || "—"}
+                    </TableCell>
+                    <TableCell className="pr-4 align-top text-foreground/80">
+                      {entry.behaviorist_comment || "—"}
+                    </TableCell>
                   </TableRow>
                 ))}
               </TableBody>
@@ -232,7 +262,9 @@ function FilterSelect({
     <div className="grid min-w-0 gap-2">
       <Label>{label}</Label>
       <Select value={value} onValueChange={onChange}>
-        <SelectTrigger><SelectValue /></SelectTrigger>
+        <SelectTrigger>
+          <SelectValue />
+        </SelectTrigger>
         <SelectContent>{children}</SelectContent>
       </Select>
     </div>

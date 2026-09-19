@@ -122,10 +122,202 @@
     font-family: var(--font-sans);
   }
 
-  h1, h2, h3 {
+  h1,
+  h2,
+  h3 {
     font-family: var(--font-display);
     font-weight: 300;
     color: var(--color-primary);
     letter-spacing: -0.01em;
+  }
+}
+
+/* UI refresh: existing palette, more deliberate hierarchy and tactile surfaces. */
+:root {
+  --input: oklch(0.64 0.025 145);
+  --motion-fast: 160ms;
+  --motion-normal: 240ms;
+  --motion-slow: 550ms;
+  --motion-ease: cubic-bezier(0.22, 1, 0.36, 1);
+  --motion-scale-press: 0.98;
+  --default-transition-duration: var(--motion-fast);
+  --default-transition-timing-function: var(--motion-ease);
+}
+
+@layer base {
+  body {
+    -webkit-font-smoothing: antialiased;
+  }
+  :where(a, button, input, textarea, select, [tabindex]):focus-visible {
+    outline: 2px solid var(--primary);
+    outline-offset: 4px;
+  }
+  ::selection {
+    background: var(--color-sage);
+    color: var(--color-forest);
+  }
+}
+
+.eyebrow {
+  font-family: var(--font-sans);
+  font-size: 0.6875rem;
+  line-height: 1.5;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--muted-foreground);
+}
+.bg-primary .eyebrow {
+  color: var(--color-sage);
+}
+.bg-primary :focus-visible {
+  outline-color: var(--primary-foreground);
+  --tw-ring-color: var(--primary-foreground);
+  --tw-ring-offset-color: var(--primary);
+}
+.landing-hero {
+  padding-top: clamp(3.5rem, 7vw, 6rem);
+  padding-bottom: clamp(2rem, 4vw, 4rem);
+}
+.hero-title {
+  font-size: clamp(2.85rem, 6.5vw, 6rem);
+  line-height: 1.03;
+  letter-spacing: -0.035em;
+  text-wrap: balance;
+}
+.section-title {
+  font-size: clamp(2.6rem, 4.5vw, 4.25rem);
+  line-height: 1.05;
+  letter-spacing: -0.025em;
+  text-wrap: balance;
+}
+.landing-section {
+  padding-top: clamp(4rem, 8vw, 7.5rem);
+  padding-bottom: clamp(4rem, 8vw, 7.5rem);
+}
+.paw-trail {
+  position: absolute;
+  width: 150px;
+  height: 230px;
+}
+.paw-step {
+  position: absolute;
+  width: 48px;
+}
+.paw-step-one {
+  top: 150px;
+  left: 10px;
+  transform: rotate(25deg);
+}
+.paw-step-two {
+  top: 75px;
+  left: 85px;
+  transform: rotate(5deg);
+}
+.paw-step-three {
+  top: 0;
+  left: 55px;
+  transform: rotate(-20deg);
+}
+.hero-paws {
+  left: 1%;
+  bottom: 8%;
+  color: var(--color-sage);
+  transform: rotate(-15deg);
+}
+.cta-paws {
+  right: 5%;
+  top: 26%;
+  color: var(--color-sage);
+  transform: rotate(15deg);
+}
+.dog-grid-card {
+  border-radius: var(--radius-2xl);
+}
+.entry-card {
+  transition: border-color var(--motion-fast);
+}
+.entry-card:hover {
+  border-color: color-mix(in oklch, var(--primary) 25%, transparent);
+}
+.dog-masthead .eyebrow {
+  max-width: 20rem;
+}
+.dog-view-nav {
+  scrollbar-width: thin;
+  scroll-padding-inline: 1rem;
+}
+.skip-link {
+  position: fixed;
+  top: 0.5rem;
+  left: 1rem;
+  z-index: 100;
+  padding: 0.75rem 1rem;
+  border-radius: 999px;
+  background: var(--primary);
+  color: var(--primary-foreground);
+  transform: translateY(-160%);
+}
+.skip-link:focus {
+  transform: translateY(0);
+}
+.motion-dialog,
+.motion-overlay {
+  animation-duration: var(--motion-normal);
+  animation-timing-function: var(--motion-ease);
+}
+.motion-dialog {
+  --tw-enter-scale: var(--motion-scale-press);
+  --tw-exit-scale: var(--motion-scale-press);
+}
+.motion-dialog[data-state="closed"],
+.motion-overlay[data-state="closed"] {
+  animation-duration: var(--motion-fast);
+}
+@media (prefers-reduced-motion: no-preference) {
+  /* Keyed by dog, never by query updates. CSS keeps routing and Radix presence immediate. */
+  .content-enter:not([data-ready="false"]) {
+    animation: content-appear var(--motion-fast) var(--motion-ease);
+  }
+  @keyframes content-appear {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-delay: 0ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    transition-delay: 0ms !important;
+    scroll-behavior: auto !important;
+  }
+  [data-reveal],
+  .paw-print {
+    opacity: 1 !important;
+    transform: none !important;
+  }
+}
+@media print {
+  [data-reveal],
+  .paw-print {
+    opacity: 1 !important;
+    transform: none !important;
+  }
+}
+@media (max-width: 420px) {
+  .hero-title {
+    font-size: clamp(2rem, 9.8vw, 2.5rem);
+  }
+  .dog-masthead .eyebrow {
+    font-size: 0.6rem;
+    letter-spacing: 0.06em;
   }
 }
