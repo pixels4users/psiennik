@@ -23,8 +23,10 @@ import { Route as AuthenticatedPiesIdAnalizaRouteImport } from './routes/_authen
 import { Route as AuthenticatedPiesIdKalendarzRouteImport } from './routes/_authenticated/pies.$id.kalendarz'
 import { Route as AuthenticatedPiesIdTabelaRouteImport } from './routes/_authenticated/pies.$id.tabela'
 import { Route as AuthenticatedPiesIdZaleceniaRouteImport } from './routes/_authenticated/pies.$id.zalecenia'
+import { Route as ApiPublicNotificationsSendRouteImport } from './routes/api/public/notifications/send'
 import { Route as LovableEmailAuthPreviewRouteImport } from './routes/lovable/email/auth/preview'
 import { Route as LovableEmailAuthWebhookRouteImport } from './routes/lovable/email/auth/webhook'
+import { Route as LovableEmailTransactionalPreviewRouteImport } from './routes/lovable/email/transactional/preview'
 import { Route as AuthenticatedPiesIdWydarzenieEntryIdRouteImport } from './routes/_authenticated/pies.$id.wydarzenie.$entryId'
 import { Route as AuthenticatedPiesIdWydarzenieNoweRouteImport } from './routes/_authenticated/pies.$id.wydarzenie.nowe'
 import { Route as AuthenticatedPiesIdWydarzenieEntryIdIndexRouteImport } from './routes/_authenticated/pies.$id.wydarzenie.$entryId.index'
@@ -104,6 +106,12 @@ const AuthenticatedPiesIdZaleceniaRoute =
     path: '/zalecenia',
     getParentRoute: () => AuthenticatedPiesIdRoute,
   } as any)
+const ApiPublicNotificationsSendRoute =
+  ApiPublicNotificationsSendRouteImport.update({
+    id: '/api/public/notifications/send',
+    path: '/api/public/notifications/send',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const LovableEmailAuthPreviewRoute = LovableEmailAuthPreviewRouteImport.update({
   id: '/lovable/email/auth/preview',
   path: '/lovable/email/auth/preview',
@@ -114,6 +122,12 @@ const LovableEmailAuthWebhookRoute = LovableEmailAuthWebhookRouteImport.update({
   path: '/lovable/email/auth/webhook',
   getParentRoute: () => rootRouteImport,
 } as any)
+const LovableEmailTransactionalPreviewRoute =
+  LovableEmailTransactionalPreviewRouteImport.update({
+    id: '/lovable/email/transactional/preview',
+    path: '/lovable/email/transactional/preview',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const AuthenticatedPiesIdWydarzenieEntryIdRoute =
   AuthenticatedPiesIdWydarzenieEntryIdRouteImport.update({
     id: '/wydarzenie/$entryId',
@@ -152,8 +166,10 @@ export interface FileRoutesByFullPath {
   '/pies/$id/kalendarz': typeof AuthenticatedPiesIdKalendarzRoute
   '/pies/$id/tabela': typeof AuthenticatedPiesIdTabelaRoute
   '/pies/$id/zalecenia': typeof AuthenticatedPiesIdZaleceniaRoute
+  '/api/public/notifications/send': typeof ApiPublicNotificationsSendRoute
   '/lovable/email/auth/preview': typeof LovableEmailAuthPreviewRoute
   '/lovable/email/auth/webhook': typeof LovableEmailAuthWebhookRoute
+  '/lovable/email/transactional/preview': typeof LovableEmailTransactionalPreviewRoute
   '/pies/$id/': typeof AuthenticatedPiesIdIndexRoute
   '/pies/$id/wydarzenie/$entryId': typeof AuthenticatedPiesIdWydarzenieEntryIdRouteWithChildren
   '/pies/$id/wydarzenie/nowe': typeof AuthenticatedPiesIdWydarzenieNoweRoute
@@ -172,8 +188,10 @@ export interface FileRoutesByTo {
   '/pies/$id/kalendarz': typeof AuthenticatedPiesIdKalendarzRoute
   '/pies/$id/tabela': typeof AuthenticatedPiesIdTabelaRoute
   '/pies/$id/zalecenia': typeof AuthenticatedPiesIdZaleceniaRoute
+  '/api/public/notifications/send': typeof ApiPublicNotificationsSendRoute
   '/lovable/email/auth/preview': typeof LovableEmailAuthPreviewRoute
   '/lovable/email/auth/webhook': typeof LovableEmailAuthWebhookRoute
+  '/lovable/email/transactional/preview': typeof LovableEmailTransactionalPreviewRoute
   '/pies/$id': typeof AuthenticatedPiesIdIndexRoute
   '/pies/$id/wydarzenie/nowe': typeof AuthenticatedPiesIdWydarzenieNoweRoute
   '/pies/$id/wydarzenie/$entryId/edytuj': typeof AuthenticatedPiesIdWydarzenieEntryIdEdytujRoute
@@ -194,8 +212,10 @@ export interface FileRoutesById {
   '/_authenticated/pies/$id/kalendarz': typeof AuthenticatedPiesIdKalendarzRoute
   '/_authenticated/pies/$id/tabela': typeof AuthenticatedPiesIdTabelaRoute
   '/_authenticated/pies/$id/zalecenia': typeof AuthenticatedPiesIdZaleceniaRoute
+  '/api/public/notifications/send': typeof ApiPublicNotificationsSendRoute
   '/lovable/email/auth/preview': typeof LovableEmailAuthPreviewRoute
   '/lovable/email/auth/webhook': typeof LovableEmailAuthWebhookRoute
+  '/lovable/email/transactional/preview': typeof LovableEmailTransactionalPreviewRoute
   '/_authenticated/pies/$id/': typeof AuthenticatedPiesIdIndexRoute
   '/_authenticated/pies/$id/wydarzenie/$entryId': typeof AuthenticatedPiesIdWydarzenieEntryIdRouteWithChildren
   '/_authenticated/pies/$id/wydarzenie/nowe': typeof AuthenticatedPiesIdWydarzenieNoweRoute
@@ -217,8 +237,10 @@ export interface FileRouteTypes {
     | '/pies/$id/kalendarz'
     | '/pies/$id/tabela'
     | '/pies/$id/zalecenia'
+    | '/api/public/notifications/send'
     | '/lovable/email/auth/preview'
     | '/lovable/email/auth/webhook'
+    | '/lovable/email/transactional/preview'
     | '/pies/$id/'
     | '/pies/$id/wydarzenie/$entryId'
     | '/pies/$id/wydarzenie/nowe'
@@ -237,8 +259,10 @@ export interface FileRouteTypes {
     | '/pies/$id/kalendarz'
     | '/pies/$id/tabela'
     | '/pies/$id/zalecenia'
+    | '/api/public/notifications/send'
     | '/lovable/email/auth/preview'
     | '/lovable/email/auth/webhook'
+    | '/lovable/email/transactional/preview'
     | '/pies/$id'
     | '/pies/$id/wydarzenie/nowe'
     | '/pies/$id/wydarzenie/$entryId/edytuj'
@@ -258,8 +282,10 @@ export interface FileRouteTypes {
     | '/_authenticated/pies/$id/kalendarz'
     | '/_authenticated/pies/$id/tabela'
     | '/_authenticated/pies/$id/zalecenia'
+    | '/api/public/notifications/send'
     | '/lovable/email/auth/preview'
     | '/lovable/email/auth/webhook'
+    | '/lovable/email/transactional/preview'
     | '/_authenticated/pies/$id/'
     | '/_authenticated/pies/$id/wydarzenie/$entryId'
     | '/_authenticated/pies/$id/wydarzenie/nowe'
@@ -274,8 +300,10 @@ export interface RootRouteChildren {
   KontaktRoute: typeof KontaktRoute
   PrywatnoscRoute: typeof PrywatnoscRoute
   RegulaminRoute: typeof RegulaminRoute
+  ApiPublicNotificationsSendRoute: typeof ApiPublicNotificationsSendRoute
   LovableEmailAuthPreviewRoute: typeof LovableEmailAuthPreviewRoute
   LovableEmailAuthWebhookRoute: typeof LovableEmailAuthWebhookRoute
+  LovableEmailTransactionalPreviewRoute: typeof LovableEmailTransactionalPreviewRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -378,6 +406,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedPiesIdZaleceniaRouteImport
       parentRoute: typeof AuthenticatedPiesIdRoute
     }
+    '/api/public/notifications/send': {
+      id: '/api/public/notifications/send'
+      path: '/api/public/notifications/send'
+      fullPath: '/api/public/notifications/send'
+      preLoaderRoute: typeof ApiPublicNotificationsSendRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/lovable/email/auth/preview': {
       id: '/lovable/email/auth/preview'
       path: '/lovable/email/auth/preview'
@@ -390,6 +425,13 @@ declare module '@tanstack/react-router' {
       path: '/lovable/email/auth/webhook'
       fullPath: '/lovable/email/auth/webhook'
       preLoaderRoute: typeof LovableEmailAuthWebhookRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/lovable/email/transactional/preview': {
+      id: '/lovable/email/transactional/preview'
+      path: '/lovable/email/transactional/preview'
+      fullPath: '/lovable/email/transactional/preview'
+      preLoaderRoute: typeof LovableEmailTransactionalPreviewRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_authenticated/pies/$id/wydarzenie/$entryId': {
@@ -488,8 +530,10 @@ const rootRouteChildren: RootRouteChildren = {
   KontaktRoute: KontaktRoute,
   PrywatnoscRoute: PrywatnoscRoute,
   RegulaminRoute: RegulaminRoute,
+  ApiPublicNotificationsSendRoute: ApiPublicNotificationsSendRoute,
   LovableEmailAuthPreviewRoute: LovableEmailAuthPreviewRoute,
   LovableEmailAuthWebhookRoute: LovableEmailAuthWebhookRoute,
+  LovableEmailTransactionalPreviewRoute: LovableEmailTransactionalPreviewRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

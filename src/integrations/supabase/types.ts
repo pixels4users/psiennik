@@ -327,6 +327,60 @@ export type Database = {
         }
         Relationships: []
       }
+      notifications: {
+        Row: {
+          actor_id: string | null
+          body: string | null
+          created_at: string
+          dog_id: string | null
+          entry_id: string | null
+          id: string
+          kind: string
+          read_at: string | null
+          title: string
+          user_id: string
+        }
+        Insert: {
+          actor_id?: string | null
+          body?: string | null
+          created_at?: string
+          dog_id?: string | null
+          entry_id?: string | null
+          id?: string
+          kind: string
+          read_at?: string | null
+          title: string
+          user_id: string
+        }
+        Update: {
+          actor_id?: string | null
+          body?: string | null
+          created_at?: string
+          dog_id?: string | null
+          entry_id?: string | null
+          id?: string
+          kind?: string
+          read_at?: string | null
+          title?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "notifications_dog_id_fkey"
+            columns: ["dog_id"]
+            isOneToOne: false
+            referencedRelation: "dogs"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "notifications_entry_id_fkey"
+            columns: ["entry_id"]
+            isOneToOne: false
+            referencedRelation: "entries"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       owner_behaviorists: {
         Row: {
           behaviorist_id: string
@@ -359,6 +413,10 @@ export type Database = {
           email_notifications: boolean
           id: string
           max_active_dogs: number
+          notify_access: boolean
+          notify_comments: boolean
+          notify_entries: boolean
+          notify_recommendations: boolean
           plan_type: string
           terms_accepted_at: string | null
           terms_accepted_method: string | null
@@ -372,6 +430,10 @@ export type Database = {
           email_notifications?: boolean
           id: string
           max_active_dogs?: number
+          notify_access?: boolean
+          notify_comments?: boolean
+          notify_entries?: boolean
+          notify_recommendations?: boolean
           plan_type?: string
           terms_accepted_at?: string | null
           terms_accepted_method?: string | null
@@ -385,6 +447,10 @@ export type Database = {
           email_notifications?: boolean
           id?: string
           max_active_dogs?: number
+          notify_access?: boolean
+          notify_comments?: boolean
+          notify_entries?: boolean
+          notify_recommendations?: boolean
           plan_type?: string
           terms_accepted_at?: string | null
           terms_accepted_method?: string | null

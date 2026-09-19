@@ -1,44 +1,77 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/auth";
-import { useIsBehaviorist } from "@/lib/access";
 
-export type DogNews = {
-  dogId: string;
-  dogName: string;
-  count: number;
+export type NotificationKind =
+  | "entry"
+  | "comment"
+  | "recommendation"
+  | "access_granted"
+  | "access_revoked"
+  | "process_completed";
+
+export type AppNotification = {
+  id: string;
+  dog_id: string | null;
+  entry_id: string | null;
+  kind: string;
+  title: string;
+  body: string | null;
+  created_at: string;
+  read_at: string | null;
 };
 
-/** Nowe wpisy (dla behawiorysty) lub nowe zalecenia (dla właściciela) od ostatniej wizyty. */
-export function useNews() {
+/** Ostatnie powiadomienia zalogowanej osoby (najnowsze pierwsze). */
+export function useNotifications() {
   const { user } = useAuth();
-  const { data: isBehaviorist } = useIsBehaviorist();
 
   return useQuery({
-    queryKey: ["news", user?.id, isBehaviorist],
-    enabled: !!user && isBehaviorist !== undefined,
-    queryFn: async (): Promise<DogNews[]> => {
-      const [{ data: dogs }, { data: entries }, { data: views }] = await Promise.all([
-        supabase.from("dogs").select("id, name"),
-        supabase.from("entries").select("id, dog_id, created_at, commented_at"),
-        supabase.from("dog_views").select("dog_id, last_seen_at"),
-      ]);
-
-      const seen = new Map((views ?? []).map((v) => [v.dog_id, v.last_seen_at]));
-
-      return (dogs ?? [])
-        .map((dog) => {
-          const since = seen.get(dog.id);
-          const count = (entries ?? []).filter((entry) => {
-            if (entry.dog_id !== dog.id) return false;
-            const stamp = isBehaviorist ? entry.created_at : entry.commented_at;
-            if (!stamp) return false;
-            return !since || stamp > since;
-          }).length;
-          return { dogId: dog.id, dogName: dog.name, count };
-        })
-        .filter((item) => item.count > 0);
+    queryKey: ["notifications", user?.id],
+    enabled: !!user,
+    refetchOnWindowFocus: true,
+    refetchInterval: 60_000,
+    queryFn: async (): Promise<AppNotification[]> => {
+      const { data, error } = await supabase
+        .from("notifications")
+        .select("id, dog_id, entry_id, kind, title, body, created_at, read_at")
+        .order("created_at", { ascending: false })
+        .limit(30);
+      if (error) throw error;
+      return data ?? [];
     },
+  });
+}
+
+/** Oznacza jedno powiadomienie jako przeczytane. */
+export function useMarkNotificationRead() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async (id: string) => {
+      const { error } = await supabase
+        .from("notifications")
+        .update({ read_at: new Date().toISOString() })
+        .eq("id", id);
+      if (error) throw error;
+    },
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["notifications"] }),
+  });
+}
+
+/** Oznacza wszystkie powiadomienia jako przeczytane. */
+export function useMarkAllNotificationsRead() {
+  const { user } = useAuth();
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async () => {
+      if (!user) return;
+      const { error } = await supabase
+        .from("notifications")
+        .update({ read_at: new Date().toISOString() })
+        .eq("user_id", user.id)
+        .is("read_at", null);
+      if (error) throw error;
+    },
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["notifications"] }),
   });
 }
 
