@@ -58,10 +58,17 @@ function DogRecommendationsPage() {
     <div className="mx-auto max-w-5xl px-5 py-10">
       <DogNav dog={dog} active="zalecenia" />
 
-      <section className="mt-8" aria-labelledby="recommendations-heading">
+      <section
+        key={id}
+        className="content-enter mt-8"
+        data-ready={!isLoading}
+        aria-labelledby="recommendations-heading"
+      >
         <div className="flex flex-wrap items-end justify-between gap-4">
           <div>
-            <h2 id="recommendations-heading" className="text-2xl">Wszystkie zalecenia</h2>
+            <h2 id="recommendations-heading" className="text-2xl">
+              Wszystkie zalecenia
+            </h2>
             <p className="mt-1 text-sm text-muted-foreground">
               {recommendations.length} {recommendations.length === 1 ? "zalecenie" : "zaleceń"}
             </p>
@@ -98,7 +105,9 @@ function DogRecommendationsPage() {
                   <p className="leading-relaxed text-foreground/90">{entry.behaviorist_comment}</p>
                   <div className="flex flex-wrap items-center justify-between gap-2 border-t pt-3 text-sm text-muted-foreground">
                     <time dateTime={entry.commented_at ?? entry.date}>
-                      {format(parseISO(entry.commented_at ?? entry.date), "d MMMM yyyy", { locale: pl })}
+                      {format(parseISO(entry.commented_at ?? entry.date), "d MMMM yyyy", {
+                        locale: pl,
+                      })}
                     </time>
                     <Link
                       to="/pies/$id/wydarzenie/$entryId"

@@ -2,15 +2,7 @@ import { useMemo } from "react";
 import { createFileRoute } from "@tanstack/react-router";
 import { format, parseISO, startOfWeek } from "date-fns";
 import { pl } from "date-fns/locale";
-import {
-  Bar,
-  BarChart,
-  CartesianGrid,
-  Line,
-  LineChart,
-  XAxis,
-  YAxis,
-} from "recharts";
+import { Bar, BarChart, CartesianGrid, Line, LineChart, XAxis, YAxis } from "recharts";
 import { DogNav } from "@/components/dog-nav";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
@@ -46,10 +38,48 @@ export const Route = createFileRoute("/_authenticated/pies/$id/analiza")({
 });
 
 const STOPWORDS = new Set([
-  "i", "oraz", "a", "ale", "na", "w", "we", "z", "ze", "do", "od", "po", "za",
-  "nie", "tak", "to", "się", "był", "była", "było", "jest", "być", "the",
-  "jak", "przy", "przez", "dla", "bez", "pod", "nad", "o", "u", "że",
-  "lucy", "psa", "pies", "suka", "tego", "tym", "tej", "bardzo", "trochę",
+  "i",
+  "oraz",
+  "a",
+  "ale",
+  "na",
+  "w",
+  "we",
+  "z",
+  "ze",
+  "do",
+  "od",
+  "po",
+  "za",
+  "nie",
+  "tak",
+  "to",
+  "się",
+  "był",
+  "była",
+  "było",
+  "jest",
+  "być",
+  "the",
+  "jak",
+  "przy",
+  "przez",
+  "dla",
+  "bez",
+  "pod",
+  "nad",
+  "o",
+  "u",
+  "że",
+  "lucy",
+  "psa",
+  "pies",
+  "suka",
+  "tego",
+  "tym",
+  "tej",
+  "bardzo",
+  "trochę",
 ]);
 
 const ratingConfig = {
@@ -95,7 +125,9 @@ function DogAnalysisPage() {
     const currentWeek = startOfWeek(new Date(), { weekStartsOn: 1 });
     const currentWeekKey = format(currentWeek, "yyyy-MM-dd");
     const weekEntries = all.filter(
-      (entry) => format(startOfWeek(parseISO(entry.date), { weekStartsOn: 1 }), "yyyy-MM-dd") === currentWeekKey,
+      (entry) =>
+        format(startOfWeek(parseISO(entry.date), { weekStartsOn: 1 }), "yyyy-MM-dd") ===
+        currentWeekKey,
     );
 
     const byDate = new Map<string, number>();
@@ -125,7 +157,11 @@ function DogAnalysisPage() {
       keywords: keywordCounts(all),
       daily: [...byDate.entries()]
         .sort(([a], [b]) => a.localeCompare(b))
-        .map(([date, events]) => ({ date, label: format(parseISO(date), "d MMM", { locale: pl }), events })),
+        .map(([date, events]) => ({
+          date,
+          label: format(parseISO(date), "d MMM", { locale: pl }),
+          events,
+        })),
       weekly: [...byWeek.entries()]
         .sort(([a], [b]) => a.localeCompare(b))
         .map(([week, balance]) => ({
@@ -173,15 +209,21 @@ function DogAnalysisPage() {
           <Skeleton className="h-72 w-full rounded-xl" />
         </div>
       ) : (
-        <>
+        <div key={id} className="content-enter flow-root">
           <section className="mt-8 grid gap-5 sm:grid-cols-3">
             <Card className="shadow-none">
               <CardContent className="grid gap-3 p-6">
                 <h2 className="text-xl">Ten tydzień</h2>
                 <div className="flex flex-wrap gap-2">
-                  <span className="rounded-full bg-good/15 px-3 py-1 text-xs font-medium text-good">Dobrze: {analysis.week.green}</span>
-                  <span className="rounded-full bg-warn/15 px-3 py-1 text-xs font-medium text-warn">Wyzwanie: {analysis.week.amber}</span>
-                  <span className="rounded-full bg-bad/15 px-3 py-1 text-xs font-medium text-bad">Trudno: {analysis.week.red}</span>
+                  <span className="rounded-full bg-good/15 px-3 py-1 text-xs font-medium text-good">
+                    Dobrze: {analysis.week.green}
+                  </span>
+                  <span className="rounded-full bg-warn/15 px-3 py-1 text-xs font-medium text-warn">
+                    Wyzwanie: {analysis.week.amber}
+                  </span>
+                  <span className="rounded-full bg-bad/15 px-3 py-1 text-xs font-medium text-bad">
+                    Trudno: {analysis.week.red}
+                  </span>
                 </div>
               </CardContent>
             </Card>
@@ -193,16 +235,20 @@ function DogAnalysisPage() {
                 ) : (
                   <>
                     <div className="flex h-3 overflow-hidden rounded-full bg-muted">
-                      {barSegments.map((segment) => segment.count > 0 && (
-                        <div
-                          key={segment.key}
-                          className={segment.className}
-                          style={{ width: `${(segment.count / totalCount) * 100}%` }}
-                        />
-                      ))}
+                      {barSegments.map(
+                        (segment) =>
+                          segment.count > 0 && (
+                            <div
+                              key={segment.key}
+                              className={segment.className}
+                              style={{ width: `${(segment.count / totalCount) * 100}%` }}
+                            />
+                          ),
+                      )}
                     </div>
                     <p className="text-sm text-muted-foreground">
-                      Dobrze: {analysis.total.green} · Wyzwanie: {analysis.total.amber} · Trudno: {analysis.total.red}
+                      Dobrze: {analysis.total.green} · Wyzwanie: {analysis.total.amber} · Trudno:{" "}
+                      {analysis.total.red}
                     </p>
                   </>
                 )}
@@ -216,7 +262,10 @@ function DogAnalysisPage() {
                 ) : (
                   <div className="flex flex-wrap gap-1.5">
                     {analysis.keywords.map(([word, count]) => (
-                      <span key={word} className="rounded-full bg-secondary px-3 py-1 text-xs text-secondary-foreground">
+                      <span
+                        key={word}
+                        className="rounded-full bg-secondary px-3 py-1 text-xs text-secondary-foreground"
+                      >
                         {word} · {count}
                       </span>
                     ))}
@@ -234,7 +283,14 @@ function DogAnalysisPage() {
                   <XAxis dataKey="label" tickLine={false} axisLine={false} minTickGap={24} />
                   <YAxis allowDecimals={false} tickLine={false} axisLine={false} width={24} />
                   <ChartTooltip content={<ChartTooltipContent />} />
-                  <Line dataKey="events" type="monotone" stroke="var(--color-events)" strokeWidth={2} dot={{ fill: "var(--color-events)" }} />
+                  <Line
+                    isAnimationActive={false}
+                    dataKey="events"
+                    type="monotone"
+                    stroke="var(--color-events)"
+                    strokeWidth={2}
+                    dot={{ fill: "var(--color-events)" }}
+                  />
                 </LineChart>
               </ChartContainer>
             </AnalysisCard>
@@ -247,33 +303,72 @@ function DogAnalysisPage() {
                   <YAxis allowDecimals={false} tickLine={false} axisLine={false} width={24} />
                   <ChartTooltip content={<ChartTooltipContent />} />
                   <ChartLegend content={<ChartLegendContent />} />
-                  <Bar dataKey="green" stackId="ratings" fill="var(--color-green)" />
-                  <Bar dataKey="amber" stackId="ratings" fill="var(--color-amber)" />
-                  <Bar dataKey="red" stackId="ratings" fill="var(--color-red)" radius={[4, 4, 0, 0]} />
+                  <Bar
+                    isAnimationActive={false}
+                    dataKey="green"
+                    stackId="ratings"
+                    fill="var(--color-green)"
+                  />
+                  <Bar
+                    isAnimationActive={false}
+                    dataKey="amber"
+                    stackId="ratings"
+                    fill="var(--color-amber)"
+                  />
+                  <Bar
+                    isAnimationActive={false}
+                    dataKey="red"
+                    stackId="ratings"
+                    fill="var(--color-red)"
+                    radius={[4, 4, 0, 0]}
+                  />
                 </BarChart>
               </ChartContainer>
             </AnalysisCard>
 
-            <AnalysisCard title="Aktywności według pory dnia" empty={analysis.activityByTime.length === 0} className="lg:col-span-2">
+            <AnalysisCard
+              title="Aktywności według pory dnia"
+              empty={analysis.activityByTime.length === 0}
+              className="lg:col-span-2"
+            >
               <p className="mb-3 text-sm text-muted-foreground">
-                Wydarzenie z kilkoma typami lub porami liczy się w każdym z nich, więc suma może
-                być wyższa niż liczba wpisów.
+                Wydarzenie z kilkoma typami lub porami liczy się w każdym z nich, więc suma może być
+                wyższa niż liczba wpisów.
               </p>
               <ChartContainer config={timeConfig} className="h-80 w-full">
-                <BarChart accessibilityLayer data={analysis.activityByTime} margin={{ left: 4, right: 12 }}>
+                <BarChart
+                  accessibilityLayer
+                  data={analysis.activityByTime}
+                  margin={{ left: 4, right: 12 }}
+                >
                   <CartesianGrid vertical={false} />
                   <XAxis dataKey="activity" tickLine={false} axisLine={false} minTickGap={12} />
                   <YAxis allowDecimals={false} tickLine={false} axisLine={false} width={24} />
                   <ChartTooltip content={<ChartTooltipContent />} />
                   <ChartLegend content={<ChartLegendContent />} />
-                  <Bar dataKey="rano" fill="var(--color-rano)" radius={[4, 4, 0, 0]} />
-                  <Bar dataKey="poludnie" fill="var(--color-poludnie)" radius={[4, 4, 0, 0]} />
-                  <Bar dataKey="wieczor" fill="var(--color-wieczor)" radius={[4, 4, 0, 0]} />
+                  <Bar
+                    isAnimationActive={false}
+                    dataKey="rano"
+                    fill="var(--color-rano)"
+                    radius={[4, 4, 0, 0]}
+                  />
+                  <Bar
+                    isAnimationActive={false}
+                    dataKey="poludnie"
+                    fill="var(--color-poludnie)"
+                    radius={[4, 4, 0, 0]}
+                  />
+                  <Bar
+                    isAnimationActive={false}
+                    dataKey="wieczor"
+                    fill="var(--color-wieczor)"
+                    radius={[4, 4, 0, 0]}
+                  />
                 </BarChart>
               </ChartContainer>
             </AnalysisCard>
           </section>
-        </>
+        </div>
       )}
     </div>
   );
@@ -297,8 +392,12 @@ function AnalysisCard({
       </CardHeader>
       <CardContent>
         {empty ? (
-          <div className="grid h-64 place-items-center text-sm text-muted-foreground">Brak danych do pokazania.</div>
-        ) : children}
+          <div className="grid h-64 place-items-center text-sm text-muted-foreground">
+            Brak danych do pokazania.
+          </div>
+        ) : (
+          children
+        )}
       </CardContent>
     </Card>
   );

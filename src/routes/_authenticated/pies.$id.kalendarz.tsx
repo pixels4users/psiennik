@@ -1,12 +1,6 @@
 import { useMemo, useState } from "react";
 import { createFileRoute, useNavigate, useRouter } from "@tanstack/react-router";
-import {
-  addDays,
-  addWeeks,
-  format,
-  isToday,
-  startOfWeek,
-} from "date-fns";
+import { addDays, addWeeks, format, isToday, startOfWeek } from "date-fns";
 import { pl } from "date-fns/locale";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { useDog, useEntries, type Entry } from "@/lib/dogs";
@@ -67,9 +61,7 @@ function DogCalendarPage() {
   const { data: role } = useDogRole(id);
   const { data: dog } = useDog(id);
   const { data: entries, isLoading } = useEntries(id);
-  const [weekStart, setWeekStart] = useState(() =>
-    startOfWeek(new Date(), { weekStartsOn: 1 }),
-  );
+  const [weekStart, setWeekStart] = useState(() => startOfWeek(new Date(), { weekStartsOn: 1 }));
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
   const [commentedEntry, setCommentedEntry] = useState<Entry | null>(null);
   const [commentDialogOpen, setCommentDialogOpen] = useState(false);
@@ -112,98 +104,107 @@ function DogCalendarPage() {
           <Skeleton className="h-64 w-full rounded-xl" />
         </div>
       ) : (
-          <section className="mt-10">
-            <div className="flex flex-wrap items-center justify-between gap-3">
-              <h2 className="text-2xl capitalize">
-                {format(weekStart, "LLLL yyyy", { locale: pl })}
-              </h2>
-              <div className="flex items-center gap-2">
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => setWeekStart(startOfWeek(new Date(), { weekStartsOn: 1 }))}
-                >
-                  Dziś
-                </Button>
-                <Button
-                  variant="outline"
-                  size="icon"
-                  aria-label="Poprzedni tydzień"
-                  onClick={() => setWeekStart((w) => addWeeks(w, -1))}
-                >
-                  <ChevronLeft className="size-4" />
-                </Button>
-                <Button
-                  variant="outline"
-                  size="icon"
-                  aria-label="Następny tydzień"
-                  onClick={() => setWeekStart((w) => addWeeks(w, 1))}
-                >
-                  <ChevronRight className="size-4" />
-                </Button>
-              </div>
+        <section key={id} className="content-enter mt-10">
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <h2 className="text-2xl capitalize">
+              {format(weekStart, "LLLL yyyy", { locale: pl })}
+            </h2>
+            <div className="flex items-center gap-2">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setWeekStart(startOfWeek(new Date(), { weekStartsOn: 1 }))}
+              >
+                Dziś
+              </Button>
+              <Button
+                variant="outline"
+                size="icon"
+                aria-label="Poprzedni tydzień"
+                onClick={() => setWeekStart((w) => addWeeks(w, -1))}
+              >
+                <ChevronLeft className="size-4" />
+              </Button>
+              <Button
+                variant="outline"
+                size="icon"
+                aria-label="Następny tydzień"
+                onClick={() => setWeekStart((w) => addWeeks(w, 1))}
+              >
+                <ChevronRight className="size-4" />
+              </Button>
             </div>
+          </div>
 
-            <div className="mt-4 grid grid-cols-7 gap-2">
-              {WEEKDAY_LABELS.map((label) => (
-                <div
-                  key={label}
-                  className="pb-1 text-center text-xs font-medium tracking-wide text-muted-foreground uppercase"
+          <div className="mt-4 grid grid-cols-7 gap-2">
+            {WEEKDAY_LABELS.map((label) => (
+              <div
+                key={label}
+                className="pb-1 text-center text-xs font-medium tracking-wide text-muted-foreground uppercase"
+              >
+                {label}
+              </div>
+            ))}
+            {weekDays.map((day) => {
+              const key = format(day, "yyyy-MM-dd");
+              const dayEntries = byDate.get(key) ?? [];
+              const counts = Object.fromEntries(
+                RATING_DOTS.map(({ rating }) => [rating, ratingCount(dayEntries, rating)]),
+              );
+              return (
+                <Button
+                  type="button"
+                  variant="outline"
+                  key={key}
+                  onClick={() => setSelectedDate(day)}
+                  aria-label={`Pokaż wydarzenia z ${format(day, "d MMMM yyyy", { locale: pl })}`}
+                  className={cn(
+                    "h-auto min-h-20 flex-col items-stretch justify-start rounded-lg p-2 text-left font-normal",
+                    "hover:bg-keylime",
+                    isToday(day) && "ring-2 ring-ring",
+                  )}
                 >
-                  {label}
-                </div>
-              ))}
-              {weekDays.map((day) => {
-                const key = format(day, "yyyy-MM-dd");
-                const dayEntries = byDate.get(key) ?? [];
-                const counts = Object.fromEntries(
-                  RATING_DOTS.map(({ rating }) => [rating, ratingCount(dayEntries, rating)]),
-                );
-                return (
-                  <Button
-                    type="button"
-                    variant="outline"
-                    key={key}
-                    onClick={() => setSelectedDate(day)}
-                    aria-label={`Pokaż wydarzenia z ${format(day, "d MMMM yyyy", { locale: pl })}`}
+                  <span
                     className={cn(
-                      "h-auto min-h-20 flex-col items-stretch justify-start rounded-lg p-2 text-left font-normal",
-                      "hover:bg-keylime",
-                      isToday(day) && "ring-2 ring-ring",
+                      "text-sm font-medium",
+                      isToday(day) ? "text-primary" : "text-foreground",
                     )}
                   >
-                    <span
-                      className={cn(
-                        "text-sm font-medium",
-                        isToday(day) ? "text-primary" : "text-foreground",
-                      )}
-                    >
-                      {format(day, "d")}
-                    </span>
-                    <span className="mt-auto flex h-4 items-center justify-center gap-1.5" aria-hidden="true">
-                      {RATING_DOTS.map(({ rating, label, className }) => {
-                        const count = counts[rating] ?? 0;
-                        return (
-                          <span
-                            key={rating}
-                            title={`${count} ocen ${label}`}
-                            className={cn("shrink-0 rounded-full transition-[width,height,opacity]", className, ratingDotSize(count))}
-                          />
-                        );
-                      })}
-                    </span>
-                    <span className="sr-only">
-                      {RATING_DOTS.map(({ rating, label }) => `${counts[rating] ?? 0} ocen ${label}`).join(", ")}
-                    </span>
-                  </Button>
-                );
-              })}
-            </div>
-            <p className="mt-3 text-xs text-muted-foreground">
-              Wielkość kropek pokazuje liczbę ocen: brak, jedna lub co najmniej dwie. Kliknij
-              dzień, aby otworzyć jego szczegóły.
-            </p>
-          </section>
+                    {format(day, "d")}
+                  </span>
+                  <span
+                    className="mt-auto flex h-4 items-center justify-center gap-1.5"
+                    aria-hidden="true"
+                  >
+                    {RATING_DOTS.map(({ rating, label, className }) => {
+                      const count = counts[rating] ?? 0;
+                      return (
+                        <span
+                          key={rating}
+                          title={`${count} ocen ${label}`}
+                          className={cn(
+                            "shrink-0 rounded-full transition-[width,height,opacity]",
+                            className,
+                            ratingDotSize(count),
+                          )}
+                        />
+                      );
+                    })}
+                  </span>
+                  <span className="sr-only">
+                    {RATING_DOTS.map(
+                      ({ rating, label }) => `${counts[rating] ?? 0} ocen ${label}`,
+                    ).join(", ")}
+                  </span>
+                </Button>
+              );
+            })}
+          </div>
+          <p className="mt-3 text-xs text-muted-foreground">
+            Wielkość kropek pokazuje liczbę ocen: brak, jedna lub co najmniej dwie. Kliknij dzień,
+            aby otworzyć jego szczegóły.
+          </p>
+        </section>
       )}
 
       <Sheet open={selectedDate !== null} onOpenChange={(open) => !open && setSelectedDate(null)}>

@@ -73,8 +73,11 @@ function RootComponent() {
     <QueryClientProvider client={queryClient}>
       <AuthProvider>
         <div className="flex min-h-screen flex-col">
+          <a href="#main-content" className="skip-link">
+            Przejdź do treści
+          </a>
           {!bareScreen && <AppHeader />}
-          <main className="flex-1">
+          <main id="main-content" className="flex-1" tabIndex={-1}>
             <Outlet />
           </main>
           {!bareScreen && <SiteFooter />}

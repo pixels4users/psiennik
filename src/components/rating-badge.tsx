@@ -2,9 +2,9 @@ import { cn } from "@/lib/utils";
 import { RATINGS, labelFor } from "@/lib/dogs";
 
 const RATING_STYLES: Record<string, string> = {
-  green: "bg-good/15 text-good",
-  amber: "bg-warn/15 text-warn",
-  red: "bg-bad/15 text-bad",
+  green: "bg-good/15 text-foreground",
+  amber: "bg-warn/15 text-foreground",
+  red: "bg-bad/15 text-foreground",
 };
 
 const RATING_DOTS: Record<string, string> = {
@@ -17,7 +17,7 @@ export function RatingBadge({ rating, className }: { rating: string; className?:
   return (
     <span
       className={cn(
-        "inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-medium",
+        "inline-flex shrink-0 items-center gap-1.5 rounded-full px-3 py-1 text-xs font-medium",
         RATING_STYLES[rating] ?? "bg-muted text-muted-foreground",
         className,
       )}

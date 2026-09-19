@@ -1,9 +1,12 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { format, parseISO } from "date-fns";
 import { pl } from "date-fns/locale";
-import { Clock, PawPrint, Plus, Ticket, UserPlus } from "lucide-react";
-import { toast } from "sonner";
+import { ArrowUpRight, Clock, PawPrint, Plus, Ticket, UserPlus } from "lucide-react";
+import { useAuth } from "@/lib/auth";
+import { readSelectedDog } from "@/lib/selected-dog";
+import { JoinDialog } from "@/components/join-dialog";
+import { DogDoodle } from "@/components/dog-motifs";
 import {
   useDogs,
   useRecentEntries,
@@ -15,31 +18,17 @@ import {
   type DogWithAccess,
   type RecentEntry,
 } from "@/lib/dogs";
-import {
-  useIsOwner,
-  useIsBehaviorist,
-  useRedeemInvite,
-  useSubscriptionLimits,
-} from "@/lib/access";
+import { useIsOwner, useIsBehaviorist, useSubscriptionLimits } from "@/lib/access";
 import { DogFormDialog } from "@/components/dog-form-dialog";
 import { InviteClientDialog } from "@/components/behaviorist-invite";
 import { DogAvatar } from "@/components/dog-avatar";
 import { RatingBadge } from "@/components/rating-badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { socialMeta } from "@/lib/seo";
 import sygnetAsset from "@/assets/Psiennik_sygnet.png.asset.json";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
 
 export const Route = createFileRoute("/_authenticated/psy")({
   head: () => ({
@@ -54,89 +43,31 @@ export const Route = createFileRoute("/_authenticated/psy")({
   component: DogsPage,
 });
 
-function JoinDialog({ open, onOpenChange }: { open: boolean; onOpenChange: (v: boolean) => void }) {
-  const [code, setCode] = useState("");
-  const redeem = useRedeemInvite();
-  const navigate = useNavigate();
-
-  const submit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    try {
-      const { dogId } = await redeem.mutateAsync(code);
-      if (dogId) {
-        toast.success("Pies dodany do Twojej listy");
-        onOpenChange(false);
-        setCode("");
-        navigate({ to: "/pies/$id", params: { id: dogId } });
-      } else {
-        toast.success("Kod behawiorysty został użyty");
-        onOpenChange(false);
-        setCode("");
-      }
-    } catch (err) {
-      toast.error(err instanceof Error ? err.message : "Nie udało się użyć kodu");
-    }
-  };
-
-  return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-md">
-        <DialogHeader>
-          <DialogTitle className="font-display text-2xl font-light text-primary">
-            Dołącz kodem
-          </DialogTitle>
-          <DialogDescription>
-            Wpisz kod zaproszenia otrzymany od właściciela psa lub kod behawiorysty.
-          </DialogDescription>
-        </DialogHeader>
-        <form onSubmit={submit} className="grid gap-4">
-          <div className="grid gap-2">
-            <Label htmlFor="invite-code">Kod zaproszenia</Label>
-            <Input
-              id="invite-code"
-              value={code}
-              onChange={(e) => setCode(e.target.value.toUpperCase())}
-              placeholder="np. K7T2QA"
-              autoFocus
-            />
-          </div>
-          <div className="flex justify-end gap-2 pt-2">
-            <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
-              Anuluj
-            </Button>
-            <Button type="submit" disabled={redeem.isPending || !code.trim()}>
-              {redeem.isPending ? "Sprawdzanie…" : "Dołącz"}
-            </Button>
-          </div>
-        </form>
-      </DialogContent>
-    </Dialog>
-  );
-}
-
 function DogCard({ dog }: { dog: DogWithAccess }) {
   const status = dog.dog_access?.[0]?.process_status ?? "active";
   const isPending = status === "pending";
   return (
-    <Link to="/pies/$id" params={{ id: dog.id }} className="block">
-      <Card className="shadow-none transition-colors hover:bg-keylime">
-        <CardContent className="flex items-center gap-4 p-6">
-          <DogAvatar dog={dog} />
-          <div className="grid flex-1 gap-0.5">
-            <div className="flex items-center gap-2">
-              <h2 className="text-2xl">{dog.name}</h2>
-              {isPending && (
-                <span className="inline-flex items-center gap-1 rounded-full bg-warn/10 px-2 py-0.5 text-xs text-warn">
-                  <Clock className="size-3" />
-                  Oczekujący
-                </span>
-              )}
-            </div>
-            <p className="text-sm text-muted-foreground">
-              {[dog.breed, dog.age, dog.sex].filter(Boolean).join(" · ") ||
-                "Brak dodatkowych informacji"}
-            </p>
+    <Link to="/pies/$id" params={{ id: dog.id }} className="dog-grid-card group block h-full">
+      <Card className="h-full overflow-hidden border-primary/10 shadow-none transition-colors group-hover:border-primary/35 group-hover:bg-secondary/20 group-focus-visible:border-primary/35">
+        <div className="relative flex aspect-[5/4] items-center justify-center overflow-hidden bg-secondary">
+          <DogAvatar dog={dog} className="size-full rounded-none object-cover" />
+          {isPending && (
+            <span className="absolute left-3 top-3 inline-flex items-center gap-1 rounded-full bg-background px-3 py-1 text-xs text-foreground">
+              <Clock className="size-3" />
+              Oczekujący
+            </span>
+          )}
+        </div>
+        <CardContent className="grid gap-3 p-5">
+          <div className="flex items-center justify-between gap-2">
+            <h2 className="truncate text-3xl">{dog.name}</h2>
+            <ArrowUpRight className="size-5 shrink-0 text-primary" aria-hidden="true" />
           </div>
+          <p className="text-sm text-muted-foreground">
+            {[dog.breed, dog.age, dog.sex].filter(Boolean).join(" · ") ||
+              "Brak dodatkowych informacji"}
+          </p>
+          <span className="border-t pt-3 text-xs font-medium text-primary">Otwórz dziennik</span>
         </CardContent>
       </Card>
     </Link>
@@ -169,21 +100,21 @@ function RecentEntryCard({ entry }: { entry: RecentEntry }) {
       to="/pies/$id"
       params={{ id: entry.dog_id }}
       search={{ wpis: entry.id }}
-      className="block"
+      className="block min-w-0"
     >
       <Card className="shadow-none transition-colors hover:bg-keylime">
         <CardContent className="flex items-start gap-4 p-4">
           <RecentEntryDogPhoto photoUrl={entry.dogs?.photo_url ?? null} />
-          <div className="grid min-w-0 flex-1 gap-1.5">
-            <div className="flex items-start justify-between gap-2">
-              <p className="truncate font-display text-lg leading-tight">{entry.title}</p>
-              <RatingBadge rating={entry.rating} />
-            </div>
+          <div className="grid min-w-0 flex-1 grid-cols-1 gap-1.5">
+            <p className="font-display text-lg leading-tight [overflow-wrap:anywhere]">
+              {entry.title}
+            </p>
             <p className="text-sm text-muted-foreground">
               {entry.dogs?.name ?? "Pies"} ·{" "}
               {format(parseISO(entry.date), "d MMMM yyyy", { locale: pl })}
             </p>
             <div className="flex flex-wrap gap-1.5">
+              <RatingBadge rating={entry.rating} />
               {activities.map((value) => {
                 const Icon = ACTIVITY_ICONS[value];
                 return (
@@ -206,8 +137,15 @@ function RecentEntryCard({ entry }: { entry: RecentEntry }) {
 
 function DogsPage() {
   const { data: isOwner, isLoading: ownerLoading } = useIsOwner();
-  const { data: isBehaviorist, isLoading: behavioristLoading } = useIsBehaviorist();
-  const { data: dogs, isLoading } = useDogs();
+  const {
+    data: isBehaviorist,
+    isLoading: behavioristLoading,
+    isError: roleError,
+    refetch: refetchRole,
+  } = useIsBehaviorist();
+  const { user } = useAuth();
+  const navigate = useNavigate();
+  const { data: dogs, isLoading, isError, refetch } = useDogs();
   const { data: recent } = useRecentEntries(5);
   const limits = useSubscriptionLimits();
   const [dialogOpen, setDialogOpen] = useState(false);
@@ -229,12 +167,48 @@ function DogsPage() {
 
   const loading = isLoading || ownerLoading || behavioristLoading;
   const recentEntries = (recent ?? []).slice(0, 3);
+  const ownerDestination =
+    !loading && !isError && !roleError && isBehaviorist === false && dogs?.length
+      ? readSelectedDog(dogs, user?.id)
+      : null;
+
+  useEffect(() => {
+    if (ownerDestination)
+      void navigate({ to: "/pies/$id", params: { id: ownerDestination }, replace: true });
+  }, [ownerDestination, navigate]);
+
+  if (ownerDestination)
+    return (
+      <div
+        className="mx-auto max-w-5xl px-5 py-10"
+        role="status"
+        aria-label="Otwieranie dziennika psa"
+      >
+        <Skeleton className="h-64 w-full rounded-3xl" />
+      </div>
+    );
+  if (isError || roleError)
+    return (
+      <div className="mx-auto max-w-7xl px-5 py-10 sm:px-8">
+        <h1 className="text-4xl">Nie udało się wczytać psów</h1>
+        <Button
+          className="mt-5"
+          onClick={() => {
+            void refetch();
+            void refetchRole();
+          }}
+        >
+          Spróbuj ponownie
+        </Button>
+      </div>
+    );
 
   return (
-    <div className="mx-auto max-w-5xl px-5 py-12">
+    <div className="mx-auto max-w-7xl px-5 py-10 sm:px-8">
       <div className="flex flex-wrap items-end justify-between gap-4">
         <div>
-          <h1 className="text-4xl">{isBehaviorist ? "Psy pod opieką" : "Twoje psy"}</h1>
+          <p className="eyebrow mb-2">{isBehaviorist ? "Twój gabinet" : "Twój dziennik"}</p>
+          <h1 className="text-4xl sm:text-5xl">{isBehaviorist ? "Psy pod opieką" : "Twoje psy"}</h1>
         </div>
         <div className="flex flex-wrap gap-2">
           {isBehaviorist ? (
@@ -246,7 +220,7 @@ function DogsPage() {
                 </Button>
                 <Button variant="outline" onClick={() => setJoinOpen(true)}>
                   <Ticket className="size-4" />
-                  Dołącz kodem
+                  Wpisz kod zaproszenia
                 </Button>
               </>
             ) : null
@@ -255,7 +229,7 @@ function DogsPage() {
               {isOwner && (
                 <Button variant="outline" onClick={() => setJoinOpen(true)}>
                   <Ticket className="size-4" />
-                  Dołącz kodem
+                  Wpisz kod zaproszenia
                 </Button>
               )}
               <Button onClick={() => setDialogOpen(true)}>
@@ -277,7 +251,7 @@ function DogsPage() {
       {!!recentEntries.length && (
         <div className="mt-10">
           <h2 className="text-2xl">Ostatnie wydarzenia</h2>
-          <div className="mt-4 grid gap-3">
+          <div className="mt-4 grid grid-cols-1 gap-3 lg:grid-cols-3">
             {recentEntries.map((entry) => (
               <RecentEntryCard key={entry.id} entry={entry} />
             ))}
@@ -286,7 +260,7 @@ function DogsPage() {
       )}
 
       {loading ? (
-        <div className="mt-10 grid gap-5 sm:grid-cols-2">
+        <div className="mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
           {[0, 1].map((i) => (
             <Card key={i} className="shadow-none">
               <CardContent className="flex items-center gap-4 p-6">
@@ -300,8 +274,8 @@ function DogsPage() {
           ))}
         </div>
       ) : !dogs?.length ? (
-        <div className="mt-10 rounded-xl bg-keylime p-12 text-center">
-          <PawPrint className="mx-auto size-10 text-primary" />
+        <div className="mt-10 rounded-3xl bg-keylime px-6 py-12 text-center">
+          <DogDoodle className="mx-auto w-36 text-primary" />
           <h2 className="mt-4 text-3xl">
             {isBehaviorist ? "Zaproś pierwszego klienta" : "Nie masz jeszcze dodanych psów"}
           </h2>
@@ -318,7 +292,7 @@ function DogsPage() {
               </Button>
               <Button variant="outline" onClick={() => setJoinOpen(true)}>
                 <Ticket className="size-4" />
-                Dołącz kodem
+                Wpisz kod zaproszenia
               </Button>
             </div>
           ) : (
@@ -330,7 +304,7 @@ function DogsPage() {
         </div>
       ) : (
         <Tabs defaultValue="active" className="mt-10">
-          <TabsList className="mb-6">
+          <TabsList className="mb-6 flex h-auto w-fit max-w-full flex-wrap">
             <TabsTrigger value="active">
               Aktywne
               <span className="ml-2 rounded-full bg-secondary px-1.5 py-0.5 text-xs">
@@ -352,7 +326,7 @@ function DogsPage() {
           </TabsList>
           {(["active", "pending", "completed"] as const).map((key) => (
             <TabsContent key={key} value={key}>
-              <div className="grid gap-5 sm:grid-cols-2">
+              <div className="content-enter grid gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
                 {grouped[key].length === 0 ? (
                   <p className="col-span-full text-sm text-muted-foreground">
                     {key === "active"
