@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { Download, Ticket, Trash2 } from "lucide-react";
+import { Check, Download, Ticket, Trash2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth, useProfile } from "@/lib/auth";
 import {
@@ -239,13 +239,18 @@ function ProfilePage() {
               </div>
 
               <div className="flex justify-end gap-2 pt-2">
-                <Button type="submit" disabled={saving || !dirty}>
-                  {saving
-                    ? "Zapisywanie…"
-                    : dirty || !saved
-                      ? "Zapisz"
-                      : "Zapisano zmiany"}
-                </Button>
+                {saving ? (
+                  <Button type="submit" disabled>
+                    Zapisywanie…
+                  </Button>
+                ) : dirty ? (
+                  <Button type="submit">Zapisz zmiany</Button>
+                ) : saved ? (
+                  <p className="flex items-center gap-1.5 text-sm text-foreground">
+                    <Check className="size-4" aria-hidden="true" />
+                    Zapisano zmiany
+                  </p>
+                ) : null}
               </div>
             </form>
           )}
