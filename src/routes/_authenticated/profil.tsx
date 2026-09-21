@@ -256,6 +256,7 @@ function ProfilePage() {
       <BehavioristCodeCard />
       <OwnerBehavioristsCard />
       <BehavioristOwnersCard />
+      <SignOutCard />
       <DeleteAccountCard />
       <JoinDialog open={joinOpen} onOpenChange={setJoinOpen} />
     </div>
