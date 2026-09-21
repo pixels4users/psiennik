@@ -1,5 +1,8 @@
 # Zadania
 
+- [x] Ustawienia: „Wyloguj się" w osobnej karcie „Konto" nad „Usunięciem konta"; „Zapisz" nieaktywny bez zmian, po zapisie „Zapisano zmiany"
+
+
 - [x] Migracja bazy: entry_comments + uszczelnienie entries (SQL z zatwierdzonego planu)
 - [x] Aplikacja: szczegóły wydarzenia, trasa edycji, dyskusja, RecommendationDialog, liczniki, canDiscuss/canRecommend, eksport
 - [x] Testy API/RLS (lista z planu) + Playwright 390×844 i desktop

@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
@@ -78,7 +78,6 @@ function ProfilePage() {
   const { data: profile, isLoading } = useProfile();
   const { data: isBehaviorist } = useIsBehaviorist();
   const queryClient = useQueryClient();
-  const navigate = useNavigate();
 
   const [displayName, setDisplayName] = useState("");
   const [email, setEmail] = useState("");
@@ -90,6 +89,7 @@ function ProfilePage() {
     notify_access: true,
   });
   const [saving, setSaving] = useState(false);
+  const [saved, setSaved] = useState(false);
   const [joinOpen, setJoinOpen] = useState(false);
 
   useEffect(() => {
@@ -104,6 +104,19 @@ function ProfilePage() {
       notify_access: profile.notify_access,
     });
   }, [profile]);
+
+  const dirty = useMemo(() => {
+    if (!profile) return false;
+    return (
+      (displayName.trim() || null) !== (profile.display_name ?? null) ||
+      (email.trim() || null) !== (profile.email ?? null) ||
+      notifications !== profile.email_notifications ||
+      kinds.notify_entries !== profile.notify_entries ||
+      kinds.notify_comments !== profile.notify_comments ||
+      kinds.notify_recommendations !== profile.notify_recommendations ||
+      kinds.notify_access !== profile.notify_access
+    );
+  }, [profile, displayName, email, notifications, kinds]);
 
   const save = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -125,19 +138,13 @@ function ProfilePage() {
         .eq("id", user!.id);
       if (error) throw error;
       await queryClient.invalidateQueries({ queryKey: ["profile"] });
+      setSaved(true);
       toast.success("Ustawienia zapisane");
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Nie udało się zapisać ustawień");
     } finally {
       setSaving(false);
     }
-  };
-
-  const signOut = async () => {
-    await queryClient.cancelQueries();
-    queryClient.clear();
-    await supabase.auth.signOut();
-    navigate({ to: "/auth", replace: true });
   };
 
   return (
@@ -231,12 +238,13 @@ function ProfilePage() {
                 </div>
               </div>
 
-              <div className="flex flex-wrap justify-between gap-2 pt-2">
-                <Button type="button" variant="outline" onClick={signOut}>
-                  Wyloguj się
-                </Button>
-                <Button type="submit" disabled={saving}>
-                  {saving ? "Zapisywanie…" : "Zapisz"}
+              <div className="flex justify-end gap-2 pt-2">
+                <Button type="submit" disabled={saving || !dirty}>
+                  {saving
+                    ? "Zapisywanie…"
+                    : dirty || !saved
+                      ? "Zapisz"
+                      : "Zapisano zmiany"}
                 </Button>
               </div>
             </form>
@@ -248,6 +256,7 @@ function ProfilePage() {
       <BehavioristCodeCard />
       <OwnerBehavioristsCard />
       <BehavioristOwnersCard />
+      <SignOutCard />
       <DeleteAccountCard />
       <JoinDialog open={joinOpen} onOpenChange={setJoinOpen} />
     </div>
@@ -315,6 +324,38 @@ function ExportDataCard() {
         >
           <Download className="mr-2 size-4" />
           {exporting ? "Pobieranie…" : "Pobierz moje dane"}
+        </Button>
+      </CardContent>
+    </Card>
+  );
+}
+
+function SignOutCard() {
+  const queryClient = useQueryClient();
+  const navigate = useNavigate();
+
+  const signOut = async () => {
+    await queryClient.cancelQueries();
+    queryClient.clear();
+    await supabase.auth.signOut();
+    navigate({ to: "/auth", replace: true });
+  };
+
+  return (
+    <Card className="mt-6 shadow-none">
+      <CardHeader>
+        <CardTitle className="text-xl">Konto</CardTitle>
+      </CardHeader>
+      <CardContent className="grid gap-4">
+        <p className="text-sm leading-relaxed text-muted-foreground">
+          Wylogujesz się z Psiennika na tym urządzeniu. Twoje dane pozostają bezpieczne.
+        </p>
+        <Button
+          variant="outline"
+          className="justify-self-start"
+          onClick={() => void signOut()}
+        >
+          Wyloguj się
         </Button>
       </CardContent>
     </Card>
