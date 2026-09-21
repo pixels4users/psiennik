@@ -106,6 +106,19 @@ function ProfilePage() {
     });
   }, [profile]);
 
+  const dirty = useMemo(() => {
+    if (!profile) return false;
+    return (
+      (displayName.trim() || null) !== (profile.display_name ?? null) ||
+      (email.trim() || null) !== (profile.email ?? null) ||
+      notifications !== profile.email_notifications ||
+      kinds.notify_entries !== profile.notify_entries ||
+      kinds.notify_comments !== profile.notify_comments ||
+      kinds.notify_recommendations !== profile.notify_recommendations ||
+      kinds.notify_access !== profile.notify_access
+    );
+  }, [profile, displayName, email, notifications, kinds]);
+
   const save = async (e: React.FormEvent) => {
     e.preventDefault();
     const trimmedEmail = email.trim();
@@ -126,19 +139,13 @@ function ProfilePage() {
         .eq("id", user!.id);
       if (error) throw error;
       await queryClient.invalidateQueries({ queryKey: ["profile"] });
+      setSaved(true);
       toast.success("Ustawienia zapisane");
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Nie udało się zapisać ustawień");
     } finally {
       setSaving(false);
     }
-  };
-
-  const signOut = async () => {
-    await queryClient.cancelQueries();
-    queryClient.clear();
-    await supabase.auth.signOut();
-    navigate({ to: "/auth", replace: true });
   };
 
   return (
