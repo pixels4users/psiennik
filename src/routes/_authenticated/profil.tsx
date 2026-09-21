@@ -78,7 +78,6 @@ function ProfilePage() {
   const { data: profile, isLoading } = useProfile();
   const { data: isBehaviorist } = useIsBehaviorist();
   const queryClient = useQueryClient();
-  const navigate = useNavigate();
 
   const [displayName, setDisplayName] = useState("");
   const [email, setEmail] = useState("");
