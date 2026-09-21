@@ -239,12 +239,13 @@ function ProfilePage() {
                 </div>
               </div>
 
-              <div className="flex flex-wrap justify-between gap-2 pt-2">
-                <Button type="button" variant="outline" onClick={signOut}>
-                  Wyloguj się
-                </Button>
-                <Button type="submit" disabled={saving}>
-                  {saving ? "Zapisywanie…" : "Zapisz"}
+              <div className="flex justify-end gap-2 pt-2">
+                <Button type="submit" disabled={saving || !dirty}>
+                  {saving
+                    ? "Zapisywanie…"
+                    : dirty || !saved
+                      ? "Zapisz"
+                      : "Zapisano zmiany"}
                 </Button>
               </div>
             </form>
