@@ -330,6 +330,38 @@ function ExportDataCard() {
   );
 }
 
+function SignOutCard() {
+  const queryClient = useQueryClient();
+  const navigate = useNavigate();
+
+  const signOut = async () => {
+    await queryClient.cancelQueries();
+    queryClient.clear();
+    await supabase.auth.signOut();
+    navigate({ to: "/auth", replace: true });
+  };
+
+  return (
+    <Card className="mt-6 shadow-none">
+      <CardHeader>
+        <CardTitle className="text-xl">Konto</CardTitle>
+      </CardHeader>
+      <CardContent className="grid gap-4">
+        <p className="text-sm leading-relaxed text-muted-foreground">
+          Wylogujesz się z Psiennika na tym urządzeniu. Twoje dane pozostają bezpieczne.
+        </p>
+        <Button
+          variant="outline"
+          className="justify-self-start"
+          onClick={() => void signOut()}
+        >
+          Wyloguj się
+        </Button>
+      </CardContent>
+    </Card>
+  );
+}
+
 function DeleteAccountCard() {
   const { user } = useAuth();
   const queryClient = useQueryClient();
