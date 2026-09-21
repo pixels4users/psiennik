@@ -90,6 +90,7 @@ function ProfilePage() {
     notify_access: true,
   });
   const [saving, setSaving] = useState(false);
+  const [saved, setSaved] = useState(false);
   const [joinOpen, setJoinOpen] = useState(false);
 
   useEffect(() => {
