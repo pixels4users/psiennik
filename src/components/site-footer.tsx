@@ -12,6 +12,9 @@ export function SiteFooter() {
           </a>
         </p>
         <nav className="flex flex-wrap gap-4">
+          <Link to="/poradnik/dziennik-obserwacji-psa" className="underline hover:text-primary">
+            Poradnik
+          </Link>
           <Link to="/kontakt" className="underline hover:text-primary">
             Kontakt
           </Link>
