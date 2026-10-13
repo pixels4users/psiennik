@@ -17,6 +17,7 @@ import { Route as PrywatnoscRouteImport } from './routes/prywatnosc'
 import { Route as RegulaminRouteImport } from './routes/regulamin'
 import { Route as AuthenticatedProfilRouteImport } from './routes/_authenticated/profil'
 import { Route as AuthenticatedPsyRouteImport } from './routes/_authenticated/psy'
+import { Route as PoradnikDziennikObserwacjiPsaRouteImport } from './routes/poradnik.dziennik-obserwacji-psa'
 import { Route as AuthenticatedPiesIdRouteImport } from './routes/_authenticated/pies.$id'
 import { Route as AuthenticatedPiesIdIndexRouteImport } from './routes/_authenticated/pies.$id.index'
 import { Route as AuthenticatedPiesIdAnalizaRouteImport } from './routes/_authenticated/pies.$id.analiza'
@@ -71,6 +72,12 @@ const AuthenticatedPsyRoute = AuthenticatedPsyRouteImport.update({
   path: '/psy',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const PoradnikDziennikObserwacjiPsaRoute =
+  PoradnikDziennikObserwacjiPsaRouteImport.update({
+    id: '/poradnik/dziennik-obserwacji-psa',
+    path: '/poradnik/dziennik-obserwacji-psa',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const AuthenticatedPiesIdRoute = AuthenticatedPiesIdRouteImport.update({
   id: '/pies/$id',
   path: '/pies/$id',
@@ -161,6 +168,7 @@ export interface FileRoutesByFullPath {
   '/regulamin': typeof RegulaminRoute
   '/profil': typeof AuthenticatedProfilRoute
   '/psy': typeof AuthenticatedPsyRoute
+  '/poradnik/dziennik-obserwacji-psa': typeof PoradnikDziennikObserwacjiPsaRoute
   '/pies/$id': typeof AuthenticatedPiesIdRouteWithChildren
   '/pies/$id/analiza': typeof AuthenticatedPiesIdAnalizaRoute
   '/pies/$id/kalendarz': typeof AuthenticatedPiesIdKalendarzRoute
@@ -184,6 +192,7 @@ export interface FileRoutesByTo {
   '/regulamin': typeof RegulaminRoute
   '/profil': typeof AuthenticatedProfilRoute
   '/psy': typeof AuthenticatedPsyRoute
+  '/poradnik/dziennik-obserwacji-psa': typeof PoradnikDziennikObserwacjiPsaRoute
   '/pies/$id/analiza': typeof AuthenticatedPiesIdAnalizaRoute
   '/pies/$id/kalendarz': typeof AuthenticatedPiesIdKalendarzRoute
   '/pies/$id/tabela': typeof AuthenticatedPiesIdTabelaRoute
@@ -207,6 +216,7 @@ export interface FileRoutesById {
   '/regulamin': typeof RegulaminRoute
   '/_authenticated/profil': typeof AuthenticatedProfilRoute
   '/_authenticated/psy': typeof AuthenticatedPsyRoute
+  '/poradnik/dziennik-obserwacji-psa': typeof PoradnikDziennikObserwacjiPsaRoute
   '/_authenticated/pies/$id': typeof AuthenticatedPiesIdRouteWithChildren
   '/_authenticated/pies/$id/analiza': typeof AuthenticatedPiesIdAnalizaRoute
   '/_authenticated/pies/$id/kalendarz': typeof AuthenticatedPiesIdKalendarzRoute
@@ -232,6 +242,7 @@ export interface FileRouteTypes {
     | '/regulamin'
     | '/profil'
     | '/psy'
+    | '/poradnik/dziennik-obserwacji-psa'
     | '/pies/$id'
     | '/pies/$id/analiza'
     | '/pies/$id/kalendarz'
@@ -255,6 +266,7 @@ export interface FileRouteTypes {
     | '/regulamin'
     | '/profil'
     | '/psy'
+    | '/poradnik/dziennik-obserwacji-psa'
     | '/pies/$id/analiza'
     | '/pies/$id/kalendarz'
     | '/pies/$id/tabela'
@@ -277,6 +289,7 @@ export interface FileRouteTypes {
     | '/regulamin'
     | '/_authenticated/profil'
     | '/_authenticated/psy'
+    | '/poradnik/dziennik-obserwacji-psa'
     | '/_authenticated/pies/$id'
     | '/_authenticated/pies/$id/analiza'
     | '/_authenticated/pies/$id/kalendarz'
@@ -300,6 +313,7 @@ export interface RootRouteChildren {
   KontaktRoute: typeof KontaktRoute
   PrywatnoscRoute: typeof PrywatnoscRoute
   RegulaminRoute: typeof RegulaminRoute
+  PoradnikDziennikObserwacjiPsaRoute: typeof PoradnikDziennikObserwacjiPsaRoute
   ApiPublicNotificationsSendRoute: typeof ApiPublicNotificationsSendRoute
   LovableEmailAuthPreviewRoute: typeof LovableEmailAuthPreviewRoute
   LovableEmailAuthWebhookRoute: typeof LovableEmailAuthWebhookRoute
@@ -363,6 +377,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/psy'
       preLoaderRoute: typeof AuthenticatedPsyRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/poradnik/dziennik-obserwacji-psa': {
+      id: '/poradnik/dziennik-obserwacji-psa'
+      path: '/poradnik/dziennik-obserwacji-psa'
+      fullPath: '/poradnik/dziennik-obserwacji-psa'
+      preLoaderRoute: typeof PoradnikDziennikObserwacjiPsaRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/_authenticated/pies/$id': {
       id: '/_authenticated/pies/$id'
@@ -530,6 +551,7 @@ const rootRouteChildren: RootRouteChildren = {
   KontaktRoute: KontaktRoute,
   PrywatnoscRoute: PrywatnoscRoute,
   RegulaminRoute: RegulaminRoute,
+  PoradnikDziennikObserwacjiPsaRoute: PoradnikDziennikObserwacjiPsaRoute,
   ApiPublicNotificationsSendRoute: ApiPublicNotificationsSendRoute,
   LovableEmailAuthPreviewRoute: LovableEmailAuthPreviewRoute,
   LovableEmailAuthWebhookRoute: LovableEmailAuthWebhookRoute,
