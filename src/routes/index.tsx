@@ -258,7 +258,7 @@ function LandingPage() {
           </div>
           <p className="mt-5 text-xs text-muted-foreground">Przykładowe wpisy w dzienniku.</p>
           <Link
-            to="/poradnik/dziennik-obserwacji-psa"
+            to="/poradnik/$slug" params={{ slug: "dziennik-obserwacji-psa" }}
             className="mt-4 inline-flex min-h-11 items-center gap-2 text-sm text-primary underline hover:no-underline"
           >
             Jak prowadzić dziennik obserwacji psa

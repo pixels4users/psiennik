@@ -18,7 +18,7 @@ import {
   type DogWithAccess,
   type RecentEntry,
 } from "@/lib/dogs";
-import { useIsOwner, useIsBehaviorist, useSubscriptionLimits } from "@/lib/access";
+import { useIsOwner, useIsBehaviorist } from "@/lib/access";
 import { DogFormDialog } from "@/components/dog-form-dialog";
 import { InviteClientDialog } from "@/components/behaviorist-invite";
 import { DogAvatar } from "@/components/dog-avatar";
@@ -160,7 +160,6 @@ function DogsPage() {
   const navigate = useNavigate();
   const { data: dogs, isLoading, isError, refetch } = useDogs();
   const { data: recent } = useRecentEntries(5);
-  const limits = useSubscriptionLimits();
   const [dialogOpen, setDialogOpen] = useState(false);
   const [joinOpen, setJoinOpen] = useState(false);
   const [inviteOpen, setInviteOpen] = useState(false);
@@ -168,14 +167,12 @@ function DogsPage() {
   const grouped = useMemo(() => {
     const active: DogWithAccess[] = [];
     const completed: DogWithAccess[] = [];
-    const pending: DogWithAccess[] = [];
     for (const dog of (dogs as DogWithAccess[] | undefined) ?? []) {
       const status = dog.dog_access?.[0]?.process_status ?? "active";
       if (status === "completed") completed.push(dog);
-      else if (status === "pending") pending.push(dog);
       else active.push(dog);
     }
-    return { active, completed, pending };
+    return { active, completed };
   }, [dogs]);
 
   const loading = isLoading || ownerLoading || behavioristLoading;
@@ -254,12 +251,6 @@ function DogsPage() {
         </div>
       </div>
 
-      {isBehaviorist && (
-        <p className="mt-3 text-sm text-muted-foreground">
-          Aktywne procesy: {limits.active} z {limits.max}
-          {limits.pending > 0 && ` · oczekujące: ${limits.pending}`}
-        </p>
-      )}
 
       {!!recentEntries.length && (
         <div className="mt-10">
@@ -324,12 +315,6 @@ function DogsPage() {
                 {grouped.active.length}
               </span>
             </TabsTrigger>
-            <TabsTrigger value="pending">
-              Oczekujące
-              <span className="ml-2 rounded-full bg-secondary px-1.5 py-0.5 text-xs">
-                {grouped.pending.length}
-              </span>
-            </TabsTrigger>
             <TabsTrigger value="completed">
               Zakończone
               <span className="ml-2 rounded-full bg-secondary px-1.5 py-0.5 text-xs">
@@ -337,16 +322,14 @@ function DogsPage() {
               </span>
             </TabsTrigger>
           </TabsList>
-          {(["active", "pending", "completed"] as const).map((key) => (
+          {(["active", "completed"] as const).map((key) => (
             <TabsContent key={key} value={key}>
               <div className="content-enter grid gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
                 {grouped[key].length === 0 ? (
                   <p className="col-span-full text-sm text-muted-foreground">
                     {key === "active"
                       ? "Brak aktywnych psów."
-                      : key === "pending"
-                        ? "Brak oczekujących psów."
-                        : "Brak zakończonych procesów."}
+                      : "Brak zakończonych procesów."}
                   </p>
                 ) : (
                   grouped[key].map((dog) => (

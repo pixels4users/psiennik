@@ -169,11 +169,35 @@ export function useRecentEntries(limit = 5) {
   });
 }
 
+/** Zmniejsza zdjęcie do maks. 1200 px i zapisuje jako JPEG (zwykle 200–400 KB). */
+async function shrinkPhoto(file: File): Promise<Blob> {
+  try {
+    const bitmap = await createImageBitmap(file);
+    const scale = Math.min(1, 1200 / Math.max(bitmap.width, bitmap.height));
+    const canvas = document.createElement("canvas");
+    canvas.width = Math.round(bitmap.width * scale);
+    canvas.height = Math.round(bitmap.height * scale);
+    canvas.getContext("2d")!.drawImage(bitmap, 0, 0, canvas.width, canvas.height);
+    const blob = await new Promise<Blob | null>((resolve) => canvas.toBlob(resolve, "image/jpeg", 0.82));
+    return blob && blob.size < file.size ? blob : file;
+  } catch {
+    return file;
+  }
+}
+
+export const PHOTO_QUOTA_MESSAGE = "Brak miejsca na zdjęcia. Usuń jedno ze starszych zdjęć psa.";
+
 export async function uploadDogPhoto(file: File, dogId: string): Promise<string> {
-  const ext = file.name.split(".").pop() ?? "jpg";
+  const body = await shrinkPhoto(file);
+  const ext = body.type === "image/jpeg" ? "jpg" : (file.name.split(".").pop() ?? "jpg");
   const path = `${dogId}/${crypto.randomUUID()}.${ext}`;
-  const { error } = await supabase.storage.from("dog-photos").upload(path, file);
-  if (error) throw error;
+  const { error } = await supabase.storage
+    .from("dog-photos")
+    .upload(path, body, { contentType: body.type || file.type });
+  if (error) {
+    if (/row-level security|policy|403|Unauthorized/i.test(error.message)) throw new Error(PHOTO_QUOTA_MESSAGE);
+    throw error;
+  }
   return path;
 }
 
