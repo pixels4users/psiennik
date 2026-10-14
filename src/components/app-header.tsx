@@ -3,7 +3,7 @@ import { Link, useNavigate } from "@tanstack/react-router";
 import { useQueryClient } from "@tanstack/react-query";
 import { formatDistanceToNow } from "date-fns";
 import { pl } from "date-fns/locale";
-import { Bell, ChevronDown, LogOut, PawPrint, Plus, Settings, User, UserPlus } from "lucide-react";
+import { Bell, BookOpen, ChevronDown, Coffee, LogOut, PawPrint, Plus, Settings, User, UserPlus } from "lucide-react";
 import logoAsset from "@/assets/psiennik-logo-3.webp.asset.json";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth, useProfile } from "@/lib/auth";
@@ -107,6 +107,15 @@ export function AppHeader() {
                 </Link>
               )}
               <Link
+                to="/poradnik"
+                aria-label="Poradniki"
+                className="flex items-center gap-1.5 rounded-full px-2.5 py-1.5 text-sm transition-colors hover:bg-secondary sm:px-3"
+                activeProps={{ className: "bg-secondary font-medium text-primary" }}
+              >
+                <BookOpen className="size-4 shrink-0" aria-hidden="true" />
+                <span className="hidden md:inline">Poradniki</span>
+              </Link>
+              <Link
                 to="/profil"
                 aria-label="Ustawienia"
                 className="hidden items-center gap-1.5 rounded-full px-3 py-1.5 text-sm transition-colors hover:bg-secondary md:flex"
@@ -117,10 +126,24 @@ export function AppHeader() {
               </Link>
             </nav>
           )}
+          {!user && (
+            <nav aria-label="Główna nawigacja">
+                <Link
+                  to="/poradnik"
+                  aria-label="Poradniki"
+                  className="flex items-center gap-1.5 rounded-full px-2.5 py-1.5 text-sm transition-colors hover:bg-secondary sm:px-3"
+                  activeProps={{ className: "bg-secondary font-medium text-primary" }}
+                >
+                  <BookOpen className="size-4 shrink-0" aria-hidden="true" />
+                  <span className="hidden md:inline">Poradniki</span>
+                </Link>
+            </nav>
+          )}
         </div>
 
         {user ? (
           <div className="flex shrink-0 items-center gap-1">
+            <CoffeeButton />
             {isBehaviorist === false && (
               <Button
                 variant="ghost"
@@ -223,9 +246,12 @@ export function AppHeader() {
             )}
           </div>
         ) : (
+          <div className="flex shrink-0 items-center gap-1">
+          <CoffeeButton />
           <Button asChild variant="default" size="sm">
             <Link to="/auth">Zaloguj się / Załóż konto</Link>
           </Button>
+          </div>
         )}
       </div>
     </header>
@@ -299,5 +325,18 @@ function OwnerDogNavigation({ onAddDog }: { onAddDog: () => void }) {
         </DropdownMenuContent>
       </DropdownMenu>
     </>
+  );
+}
+
+export const BUYCOFFEE_URL = "https://buycoffee.to/psiennik";
+
+function CoffeeButton() {
+  return (
+    <Button asChild variant="ghost" size="sm" className="mr-1 hidden gap-1.5 xl:inline-flex">
+      <a href={BUYCOFFEE_URL} target="_blank" rel="noopener noreferrer">
+        <Coffee className="size-4" aria-hidden="true" />
+        Postaw kawę
+      </a>
+    </Button>
   );
 }

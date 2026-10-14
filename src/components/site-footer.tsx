@@ -12,8 +12,8 @@ export function SiteFooter() {
           </a>
         </p>
         <nav className="flex flex-wrap gap-4">
-          <Link to="/poradnik/dziennik-obserwacji-psa" className="underline hover:text-primary">
-            Poradnik
+          <Link to="/poradnik" className="underline hover:text-primary">
+            Poradniki
           </Link>
           <Link to="/kontakt" className="underline hover:text-primary">
             Kontakt
@@ -25,6 +25,16 @@ export function SiteFooter() {
             Polityka prywatności
           </Link>
         </nav>
+        <a href="https://buycoffee.to/psiennik" target="_blank" rel="noopener noreferrer" className="shrink-0">
+          <img
+            src="https://buycoffee.to/static/img/share/share-button-primary--pl.png"
+            alt="Postaw kawę dla Psiennik na buycoffee.to"
+            width={234}
+            height={61}
+            loading="lazy"
+            className="h-auto w-[180px] sm:w-[234px]"
+          />
+        </a>
       </div>
     </footer>
   );
