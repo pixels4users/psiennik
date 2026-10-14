@@ -17,6 +17,8 @@ import { Route as PrywatnoscRouteImport } from './routes/prywatnosc'
 import { Route as RegulaminRouteImport } from './routes/regulamin'
 import { Route as AuthenticatedProfilRouteImport } from './routes/_authenticated/profil'
 import { Route as AuthenticatedPsyRouteImport } from './routes/_authenticated/psy'
+import { Route as PoradnikIndexRouteImport } from './routes/poradnik.index'
+import { Route as PoradnikSlugRouteImport } from './routes/poradnik.$slug'
 import { Route as AuthenticatedPiesIdRouteImport } from './routes/_authenticated/pies.$id'
 import { Route as AuthenticatedPiesIdIndexRouteImport } from './routes/_authenticated/pies.$id.index'
 import { Route as AuthenticatedPiesIdAnalizaRouteImport } from './routes/_authenticated/pies.$id.analiza'
@@ -70,6 +72,16 @@ const AuthenticatedPsyRoute = AuthenticatedPsyRouteImport.update({
   id: '/psy',
   path: '/psy',
   getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const PoradnikIndexRoute = PoradnikIndexRouteImport.update({
+  id: '/poradnik/',
+  path: '/poradnik/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PoradnikSlugRoute = PoradnikSlugRouteImport.update({
+  id: '/poradnik/$slug',
+  path: '/poradnik/$slug',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const AuthenticatedPiesIdRoute = AuthenticatedPiesIdRouteImport.update({
   id: '/pies/$id',
@@ -161,6 +173,8 @@ export interface FileRoutesByFullPath {
   '/regulamin': typeof RegulaminRoute
   '/profil': typeof AuthenticatedProfilRoute
   '/psy': typeof AuthenticatedPsyRoute
+  '/poradnik/$slug': typeof PoradnikSlugRoute
+  '/poradnik/': typeof PoradnikIndexRoute
   '/pies/$id': typeof AuthenticatedPiesIdRouteWithChildren
   '/pies/$id/analiza': typeof AuthenticatedPiesIdAnalizaRoute
   '/pies/$id/kalendarz': typeof AuthenticatedPiesIdKalendarzRoute
@@ -184,6 +198,8 @@ export interface FileRoutesByTo {
   '/regulamin': typeof RegulaminRoute
   '/profil': typeof AuthenticatedProfilRoute
   '/psy': typeof AuthenticatedPsyRoute
+  '/poradnik/$slug': typeof PoradnikSlugRoute
+  '/poradnik': typeof PoradnikIndexRoute
   '/pies/$id/analiza': typeof AuthenticatedPiesIdAnalizaRoute
   '/pies/$id/kalendarz': typeof AuthenticatedPiesIdKalendarzRoute
   '/pies/$id/tabela': typeof AuthenticatedPiesIdTabelaRoute
@@ -207,6 +223,8 @@ export interface FileRoutesById {
   '/regulamin': typeof RegulaminRoute
   '/_authenticated/profil': typeof AuthenticatedProfilRoute
   '/_authenticated/psy': typeof AuthenticatedPsyRoute
+  '/poradnik/$slug': typeof PoradnikSlugRoute
+  '/poradnik/': typeof PoradnikIndexRoute
   '/_authenticated/pies/$id': typeof AuthenticatedPiesIdRouteWithChildren
   '/_authenticated/pies/$id/analiza': typeof AuthenticatedPiesIdAnalizaRoute
   '/_authenticated/pies/$id/kalendarz': typeof AuthenticatedPiesIdKalendarzRoute
@@ -232,6 +250,8 @@ export interface FileRouteTypes {
     | '/regulamin'
     | '/profil'
     | '/psy'
+    | '/poradnik/$slug'
+    | '/poradnik/'
     | '/pies/$id'
     | '/pies/$id/analiza'
     | '/pies/$id/kalendarz'
@@ -255,6 +275,8 @@ export interface FileRouteTypes {
     | '/regulamin'
     | '/profil'
     | '/psy'
+    | '/poradnik/$slug'
+    | '/poradnik'
     | '/pies/$id/analiza'
     | '/pies/$id/kalendarz'
     | '/pies/$id/tabela'
@@ -277,6 +299,8 @@ export interface FileRouteTypes {
     | '/regulamin'
     | '/_authenticated/profil'
     | '/_authenticated/psy'
+    | '/poradnik/$slug'
+    | '/poradnik/'
     | '/_authenticated/pies/$id'
     | '/_authenticated/pies/$id/analiza'
     | '/_authenticated/pies/$id/kalendarz'
@@ -300,6 +324,8 @@ export interface RootRouteChildren {
   KontaktRoute: typeof KontaktRoute
   PrywatnoscRoute: typeof PrywatnoscRoute
   RegulaminRoute: typeof RegulaminRoute
+  PoradnikSlugRoute: typeof PoradnikSlugRoute
+  PoradnikIndexRoute: typeof PoradnikIndexRoute
   ApiPublicNotificationsSendRoute: typeof ApiPublicNotificationsSendRoute
   LovableEmailAuthPreviewRoute: typeof LovableEmailAuthPreviewRoute
   LovableEmailAuthWebhookRoute: typeof LovableEmailAuthWebhookRoute
@@ -363,6 +389,20 @@ declare module '@tanstack/react-router' {
       fullPath: '/psy'
       preLoaderRoute: typeof AuthenticatedPsyRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/poradnik/': {
+      id: '/poradnik/'
+      path: '/poradnik'
+      fullPath: '/poradnik/'
+      preLoaderRoute: typeof PoradnikIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/poradnik/$slug': {
+      id: '/poradnik/$slug'
+      path: '/poradnik/$slug'
+      fullPath: '/poradnik/$slug'
+      preLoaderRoute: typeof PoradnikSlugRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/_authenticated/pies/$id': {
       id: '/_authenticated/pies/$id'
@@ -530,6 +570,8 @@ const rootRouteChildren: RootRouteChildren = {
   KontaktRoute: KontaktRoute,
   PrywatnoscRoute: PrywatnoscRoute,
   RegulaminRoute: RegulaminRoute,
+  PoradnikSlugRoute: PoradnikSlugRoute,
+  PoradnikIndexRoute: PoradnikIndexRoute,
   ApiPublicNotificationsSendRoute: ApiPublicNotificationsSendRoute,
   LovableEmailAuthPreviewRoute: LovableEmailAuthPreviewRoute,
   LovableEmailAuthWebhookRoute: LovableEmailAuthWebhookRoute,
