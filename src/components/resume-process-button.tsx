@@ -6,7 +6,6 @@ import {
   resumeErrorMessage,
   useCompleteProcess,
   useResumeProcess,
-  useSubscriptionLimits,
 } from "@/lib/access";
 import { Button } from "@/components/ui/button";
 import {
@@ -36,16 +35,8 @@ export function ResumeProcessButton({
 }) {
   const [open, setOpen] = useState(false);
   const resume = useResumeProcess(dogId);
-  const limits = useSubscriptionLimits();
 
   function handleConfirm() {
-    if (limits.atLimit) {
-      toast.error(
-        `Nie możesz wznowić współpracy — masz już maksymalną liczbę aktywnych procesów (${limits.active}/${limits.max}). Zakończ jeden z nich, aby zwolnić miejsce.`,
-      );
-      setOpen(false);
-      return;
-    }
     resume.mutate(undefined, {
       onSuccess: () => {
         toast.success(`Współpraca przy psie ${dogName} została wznowiona`);

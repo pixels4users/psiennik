@@ -9,7 +9,6 @@ import {
   useOwnerBehaviorists,
   useBehavioristOwners,
   useRemoveOwnerBehaviorist,
-  useSubscriptionLimits,
   useIsBehaviorist,
   type OwnerBehavioristWithProfile,
 } from "@/lib/access";
@@ -547,7 +546,6 @@ function OwnerBehavioristsCard() {
 
 function BehavioristOwnersCard() {
   const { data: rows, isLoading, isError, refetch } = useBehavioristOwners();
-  const limits = useSubscriptionLimits();
   const remove = useRemoveOwnerBehaviorist();
 
   if (isLoading) {
@@ -575,12 +573,6 @@ function BehavioristOwnersCard() {
         <CardTitle className="text-xl">Twoi klienci</CardTitle>
       </CardHeader>
       <CardContent className="grid gap-3">
-        <div className="rounded-lg bg-secondary p-3 text-sm">
-          Aktywne procesy: {limits.active} / {limits.max}
-          {limits.pending > 0 && (
-            <span className="ml-3 text-muted-foreground">(oczekujące: {limits.pending})</span>
-          )}
-        </div>
         {rows.map((row) => (
           <OwnerRow key={row.id} row={row} onRemove={() => remove.mutate(row.owner_id)} />
         ))}

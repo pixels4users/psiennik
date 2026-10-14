@@ -381,31 +381,6 @@ export function useIsBehaviorist() {
   });
 }
 
-/** Limity aktywnych procesów dla behawiorysty. */
-export function useSubscriptionLimits() {
-  const { user } = useAuth();
-  const { data: profile } = useProfile();
-  const { data: accessRows } = useQuery({
-    queryKey: ["behaviorist-access", user?.id],
-    enabled: !!user,
-    queryFn: async (): Promise<DogAccess[]> => {
-      const { data, error } = await supabase
-        .from("dog_access")
-        .select("*")
-        .eq("user_id", user!.id)
-        .eq("role", "behaviorist");
-      if (error) throw error;
-      return data ?? [];
-    },
-  });
-
-  const active = accessRows?.filter((row) => row.process_status === "active").length ?? 0;
-  const pending = accessRows?.filter((row) => row.process_status === "pending").length ?? 0;
-  const max = profile?.max_active_dogs ?? 2;
-
-  return { active, pending, max, atLimit: active >= max };
-}
-
 function useProfile() {
   const { user } = useAuth();
   return useQuery({
