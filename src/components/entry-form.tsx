@@ -200,8 +200,8 @@ export function EntryForm({
       toast.error("Wybierz przynajmniej jedną porę dnia");
       return;
     }
-    if (pending.length > 0) {
-      toast.error("Kliknij „Prześlij pliki” albo usuń wybrane pliki");
+    if (uploading) {
+      toast.error("Poczekaj, aż pliki się prześlą");
       return;
     }
     if (linkDraft.trim()) {
@@ -432,40 +432,20 @@ export function EntryForm({
             </ul>
           )}
           {pending.length > 0 ? (
-            <div className="grid gap-2 rounded-lg border p-3">
+            <div className="grid gap-2 rounded-lg border p-3" aria-live="polite">
               <ul className="grid gap-1 text-sm">
                 {pending.map((f, i) => (
-                  <li key={`${f.name}-${i}`} className="flex items-center justify-between gap-2">
-                    <span className="flex min-w-0 items-center gap-2">
-                      {f.type.startsWith("image/") ? <ImageIcon className="size-4 shrink-0 text-primary" /> : <Video className="size-4 shrink-0 text-primary" />}
-                      <span className="truncate">{f.name}</span>
-                      <span className="shrink-0 text-xs text-muted-foreground">{formatMb(f.size)}</span>
-                    </span>
-                    {!uploading && (
-                      <button type="button" aria-label={`Usuń ${f.name}`} className="rounded p-1 text-muted-foreground hover:text-foreground" onClick={() => setPending((p) => p.filter((_, j) => j !== i))}>
-                        <X className="size-4" />
-                      </button>
-                    )}
+                  <li key={`${f.name}-${i}`} className="flex min-w-0 items-center gap-2">
+                    {f.type.startsWith("image/") ? <ImageIcon className="size-4 shrink-0 text-primary" /> : <Video className="size-4 shrink-0 text-primary" />}
+                    <span className="truncate">{f.name}</span>
+                    <span className="shrink-0 text-xs text-muted-foreground">{formatMb(f.size)}</span>
                   </li>
                 ))}
               </ul>
-              {progress !== null ? (
-                <div className="grid gap-1" aria-live="polite">
-                  <div className="h-2 overflow-hidden rounded-full bg-muted">
-                    <div className="h-full bg-primary transition-all" style={{ width: `${Math.round(progress * 100)}%` }} />
-                  </div>
-                  <span className="text-xs text-muted-foreground">Wysyłanie… {Math.round(progress * 100)}%</span>
-                </div>
-              ) : (
-                <div className="flex flex-wrap gap-2">
-                  <Button type="button" size="sm" onClick={() => void uploadPending()} disabled={uploading}>
-                    <Upload className="size-4" /> Prześlij pliki
-                  </Button>
-                  <Button type="button" variant="outline" size="sm" onClick={() => setPending([])} disabled={uploading}>
-                    <X className="size-4" /> Anuluj
-                  </Button>
-                </div>
-              )}
+              <div className="h-2 overflow-hidden rounded-full bg-muted">
+                <div className="h-full bg-primary transition-all" style={{ width: `${Math.round((progress ?? 0) * 100)}%` }} />
+              </div>
+              <span className="text-xs text-muted-foreground">Przesyłanie… {Math.round((progress ?? 0) * 100)}%</span>
             </div>
           ) : (photoCount < MAX_PHOTOS || videoCount < MAX_VIDEOS) && (
             <div
@@ -476,8 +456,8 @@ export function EntryForm({
               }}
               className="grid gap-2 rounded-lg border border-dashed p-4 text-sm"
             >
-              <Button type="button" size="sm" className="w-fit" onClick={() => fileInputRef.current?.click()}>
-                <ImageIcon className="size-4" /> Wybierz zdjęcia lub wideo
+              <Button type="button" variant="ghost" size="sm" className="-ml-2 w-fit text-primary" onClick={() => fileInputRef.current?.click()}>
+                <Upload className="size-4" /> Wybierz zdjęcia lub wideo
               </Button>
               <span className="text-muted-foreground">
                 Albo przeciągnij pliki tutaj. Zdjęcia: {photoCount}/{MAX_PHOTOS}, wideo: {videoCount}/{MAX_VIDEOS}. Najlepiej 15–45 sekund kluczowej sytuacji.
@@ -559,8 +539,8 @@ export function EntryForm({
           </div>
         </div>
         <div className="flex flex-wrap gap-2 pt-2">
-          <Button type="submit" disabled={saving || deleting}>
-            {saving ? "Zapisywanie…" : isEdit ? "Zapisz zmiany" : "Dodaj"}
+          <Button type="submit" disabled={saving || deleting || uploading}>
+            {uploading ? "Przesyłanie plików…" : saving ? "Zapisywanie…" : isEdit ? "Zapisz zmiany" : "Dodaj"}
           </Button>
           <Button type="button" variant="outline" onClick={onCancel} disabled={deleting}>
             Anuluj
