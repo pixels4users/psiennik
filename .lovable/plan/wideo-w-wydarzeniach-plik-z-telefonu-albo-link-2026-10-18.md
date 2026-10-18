@@ -8,9 +8,9 @@
 - Jedno wideo na wydarzenie (plik albo link).
 - Szczegóły wydarzenia: odtwarzacz nad opisem, pod nim komentarze i zalecenia — behawiorystka ogląda i od razu odpisuje.
 - Karta wydarzenia na liście: mała ikona „Wideo”, bez odtwarzacza (lista zostaje lekka).
-- Usuwanie: w edycji wydarzenia przycisk „Usuń wideo” — tekst, ocena i komentarze zostają, zwalnia się tylko miejsce.
+- Usuwanie: w edycji wydarzenia przycisk „Usuń wideo” — tekst, ocena i komentarze zostają, zwalnia się tylko miejsce. Po usunięciu - możliwość dodania wideo do wydarzenia i zapisania z nowym wideo.
 - Ustawienia: nowa sekcja „Miejsce na pliki” — pasek zajętości (np. „31 z 50 MB”) i lista wszystkich wideo (pies, data, tytuł wydarzenia, rozmiar) z przyciskiem usuwania.
-- Bez automatycznego kasowania. Przy przekroczeniu limitu jasny komunikat: „Brakuje miejsca. Usuń starsze wideo w Ustawieniach albo wklej link”.
+- Automatyczne kasowanie. W Ustawieniach jasna informacja, że po przekroczeniu limitu najstarsze wideo będą usunięte. Blisko limitu pokazujemy dodatkowo jasny komunikat: „Kończy się miejsce na pliki wideo. Usuń starsze wideo”.
 
 ## Limity
 

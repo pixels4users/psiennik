@@ -6,6 +6,7 @@ import {
   MessagesSquare,
   Clock3,
   LoaderCircle,
+  Video,
 } from "lucide-react";
 import {
   ACTIVITY_TYPES,
@@ -75,6 +76,12 @@ export function EntryCard({
             </div>
           </div>
           <span className="flex shrink-0 items-center gap-1.5 text-xs text-muted-foreground">
+            {(entry.video_path || entry.video_url) && (
+              <span className="mr-1 inline-flex items-center gap-1 text-primary" title="Wydarzenie z wideo">
+                <Video className="size-3.5" aria-hidden="true" />
+                Wideo
+              </span>
+            )}
             <Clock3 className="size-3.5" aria-hidden="true" />
             {timesLabel(times)}
           </span>

@@ -191,6 +191,9 @@ export type Database = {
           time_of_day: string
           times_of_day: string[]
           title: string
+          video_path: string | null
+          video_size: number | null
+          video_url: string | null
         }
         Insert: {
           activity_type?: string
@@ -206,6 +209,9 @@ export type Database = {
           time_of_day?: string
           times_of_day?: string[]
           title: string
+          video_path?: string | null
+          video_size?: number | null
+          video_url?: string | null
         }
         Update: {
           activity_type?: string
@@ -221,6 +227,9 @@ export type Database = {
           time_of_day?: string
           times_of_day?: string[]
           title?: string
+          video_path?: string | null
+          video_size?: number | null
+          video_url?: string | null
         }
         Relationships: [
           {
@@ -488,6 +497,20 @@ export type Database = {
       complete_behavioral_process: {
         Args: { p_behaviorist_id: string; p_dog_id: string }
         Returns: undefined
+      }
+      my_storage_usage: { Args: never; Returns: number }
+      my_video_files: {
+        Args: never
+        Returns: {
+          created_at: string
+          dog_id: string
+          dog_name: string
+          entry_date: string
+          entry_id: string
+          entry_title: string
+          path: string
+          size: number
+        }[]
       }
       notify_dispatch_secret: { Args: never; Returns: string }
       redeem_dog_invite: {

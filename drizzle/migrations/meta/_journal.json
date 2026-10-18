@@ -8,6 +8,13 @@
       "when": 1791975243849,
       "tag": "0000_free_app_photo_quota",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1792307572192,
+      "tag": "0001_entry_videos",
+      "breakpoints": true
     }
   ]
 }
