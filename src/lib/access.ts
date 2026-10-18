@@ -10,10 +10,9 @@ export type OwnerBehaviorist = Tables<"owner_behaviorists">;
 
 function randomCode() {
   const alphabet = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
-  return Array.from(
-    { length: 6 },
-    () => alphabet[Math.floor(Math.random() * alphabet.length)],
-  ).join("");
+  // Kryptograficznie bezpieczne losowanie; 256 % 32 === 0, więc bez obciążenia.
+  const bytes = crypto.getRandomValues(new Uint8Array(6));
+  return Array.from(bytes, (b) => alphabet[b % alphabet.length]).join("");
 }
 
 export type AccessWithProfile = DogAccess & {

@@ -114,9 +114,9 @@ export function useVideoUrl(path: string | null | undefined) {
   return useQuery({
     queryKey: ["dog-video", path],
     enabled: !!path,
-    staleTime: 1000 * 60 * 45,
+    staleTime: 1000 * 60 * 4,
     queryFn: async (): Promise<string> => {
-      const { data, error } = await supabase.storage.from(VIDEO_BUCKET).createSignedUrl(path!, 3600);
+      const { data, error } = await supabase.storage.from(VIDEO_BUCKET).createSignedUrl(path!, 300);
       if (error) throw error;
       return data.signedUrl;
     },
