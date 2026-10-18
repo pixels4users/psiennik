@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { format, parseISO } from "date-fns";
 import { pl } from "date-fns/locale";
-import { Trash2, Video } from "lucide-react";
+import { ImageIcon, Trash2, Video } from "lucide-react";
 import { toast } from "sonner";
 import {
   STORAGE_LIMIT_BYTES,
@@ -31,9 +31,9 @@ export function StorageCard() {
         queryClient.invalidateQueries({ queryKey: ["video-files"] }),
         dogId ? queryClient.invalidateQueries({ queryKey: ["entries", dogId] }) : Promise.resolve(),
       ]);
-      toast.success("Wideo usunięte");
+      toast.success("Plik usunięty");
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : "Nie udało się usunąć wideo");
+      toast.error(err instanceof Error ? err.message : "Nie udało się usunąć pliku");
     } finally {
       setBusy(null);
     }
@@ -71,9 +71,9 @@ export function StorageCard() {
             {videos.map((v) => (
               <li key={v.path} className="flex items-center justify-between gap-3 p-3">
                 <div className="flex min-w-0 items-center gap-3">
-                  <Video className="size-4 shrink-0 text-primary" aria-hidden="true" />
+                  {v.kind === "photo" ? <ImageIcon className="size-4 shrink-0 text-primary" aria-hidden="true" /> : <Video className="size-4 shrink-0 text-primary" aria-hidden="true" />}
                   <div className="min-w-0">
-                    <p className="truncate text-sm font-medium">{v.entry_title ?? "Wideo bez wydarzenia"}</p>
+                    <p className="truncate text-sm font-medium">{v.entry_title ?? "Plik bez wydarzenia"}</p>
                     <p className="text-xs text-muted-foreground">
                       {[v.dog_name, v.entry_date && format(parseISO(v.entry_date), "d MMM yyyy", { locale: pl }), formatMb(v.size)]
                         .filter(Boolean)
@@ -87,7 +87,7 @@ export function StorageCard() {
                   className="text-destructive hover:bg-destructive/10 hover:text-destructive"
                   disabled={busy === v.path}
                   onClick={() => void remove(v.path, v.dog_id)}
-                  aria-label={`Usuń wideo: ${v.entry_title ?? "bez wydarzenia"}`}
+                  aria-label={`Usuń plik: ${v.entry_title ?? "bez wydarzenia"}`}
                 >
                   <Trash2 className="size-4" />
                   Usuń
@@ -96,7 +96,7 @@ export function StorageCard() {
             ))}
           </ul>
         ) : (
-          videos && <p className="text-sm text-muted-foreground">Nie masz jeszcze żadnych wideo.</p>
+          videos && <p className="text-sm text-muted-foreground">Nie masz jeszcze żadnych zdjęć ani wideo w wydarzeniach.</p>
         )}
       </CardContent>
     </Card>

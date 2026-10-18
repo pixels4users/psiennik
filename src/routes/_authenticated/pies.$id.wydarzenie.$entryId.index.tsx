@@ -8,7 +8,8 @@ import { useDogRole } from "@/lib/auth";
 import { EntryDiscussion } from "@/components/entry-discussion";
 import { RecommendationDialog } from "@/components/recommendation-dialog";
 import { RatingBadge } from "@/components/rating-badge";
-import { EntryVideo } from "@/components/entry-video";
+import { MediaGallery } from "@/components/entry-video";
+import { entryMedia } from "@/lib/video";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { EntriesErrorNotice } from "@/components/dog-state";
@@ -145,7 +146,7 @@ function EntryDetailsPage() {
                 );
               })}
             </div>
-            <EntryVideo entry={entry} />
+            <MediaGallery media={entryMedia(entry)} />
             {entry.description && (
               <p className="leading-relaxed whitespace-pre-wrap text-foreground/80">
                 {entry.description}

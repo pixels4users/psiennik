@@ -6,8 +6,9 @@ import {
   MessagesSquare,
   Clock3,
   LoaderCircle,
-  Video,
 } from "lucide-react";
+import { MediaPlaceholder, MediaThumb } from "@/components/entry-video";
+import { entryMedia } from "@/lib/video";
 import {
   ACTIVITY_TYPES,
   ACTIVITY_ICONS,
@@ -40,6 +41,7 @@ export function EntryCard({
 }) {
   const activities = entryActivities(entry);
   const times = entryTimes(entry);
+  const media = entryMedia(entry);
   const [openingEdit, setOpeningEdit] = useState(false);
 
   const handleEdit = async () => {
@@ -55,7 +57,26 @@ export function EntryCard({
   return (
     <Card className="entry-card shadow-none">
       <CardContent className="grid gap-4 p-5 sm:p-6">
-        <div className="flex items-start justify-between gap-3">
+        <div className="flex items-start gap-4">
+          {media[0] ? (
+            <button
+              type="button"
+              onClick={() => onOpenDetails?.(entry)}
+              disabled={!onOpenDetails}
+              className="relative shrink-0 rounded-lg focus-visible:ring-2 focus-visible:ring-ring"
+              aria-label={`Zobacz zdjęcia i wideo: ${entry.title}`}
+            >
+              <MediaThumb item={media[0]} className="size-20 sm:size-24" />
+              {media.length > 1 && (
+                <span className="absolute right-1 bottom-1 rounded-full bg-background/90 px-1.5 text-xs font-medium text-primary">
+                  +{media.length - 1}
+                </span>
+              )}
+            </button>
+          ) : (
+            <MediaPlaceholder className="size-20 shrink-0 sm:size-24" />
+          )}
+          <div className="flex min-w-0 flex-1 items-start justify-between gap-3">
           <div className="grid min-w-0 gap-1.5">
             <h3 className="font-display text-xl font-semibold leading-tight text-primary">
               {entry.title}
@@ -76,15 +97,10 @@ export function EntryCard({
             </div>
           </div>
           <span className="flex shrink-0 items-center gap-1.5 text-xs text-muted-foreground">
-            {(entry.video_path || entry.video_url) && (
-              <span className="mr-1 inline-flex items-center gap-1 text-primary" title="Wydarzenie z wideo">
-                <Video className="size-3.5" aria-hidden="true" />
-                Wideo
-              </span>
-            )}
             <Clock3 className="size-3.5" aria-hidden="true" />
             {timesLabel(times)}
           </span>
+          </div>
         </div>
 
         {entry.description && (
