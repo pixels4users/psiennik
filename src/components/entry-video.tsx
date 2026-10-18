@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { ExternalLink, Link2, Play } from "lucide-react";
-import { isImageUrl, parseVideoUrl, useVideoUrl, type MediaItem } from "@/lib/video";
+import { isImageUrl, parseVideoUrl, useVideoUrl, type MediaItem, type MediaLinkItem } from "@/lib/video";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { Paw } from "@/components/dog-motifs";
@@ -95,7 +95,7 @@ export function MediaThumb({ item, className }: { item: MediaItem; className?: s
       </div>
     );
   }
-  return <LinkThumb url={item.url} base={base} />;
+  return <LinkThumb url={(item as MediaLinkItem).url} base={base} />;
 }
 
 function LinkThumb({ url, base }: { url: string; base: string }) {
@@ -162,7 +162,7 @@ function MediaFull({ item }: { item: MediaItem }) {
     );
   }
   if (item.type === "video") return <VideoFilePlayer path={item.path} autoPlay />;
-  return <VideoLinkPlayer url={item.url} />;
+  return <VideoLinkPlayer url={(item as MediaLinkItem).url} />;
 }
 
 /** Galeria wydarzenia: siatka miniatur i podgląd na pełnym ekranie. */
