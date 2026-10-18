@@ -236,6 +236,7 @@ function DogTablePage() {
                       <Link
                         to="/pies/$id/wydarzenie/$entryId"
                         params={{ id, entryId: entry.id }}
+                        search={{ wroc: undefined }}
                         className="text-primary underline underline-offset-4 hover:decoration-2"
                       >
                         {entry.title}
