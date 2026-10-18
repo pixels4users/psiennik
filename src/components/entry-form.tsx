@@ -108,8 +108,8 @@ export function EntryForm({
   };
 
   const pickFiles = (list: FileList | null | undefined) => {
-    if (!list) return;
-    const next = [...pending];
+    if (!list || uploading) return;
+    const next: File[] = [];
     for (const file of Array.from(list)) {
       const virtual: MediaItem[] = [
         ...media,
@@ -122,31 +122,30 @@ export function EntryForm({
       }
       next.push(file);
     }
-    setPending(next);
+    if (next.length > 0) void uploadFiles(next);
   };
 
-  const uploadPending = async () => {
-    if (pending.length === 0) return;
+  // Pliki przesyłają się od razu po wybraniu — bez osobnego kroku „Prześlij”.
+  const uploadFiles = async (list: File[]) => {
+    setPending(list);
     setUploading(true);
     try {
-      const total = pending.reduce((sum, f) => sum + f.size, 0);
+      const total = list.reduce((sum, f) => sum + f.size, 0);
       const freed = await ensureSpaceFor(total);
       if (freed > 0) toast.info("Usunięto najstarsze wideo, aby zrobić miejsce.");
-      const added: MediaItem[] = [];
-      for (let i = 0; i < pending.length; i++) {
-        setProgress(i / pending.length);
-        const res = await uploadMediaFile(pending[i]!, dogId, entryId, (f) =>
-          setProgress((i + f) / pending.length),
+      for (let i = 0; i < list.length; i++) {
+        setProgress(i / list.length);
+        const res = await uploadMediaFile(list[i]!, dogId, entryId, (f) =>
+          setProgress((i + f) / list.length),
         );
-        added.push({ type: res.type, path: res.path, size: res.size });
+        setMedia((m) => [...m, { type: res.type, path: res.path, size: res.size }]);
+        setPending((p) => p.slice(1));
       }
-      setMedia((m) => [...m, ...added]);
-      setPending([]);
       invalidateStorage();
-      toast.success(added.length === 1 ? "Plik przesłany" : "Pliki przesłane");
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Nie udało się przesłać plików");
     } finally {
+      setPending([]);
       setUploading(false);
       setProgress(null);
     }
