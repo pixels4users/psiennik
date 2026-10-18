@@ -87,7 +87,17 @@ export function EntryCard({
           <div className="flex min-w-0 flex-1 items-start justify-between gap-3">
           <div className="grid min-w-0 gap-1.5">
             <h3 className="font-display text-xl font-semibold leading-tight text-primary">
-              {entry.title}
+              {onOpenDetails ? (
+                <button
+                  type="button"
+                  onClick={() => onOpenDetails(entry)}
+                  className="cursor-pointer text-left underline underline-offset-4 hover:decoration-2 focus-visible:rounded focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
+                >
+                  {entry.title}
+                </button>
+              ) : (
+                entry.title
+              )}
             </h3>
             <div className="flex flex-wrap items-center gap-2">
               {activities.map((value) => {
