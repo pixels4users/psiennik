@@ -102,7 +102,7 @@ export function entryMedia(entry: {
 }): MediaItem[] {
   const list: MediaItem[] = [];
   if (Array.isArray(entry.media)) {
-    for (const raw of entry.media as Record<string, unknown>[]) {
+    for (const raw of entry.media as { type?: unknown; path?: unknown; size?: unknown; url?: unknown }[]) {
       if (!raw || typeof raw !== "object") continue;
       if ((raw.type === "photo" || raw.type === "video") && typeof raw.path === "string")
         list.push({ type: raw.type, path: raw.path, size: Number(raw.size ?? 0) });

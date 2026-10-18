@@ -95,6 +95,11 @@ export function MediaThumb({ item, className }: { item: MediaItem; className?: s
       </div>
     );
   }
+  return <LinkThumb url={item.url} base={base} />;
+}
+
+function LinkThumb({ url, base }: { url: string; base: string }) {
+  const item = { url };
   const yt = youtubeThumb(item.url);
   const img = yt ?? (isImageUrl(item.url) ? item.url : null);
   const embed = parseVideoUrl(item.url);
@@ -172,7 +177,7 @@ export function MediaGallery({ media }: { media: MediaItem[] }) {
           const plain = item.type === "link" && parseVideoUrl(item.url)?.kind === "link" && !isImageUrl(item.url);
           return (
             <li key={item.type === "link" ? `l-${i}-${item.url}` : item.path}>
-              {plain ? (
+              {plain && item.type === "link" ? (
                 <a href={item.url} target="_blank" rel="noopener noreferrer" className="block rounded-lg focus-visible:ring-2 focus-visible:ring-ring">
                   <MediaThumb item={item} className="aspect-square" />
                   <span className="sr-only">Otwórz link w nowej karcie</span>
