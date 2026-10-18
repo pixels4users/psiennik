@@ -21,6 +21,7 @@ import { Route as AuthenticatedProfilRouteImport } from './routes/_authenticated
 import { Route as AuthenticatedPsyRouteImport } from './routes/_authenticated/psy'
 import { Route as PoradnikIndexRouteImport } from './routes/poradnik.index'
 import { Route as PoradnikSlugRouteImport } from './routes/poradnik.$slug'
+import { Route as DotlovableOauthConsentRouteImport } from './routes/[.]lovable.oauth.consent'
 import { Route as AuthenticatedPiesIdRouteImport } from './routes/_authenticated/pies.$id'
 import { Route as AuthenticatedPiesIdIndexRouteImport } from './routes/_authenticated/pies.$id.index'
 import { Route as AuthenticatedPiesIdAnalizaRouteImport } from './routes/_authenticated/pies.$id.analiza'
@@ -94,6 +95,11 @@ const PoradnikIndexRoute = PoradnikIndexRouteImport.update({
 const PoradnikSlugRoute = PoradnikSlugRouteImport.update({
   id: '/poradnik/$slug',
   path: '/poradnik/$slug',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DotlovableOauthConsentRoute = DotlovableOauthConsentRouteImport.update({
+  id: '/.lovable/oauth/consent',
+  path: '/.lovable/oauth/consent',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AuthenticatedPiesIdRoute = AuthenticatedPiesIdRouteImport.update({
@@ -190,6 +196,7 @@ export interface FileRoutesByFullPath {
   '/psy': typeof AuthenticatedPsyRoute
   '/poradnik/$slug': typeof PoradnikSlugRoute
   '/poradnik/': typeof PoradnikIndexRoute
+  '/.lovable/oauth/consent': typeof DotlovableOauthConsentRoute
   '/pies/$id': typeof AuthenticatedPiesIdRouteWithChildren
   '/pies/$id/analiza': typeof AuthenticatedPiesIdAnalizaRoute
   '/pies/$id/kalendarz': typeof AuthenticatedPiesIdKalendarzRoute
@@ -217,6 +224,7 @@ export interface FileRoutesByTo {
   '/psy': typeof AuthenticatedPsyRoute
   '/poradnik/$slug': typeof PoradnikSlugRoute
   '/poradnik': typeof PoradnikIndexRoute
+  '/.lovable/oauth/consent': typeof DotlovableOauthConsentRoute
   '/pies/$id/analiza': typeof AuthenticatedPiesIdAnalizaRoute
   '/pies/$id/kalendarz': typeof AuthenticatedPiesIdKalendarzRoute
   '/pies/$id/tabela': typeof AuthenticatedPiesIdTabelaRoute
@@ -244,6 +252,7 @@ export interface FileRoutesById {
   '/_authenticated/psy': typeof AuthenticatedPsyRoute
   '/poradnik/$slug': typeof PoradnikSlugRoute
   '/poradnik/': typeof PoradnikIndexRoute
+  '/.lovable/oauth/consent': typeof DotlovableOauthConsentRoute
   '/_authenticated/pies/$id': typeof AuthenticatedPiesIdRouteWithChildren
   '/_authenticated/pies/$id/analiza': typeof AuthenticatedPiesIdAnalizaRoute
   '/_authenticated/pies/$id/kalendarz': typeof AuthenticatedPiesIdKalendarzRoute
@@ -273,6 +282,7 @@ export interface FileRouteTypes {
     | '/psy'
     | '/poradnik/$slug'
     | '/poradnik/'
+    | '/.lovable/oauth/consent'
     | '/pies/$id'
     | '/pies/$id/analiza'
     | '/pies/$id/kalendarz'
@@ -300,6 +310,7 @@ export interface FileRouteTypes {
     | '/psy'
     | '/poradnik/$slug'
     | '/poradnik'
+    | '/.lovable/oauth/consent'
     | '/pies/$id/analiza'
     | '/pies/$id/kalendarz'
     | '/pies/$id/tabela'
@@ -326,6 +337,7 @@ export interface FileRouteTypes {
     | '/_authenticated/psy'
     | '/poradnik/$slug'
     | '/poradnik/'
+    | '/.lovable/oauth/consent'
     | '/_authenticated/pies/$id'
     | '/_authenticated/pies/$id/analiza'
     | '/_authenticated/pies/$id/kalendarz'
@@ -353,6 +365,7 @@ export interface RootRouteChildren {
   Char91DotwellKnownChar93OauthProtectedResourceRoute: typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
   PoradnikSlugRoute: typeof PoradnikSlugRoute
   PoradnikIndexRoute: typeof PoradnikIndexRoute
+  DotlovableOauthConsentRoute: typeof DotlovableOauthConsentRoute
   ApiPublicNotificationsSendRoute: typeof ApiPublicNotificationsSendRoute
   LovableEmailAuthPreviewRoute: typeof LovableEmailAuthPreviewRoute
   LovableEmailAuthWebhookRoute: typeof LovableEmailAuthWebhookRoute
@@ -443,6 +456,13 @@ declare module '@tanstack/react-router' {
       path: '/poradnik/$slug'
       fullPath: '/poradnik/$slug'
       preLoaderRoute: typeof PoradnikSlugRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/.lovable/oauth/consent': {
+      id: '/.lovable/oauth/consent'
+      path: '/.lovable/oauth/consent'
+      fullPath: '/.lovable/oauth/consent'
+      preLoaderRoute: typeof DotlovableOauthConsentRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_authenticated/pies/$id': {
@@ -616,6 +636,7 @@ const rootRouteChildren: RootRouteChildren = {
     Char91DotwellKnownChar93OauthProtectedResourceRoute,
   PoradnikSlugRoute: PoradnikSlugRoute,
   PoradnikIndexRoute: PoradnikIndexRoute,
+  DotlovableOauthConsentRoute: DotlovableOauthConsentRoute,
   ApiPublicNotificationsSendRoute: ApiPublicNotificationsSendRoute,
   LovableEmailAuthPreviewRoute: LovableEmailAuthPreviewRoute,
   LovableEmailAuthWebhookRoute: LovableEmailAuthWebhookRoute,
