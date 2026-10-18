@@ -6,9 +6,10 @@ import {
   MessagesSquare,
   Clock3,
   LoaderCircle,
+  Video,
 } from "lucide-react";
 import { MediaPlaceholder, MediaThumb } from "@/components/entry-video";
-import { entryMedia } from "@/lib/video";
+import { entryMedia, pickListThumb } from "@/lib/video";
 import {
   ACTIVITY_TYPES,
   ACTIVITY_ICONS,
@@ -42,6 +43,7 @@ export function EntryCard({
   const activities = entryActivities(entry);
   const times = entryTimes(entry);
   const media = entryMedia(entry);
+  const thumb = pickListThumb(media);
   const [openingEdit, setOpeningEdit] = useState(false);
 
   const handleEdit = async () => {
@@ -58,7 +60,7 @@ export function EntryCard({
     <Card className="entry-card shadow-none">
       <CardContent className="grid gap-4 p-5 sm:p-6">
         <div className="flex items-start gap-4">
-          {media[0] ? (
+          {thumb ? (
             <button
               type="button"
               onClick={() => onOpenDetails?.(entry)}
@@ -66,7 +68,13 @@ export function EntryCard({
               className="relative shrink-0 rounded-lg focus-visible:ring-2 focus-visible:ring-ring"
               aria-label={`Zobacz zdjęcia i wideo: ${entry.title}`}
             >
-              <MediaThumb item={media[0]} className="size-20 sm:size-24" />
+              {thumb === "icon" ? (
+                <span className="flex size-20 items-center justify-center rounded-lg bg-secondary sm:size-24">
+                  <Video className="size-8 text-primary/60" aria-hidden="true" />
+                </span>
+              ) : (
+                <MediaThumb item={thumb} className="size-20 sm:size-24" />
+              )}
               {media.length > 1 && (
                 <span className="absolute right-1 bottom-1 rounded-full bg-background/90 px-1.5 text-xs font-medium text-primary">
                   +{media.length - 1}
