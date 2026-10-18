@@ -13,6 +13,7 @@ export type VideoFile = {
   entry_id: string | null;
   entry_title: string | null;
   entry_date: string | null;
+  kind: "photo" | "video";
 };
 
 export async function fetchStorageUsage(): Promise<number> {
@@ -22,7 +23,7 @@ export async function fetchStorageUsage(): Promise<number> {
 }
 
 export async function fetchVideoFiles(): Promise<VideoFile[]> {
-  const { data, error } = await supabase.rpc("my_video_files");
+  const { data, error } = await supabase.rpc("my_media_files");
   if (error) throw error;
   return (data ?? []).map((v) => ({ ...v, size: Number(v.size) })) as VideoFile[];
 }
@@ -40,22 +41,38 @@ export async function deleteVideos(paths: string[]): Promise<void> {
   if (paths.length === 0) return;
   const { error } = await supabase.storage.from(VIDEO_BUCKET).remove(paths);
   if (error) throw error;
-  await supabase
-    .from("entries")
-    .update({ video_path: null, video_size: null })
-    .in("video_path", paths);
+  await supabase.rpc("remove_entry_media", { paths });
 }
 
 /** Robi miejsce na nowy plik, usuwając najstarsze wideo. Zwraca liczbę usuniętych nagrań. */
 export async function ensureSpaceFor(size: number): Promise<number> {
   const [usage, videos] = await Promise.all([fetchStorageUsage(), fetchVideoFiles()]);
-  const { paths, enough } = pickVideosToFree(videos, usage, size);
+  const { paths, enough } = pickVideosToFree(videos.filter((v) => v.kind === "video"), usage, size);
   if (!enough) throw new Error(STORAGE_FULL_MESSAGE);
   await deleteVideos(paths);
   return paths.length;
 }
 
-/** Wysyła wideo z paskiem postępu. */
+/** Wysyła zdjęcie (zmniejszone) lub wideo do galerii wydarzenia. */
+export async function uploadMediaFile(
+  file: File,
+  dogId: string,
+  entryId: string,
+  onProgress?: (fraction: number) => void,
+): Promise<{ path: string; size: number; type: "photo" | "video" }> {
+  if (file.type.startsWith("image/")) {
+    const { shrinkPhoto } = await import("@/lib/dogs");
+    const blob = await shrinkPhoto(file);
+    const name = blob === file ? file.name : "zdjecie.jpg";
+    const body = new File([blob], name, { type: blob.type || file.type });
+    const path = await uploadVideo(body, dogId, entryId, onProgress);
+    return { path, size: body.size, type: "photo" };
+  }
+  const path = await uploadVideo(file, dogId, entryId, onProgress);
+  return { path, size: file.size, type: "video" };
+}
+
+/** Wysyła plik z paskiem postępu. */
 export async function uploadVideo(
   file: File,
   dogId: string,
@@ -85,7 +102,7 @@ export async function uploadVideo(
       else if (xhr.status === 413) reject(new Error(VIDEO_TOO_BIG_MESSAGE));
       else if (/row-level security|policy|Unauthorized/i.test(xhr.responseText) || xhr.status === 403)
         reject(new Error(STORAGE_FULL_MESSAGE));
-      else reject(new Error("Nie udało się wysłać wideo"));
+      else reject(new Error("Nie udało się wysłać pliku"));
     };
     xhr.onerror = () => reject(new Error("Brak połączenia — nie udało się wysłać wideo"));
     xhr.send(file);
