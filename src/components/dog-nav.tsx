@@ -68,7 +68,7 @@ export function DogNav({ dog, active }: { dog: Dog; active: (typeof VIEWS)[numbe
         aria-label={`Profil psa ${dog.name}`}
         className="dog-masthead relative isolate overflow-hidden px-1 py-2 sm:px-2 sm:py-4"
       >
-        <Paw className="pointer-events-none absolute -right-4 -top-5 -z-10 w-44 rotate-[22deg] text-sage/50" />
+        <Paw className="pointer-events-none absolute -right-4 -top-5 -z-10 w-44 rotate-[22deg] text-sage/50 lg:right-auto lg:left-[30%] lg:-top-8 lg:w-36 lg:text-sage/40" />
         <div className="grid min-w-0 gap-5 lg:grid-cols-[auto_minmax(0,1fr)_minmax(13rem,auto)_auto] lg:items-center lg:gap-8">
           <div className="flex min-w-0 items-center gap-4 sm:gap-6 lg:contents">
             <DogAvatar dog={dog} className="size-20 sm:size-24" />
@@ -141,9 +141,15 @@ export function DogNav({ dog, active }: { dog: Dog; active: (typeof VIEWS)[numbe
         </div>
       </section>
 
+      <div className="relative min-w-0">
       <nav
         aria-label="Widoki dziennika psa"
-        className="dog-view-nav flex max-w-full gap-1 overflow-x-auto pb-2"
+        className="dog-view-nav flex max-w-full gap-1 overflow-x-auto pb-2 pr-10 sm:pr-0"
+        ref={(el) => {
+          const cur = el?.querySelector<HTMLElement>('[aria-current="page"]');
+          if (el && cur && cur.offsetLeft + cur.offsetWidth > el.clientWidth)
+            el.scrollLeft = cur.offsetLeft - 16;
+        }}
       >
         {VIEWS.map(({ key, label, path, icon: Icon }) => (
           <Link
@@ -163,6 +169,13 @@ export function DogNav({ dog, active }: { dog: Dog; active: (typeof VIEWS)[numbe
           </Link>
         ))}
       </nav>
+        <div
+          aria-hidden="true"
+          className="pointer-events-none absolute right-0 top-0 flex h-11 w-12 items-center justify-end bg-gradient-to-l from-background via-background/90 to-transparent sm:hidden"
+        >
+          <ArrowRight className="size-4 text-muted-foreground" />
+        </div>
+      </div>
 
       {role?.isReadOnly && (
         <div className="flex flex-wrap items-center gap-3 rounded-xl border border-warn/30 bg-warn/10 px-4 py-3 text-sm text-foreground">

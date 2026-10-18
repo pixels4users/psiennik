@@ -55,7 +55,7 @@ import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 
 const RATING_BUTTON_STYLES: Record<string, string> = {
-  green: "border-good/40 data-[active=true]:bg-good/15 data-[active=true]:text-good data-[active=true]:border-good",
+  green: "border-good/40 data-[active=true]:bg-good/15 data-[active=true]:text-foreground data-[active=true]:border-good",
   amber: "border-warn/40 data-[active=true]:bg-warn/15 data-[active=true]:text-warn data-[active=true]:border-warn",
   red: "border-bad/40 data-[active=true]:bg-bad/15 data-[active=true]:text-bad data-[active=true]:border-bad",
 };

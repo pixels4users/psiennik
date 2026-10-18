@@ -281,7 +281,7 @@ function FilterSelect({
     <div className="grid min-w-0 gap-2">
       <Label>{label}</Label>
       <Select value={value} onValueChange={onChange}>
-        <SelectTrigger>
+        <SelectTrigger aria-label={label}>
           <SelectValue />
         </SelectTrigger>
         <SelectContent>{children}</SelectContent>
