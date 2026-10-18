@@ -185,7 +185,8 @@ async function shrinkPhoto(file: File): Promise<Blob> {
   }
 }
 
-export const PHOTO_QUOTA_MESSAGE = "Brak miejsca na zdjęcia. Usuń jedno ze starszych zdjęć psa.";
+export const PHOTO_QUOTA_MESSAGE =
+  "Brak miejsca na pliki (limit 50 MB na zdjęcia i wideo). Usuń starsze wideo w Ustawieniach albo starsze zdjęcie psa.";
 
 export async function uploadDogPhoto(file: File, dogId: string): Promise<string> {
   const body = await shrinkPhoto(file);
