@@ -85,7 +85,7 @@ export function EntryCard({
             <MediaPlaceholder className="size-20 shrink-0 sm:size-24" />
           )}
           <div className="flex min-w-0 flex-1 items-start justify-between gap-3">
-          <div className="grid min-w-0 gap-1.5">
+          <div className="grid min-w-0 gap-4">
             <h3 className="font-display text-xl font-semibold leading-tight text-primary">
               {onOpenDetails ? (
                 <button
