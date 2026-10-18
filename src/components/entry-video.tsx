@@ -198,7 +198,7 @@ export function MediaGallery({ media }: { media: MediaItem[] }) {
         })}
       </ul>
       <Dialog open={open !== null} onOpenChange={(v) => !v && setOpen(null)}>
-        <DialogContent className="max-w-5xl gap-3 p-3 sm:p-4 [&>button:last-child]:z-10 [&>button:last-child]:bg-background/90 [&>button:last-child]:opacity-100 [&>button:last-child]:shadow-md">
+        <DialogContent className="max-w-5xl gap-3 p-3 sm:p-4 [&>button:last-child]:z-10 [&>button:last-child]:left-3 [&>button:last-child]:right-auto [&>button:last-child]:bg-background/90 [&>button:last-child]:opacity-100 [&>button:last-child]:shadow-md">
           <DialogTitle className="sr-only">{current ? itemLabel(current) : "Podgląd"}</DialogTitle>
           {current && <MediaFull item={current} />}
           {open !== null && (
