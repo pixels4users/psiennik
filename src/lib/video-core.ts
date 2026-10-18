@@ -81,3 +81,71 @@ export function pickVideosToFree(
   return { paths, enough: free >= needed };
 }
 
+
+// ---------- Galeria wydarzenia: zdjęcia, wideo i linki ----------
+
+export type MediaFileItem = { type: "photo" | "video"; path: string; size: number };
+export type MediaLinkItem = { type: "link"; url: string };
+export type MediaItem = MediaFileItem | MediaLinkItem;
+
+export const MAX_PHOTOS = 5;
+export const MAX_VIDEOS = 1;
+export const MAX_LINKS = 10;
+export const MEDIA_ACCEPT = "image/jpeg,image/png,image/webp,image/heic,image/*,video/mp4,video/quicktime,video/webm,video/*";
+
+/** Odczytuje galerię wpisu (z obsługą starych pojedynczych pól wideo). */
+export function entryMedia(entry: {
+  media?: unknown;
+  video_path?: string | null;
+  video_size?: number | null;
+  video_url?: string | null;
+}): MediaItem[] {
+  const list: MediaItem[] = [];
+  if (Array.isArray(entry.media)) {
+    for (const raw of entry.media as { type?: unknown; path?: unknown; size?: unknown; url?: unknown }[]) {
+      if (!raw || typeof raw !== "object") continue;
+      if ((raw.type === "photo" || raw.type === "video") && typeof raw.path === "string")
+        list.push({ type: raw.type, path: raw.path, size: Number(raw.size ?? 0) });
+      else if (raw.type === "link" && typeof raw.url === "string") list.push({ type: "link", url: raw.url });
+    }
+  }
+  if (list.length === 0) {
+    if (entry.video_path) list.push({ type: "video", path: entry.video_path, size: Number(entry.video_size ?? 0) });
+    if (entry.video_url) list.push({ type: "link", url: entry.video_url });
+  }
+  return list;
+}
+
+export function countMedia(media: MediaItem[], type: MediaItem["type"]): number {
+  return media.filter((m) => m.type === type).length;
+}
+
+/** Sprawdza, czy plik można dodać do galerii. Zwraca komunikat błędu albo null. */
+export function validateMediaFile(file: { size: number; type: string }, media: MediaItem[]): string | null {
+  if (file.type.startsWith("image/")) {
+    if (countMedia(media, "photo") >= MAX_PHOTOS) return `Możesz dodać maksymalnie ${MAX_PHOTOS} zdjęć.`;
+    if (file.size > VIDEO_MAX_BYTES) return "Zdjęcie jest za duże — maksymalnie 20 MB.";
+    return null;
+  }
+  if (file.type.startsWith("video/")) {
+    if (countMedia(media, "video") >= MAX_VIDEOS) return "Możesz dodać tylko 1 wideo. Usuń obecne, aby dodać inne.";
+    if (file.size > VIDEO_MAX_BYTES) return VIDEO_TOO_BIG_MESSAGE;
+    return null;
+  }
+  return "Wybierz zdjęcie (JPG, PNG, WebP) albo wideo (MP4, MOV, WebM).";
+}
+
+export function validateMediaLink(raw: string, media: MediaItem[]): string | null {
+  if (countMedia(media, "link") >= MAX_LINKS) return `Możesz dodać maksymalnie ${MAX_LINKS} linków.`;
+  const t = raw.trim();
+  if (t.length > 500 || !parseVideoUrl(t)) return "Wklej poprawny link zaczynający się od https://";
+  return null;
+}
+
+export function isImageUrl(raw: string): boolean {
+  try {
+    return /\.(jpe?g|png|webp|gif|avif)$/i.test(new URL(raw).pathname);
+  } catch {
+    return false;
+  }
+}

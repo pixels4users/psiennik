@@ -170,7 +170,7 @@ export function useRecentEntries(limit = 5) {
 }
 
 /** Zmniejsza zdjęcie do maks. 1200 px i zapisuje jako JPEG (zwykle 200–400 KB). */
-async function shrinkPhoto(file: File): Promise<Blob> {
+export async function shrinkPhoto(file: File): Promise<Blob> {
   try {
     const bitmap = await createImageBitmap(file);
     const scale = Math.min(1, 1200 / Math.max(bitmap.width, bitmap.height));

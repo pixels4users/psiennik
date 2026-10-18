@@ -187,6 +187,7 @@ export type Database = {
           description: string | null
           dog_id: string
           id: string
+          media: Json
           rating: string
           time_of_day: string
           times_of_day: string[]
@@ -205,6 +206,7 @@ export type Database = {
           description?: string | null
           dog_id: string
           id?: string
+          media?: Json
           rating?: string
           time_of_day?: string
           times_of_day?: string[]
@@ -223,6 +225,7 @@ export type Database = {
           description?: string | null
           dog_id?: string
           id?: string
+          media?: Json
           rating?: string
           time_of_day?: string
           times_of_day?: string[]
@@ -498,6 +501,20 @@ export type Database = {
         Args: { p_behaviorist_id: string; p_dog_id: string }
         Returns: undefined
       }
+      my_media_files: {
+        Args: never
+        Returns: {
+          created_at: string
+          dog_id: string
+          dog_name: string
+          entry_date: string
+          entry_id: string
+          entry_title: string
+          kind: string
+          path: string
+          size: number
+        }[]
+      }
       my_storage_usage: { Args: never; Returns: number }
       my_video_files: {
         Args: never
@@ -523,6 +540,7 @@ export type Database = {
           isSetofReturn: false
         }
       }
+      remove_entry_media: { Args: { paths: string[] }; Returns: undefined }
       resume_behavioral_process: {
         Args: { p_dog_id: string }
         Returns: undefined
