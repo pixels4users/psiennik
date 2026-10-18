@@ -1,6 +1,6 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { parseVideoUrl, pickVideosToFree, validateVideoFile, MB, STORAGE_LIMIT_BYTES, VIDEO_MAX_BYTES } from "../src/lib/video.ts";
+import { parseVideoUrl, pickVideosToFree, validateVideoFile, MB, STORAGE_LIMIT_BYTES, VIDEO_MAX_BYTES } from "../src/lib/video-core.ts";
 
 test("limit konta to 50 MB, pliku 20 MB", () => {
   assert.equal(STORAGE_LIMIT_BYTES, 50 * MB);
