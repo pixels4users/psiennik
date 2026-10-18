@@ -1,3 +1,4 @@
+import { cn } from "@/lib/utils";
 import { useMemo } from "react";
 import { createFileRoute } from "@tanstack/react-router";
 import { format, parseISO, startOfWeek } from "date-fns";
@@ -225,13 +226,13 @@ function DogAnalysisPage() {
               <CardContent className="grid gap-3 p-6">
                 <h2 className="text-xl">Ten tydzień</h2>
                 <div className="flex flex-wrap gap-2">
-                  <span className="rounded-full bg-good/15 px-3 py-1 text-xs font-medium text-good">
+                  <span className="rounded-full bg-good/15 px-3 py-1 text-xs font-medium text-foreground">
                     Dobrze: {analysis.week.green}
                   </span>
-                  <span className="rounded-full bg-warn/15 px-3 py-1 text-xs font-medium text-warn">
+                  <span className="rounded-full bg-warn/15 px-3 py-1 text-xs font-medium text-foreground">
                     Wyzwanie: {analysis.week.amber}
                   </span>
-                  <span className="rounded-full bg-bad/15 px-3 py-1 text-xs font-medium text-bad">
+                  <span className="rounded-full bg-bad/15 px-3 py-1 text-xs font-medium text-foreground">
                     Trudno: {analysis.week.red}
                   </span>
                 </div>
@@ -285,7 +286,7 @@ function DogAnalysisPage() {
             </Card>
           </section>
 
-          <section className="mt-8 grid gap-5 lg:grid-cols-2" aria-label="Wykresy analizy">
+          <section className="mt-8 grid min-w-0 grid-cols-1 gap-5 lg:grid-cols-2" aria-label="Wykresy analizy">
             <AnalysisCard title="Wydarzenia na dzień" empty={analysis.daily.length === 0}>
               <ChartContainer config={eventsConfig} className="h-72 w-full">
                 <LineChart accessibilityLayer data={analysis.daily} margin={{ left: 4, right: 12 }}>
@@ -396,7 +397,7 @@ function AnalysisCard({
   children: React.ReactNode;
 }) {
   return (
-    <Card className={className}>
+    <Card className={cn("min-w-0 overflow-hidden", className)}>
       <CardHeader>
         <CardTitle className="text-xl font-light">{title}</CardTitle>
       </CardHeader>
