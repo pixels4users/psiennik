@@ -1,5 +1,5 @@
-import reaktywnoscAsset from "@/assets/guide-reaktywnosc.jpg.asset.json";
-import lekAsset from "@/assets/guide-lek.jpg.asset.json";
+import reaktywnoscAsset from "@/assets/guide-lek.jpg.asset.json";
+import lekAsset from "@/assets/guide-reaktywnosc.jpg.asset.json";
 import niszczenieAsset from "@/assets/guide-niszczenie.jpg.asset.json";
 import { SITE_URL } from "@/lib/seo";
 
@@ -20,7 +20,7 @@ export const GUIDES: Guide[] = [
     description:
       "Co zapisywać po spacerze, gdy pies reaguje na inne psy, jak wygląda przykładowy tydzień wpisów i jak pokazać dziennik behawioryście.",
     imageUrl: reaktywnoscAsset.url,
-    imageAlt: "Pies patrzący przez metalową bramę w słoneczny dzień",
+    imageAlt: "Mały pies szczekający na chodniku",
   },
   {
     slug: "lek-separacyjny-psa",
@@ -28,7 +28,7 @@ export const GUIDES: Guide[] = [
     description:
       "Jak obserwować zachowanie psa, który źle znosi samotność, co notować przed wyjściem i po powrocie oraz jak przygotować się do konsultacji.",
     imageUrl: lekAsset.url,
-    imageAlt: "Pies patrzący w górę na osiedlu",
+    imageAlt: "Pies patrzący przez metalowe ogrodzenie",
   },
   {
     slug: "pies-niszczy-przedmioty",
