@@ -146,7 +146,9 @@ export function DogNav({ dog, active }: { dog: Dog; active: (typeof VIEWS)[numbe
         aria-label="Widoki dziennika psa"
         className="dog-view-nav flex max-w-full gap-1 overflow-x-auto pb-2 pr-10 sm:pr-0"
         ref={(el) => {
-          el?.querySelector<HTMLElement>('[aria-current="page"]')?.scrollIntoView({ block: "nearest", inline: "nearest" });
+          const cur = el?.querySelector<HTMLElement>('[aria-current="page"]');
+          if (el && cur && cur.offsetLeft + cur.offsetWidth > el.clientWidth)
+            el.scrollLeft = cur.offsetLeft - 16;
         }}
       >
         {VIEWS.map(({ key, label, path, icon: Icon }) => (
