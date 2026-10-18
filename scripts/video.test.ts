@@ -26,3 +26,21 @@ test("automatycznie usuwa najstarsze wideo, aż zmieści się nowe", () => {
   assert.deepEqual(pickVideosToFree(videos, 10 * MB, 18 * MB), { paths: [], enough: true });
   assert.equal(pickVideosToFree([], 45 * MB, 18 * MB).enough, false);
 });
+
+import { entryMedia, validateMediaFile, validateMediaLink, MAX_PHOTOS, MAX_LINKS } from "../src/lib/video-core.ts";
+test("galeria: maks. 5 zdjęć, 1 wideo, 10 linków", () => {
+  assert.equal(MAX_PHOTOS, 5);
+  assert.equal(MAX_LINKS, 10);
+  const photos = Array.from({ length: 5 }, (_, i) => ({ type: "photo" as const, path: `p${i}`, size: 1 }));
+  assert.notEqual(validateMediaFile({ size: 1000, type: "image/jpeg" }, photos), null);
+  assert.equal(validateMediaFile({ size: 1000, type: "image/jpeg" }, photos.slice(0, 4)), null);
+  const video = [{ type: "video" as const, path: "v", size: 1 }];
+  assert.notEqual(validateMediaFile({ size: 1000, type: "video/mp4" }, video), null);
+  assert.equal(validateMediaFile({ size: 1000, type: "video/mp4" }, photos), null);
+  const links = Array.from({ length: 10 }, () => ({ type: "link" as const, url: "https://a.pl" }));
+  assert.notEqual(validateMediaLink("https://b.pl", links), null);
+  assert.equal(validateMediaLink("https://b.pl", links.slice(0, 9)), null);
+});
+test("galeria: stare pola wideo są odczytywane", () => {
+  assert.deepEqual(entryMedia({ media: [], video_path: "x", video_size: 5, video_url: null }), [{ type: "video", path: "x", size: 5 }]);
+});
