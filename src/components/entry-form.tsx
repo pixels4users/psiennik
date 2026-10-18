@@ -1,8 +1,8 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { format, parseISO } from "date-fns";
 import { pl } from "date-fns/locale";
-import { CalendarIcon, Trash2, Video, Link2, X } from "lucide-react";
+import { CalendarIcon, Check, Trash2, Upload, Video, Link2, X } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import {
@@ -79,11 +79,15 @@ export function EntryForm({
   const [saving, setSaving] = useState(false);
   const [deleting, setDeleting] = useState(false);
   const [confirmDeleteOpen, setConfirmDeleteOpen] = useState(false);
-  const [videoMode, setVideoMode] = useState<"file" | "link">(() => (entry?.video_url ? "link" : "file"));
-  const [existingVideo, setExistingVideo] = useState<string | null>(() => entry?.video_path ?? null);
+  const [entryId] = useState(() => entry?.id ?? crypto.randomUUID());
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [videoPath, setVideoPath] = useState<string | null>(() => entry?.video_path ?? null);
+  const [videoSize, setVideoSize] = useState<number | null>(() => entry?.video_size ?? null);
   const [videoFile, setVideoFile] = useState<File | null>(null);
   const [videoPreview, setVideoPreview] = useState<string | null>(null);
   const [videoUrl, setVideoUrl] = useState(() => entry?.video_url ?? "");
+  const [urlDraft, setUrlDraft] = useState("");
+  const [uploading, setUploading] = useState(false);
   const [progress, setProgress] = useState<number | null>(null);
   const { data: usage } = useStorageUsage();
 
@@ -102,6 +106,56 @@ export function EntryForm({
       return;
     }
     setVideoFile(file);
+  };
+
+  const uploadPicked = async () => {
+    if (!videoFile) return;
+    setUploading(true);
+    try {
+      const freed = await ensureSpaceFor(videoFile.size);
+      if (freed > 0) {
+        toast.info(
+          freed === 1
+            ? "Usunięto najstarsze wideo, aby zrobić miejsce."
+            : `Usunięto ${freed} najstarsze wideo, aby zrobić miejsce.`,
+        );
+      }
+      setProgress(0);
+      const path = await uploadVideo(videoFile, dogId, entryId, setProgress);
+      setVideoPath(path);
+      setVideoSize(videoFile.size);
+      setVideoFile(null);
+      void queryClient.invalidateQueries({ queryKey: ["storage-usage"] });
+      void queryClient.invalidateQueries({ queryKey: ["video-files"] });
+      toast.success("Wideo przesłane");
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Nie udało się przesłać wideo");
+    } finally {
+      setUploading(false);
+      setProgress(null);
+    }
+  };
+
+  const removeAttachedVideo = async () => {
+    const path = videoPath;
+    setVideoPath(null);
+    setVideoSize(null);
+    // Nowo przesłany plik (jeszcze nie zapisany w wydarzeniu) usuwamy od razu.
+    if (path && path !== (entry?.video_path ?? null)) {
+      await supabase.storage.from(VIDEO_BUCKET).remove([path]);
+      void queryClient.invalidateQueries({ queryKey: ["storage-usage"] });
+      void queryClient.invalidateQueries({ queryKey: ["video-files"] });
+    }
+  };
+
+  const attachLink = () => {
+    const trimmed = urlDraft.trim();
+    if (!parseVideoUrl(trimmed)) {
+      toast.error("Wklej poprawny link zaczynający się od https://");
+      return;
+    }
+    setVideoUrl(trimmed);
+    setUrlDraft("");
   };
 
   useEffect(() => {
@@ -129,33 +183,19 @@ export function EntryForm({
       toast.error("Wybierz przynajmniej jedną porę dnia");
       return;
     }
-    const trimmedUrl = videoMode === "link" ? videoUrl.trim() : "";
-    if (trimmedUrl && !parseVideoUrl(trimmedUrl)) {
-      toast.error("Wklej poprawny link zaczynający się od https://");
+    if (videoFile && !videoPath) {
+      toast.error("Kliknij „Prześlij wideo” albo usuń wybrany plik");
+      return;
+    }
+    if (urlDraft.trim() && !videoUrl) {
+      toast.error("Kliknij „Załącz link” albo wyczyść pole linku");
       return;
     }
     setSaving(true);
     try {
-      const entryId = entry?.id ?? crypto.randomUUID();
       const originalPath = entry?.video_path ?? null;
-      const keepExisting = videoMode === "file" && !videoFile && existingVideo === originalPath;
-      if (originalPath && !keepExisting) {
+      if (originalPath && originalPath !== videoPath) {
         await supabase.storage.from(VIDEO_BUCKET).remove([originalPath]);
-      }
-      let videoPath: string | null = keepExisting ? originalPath : null;
-      let videoSize: number | null = keepExisting ? (entry?.video_size ?? null) : null;
-      if (videoMode === "file" && videoFile) {
-        const freed = await ensureSpaceFor(videoFile.size);
-        if (freed > 0) {
-          toast.info(
-            freed === 1
-              ? "Usunięto najstarsze wideo, aby zrobić miejsce."
-              : `Usunięto ${freed} najstarsze wideo, aby zrobić miejsce.`,
-          );
-        }
-        setProgress(0);
-        videoPath = await uploadVideo(videoFile, dogId, entryId, setProgress);
-        videoSize = videoFile.size;
       }
       const orderedTimes = TIMES_OF_DAY.filter((t) => timesOfDay.includes(t.value)).map(
         (t) => t.value,
@@ -174,15 +214,12 @@ export function EntryForm({
         description: description.trim() || null,
         rating,
         video_path: videoPath,
-        video_size: videoSize,
-        video_url: trimmedUrl || null,
+        video_size: videoPath ? videoSize : null,
+        video_url: videoUrl || null,
       };
       const { error } = isEdit
         ? await supabase.from("entries").update(payload).eq("id", entry.id)
         : await supabase.from("entries").insert({ ...payload, id: entryId });
-      if (error && videoPath && videoPath !== originalPath) {
-        await supabase.storage.from(VIDEO_BUCKET).remove([videoPath]);
-      }
       if (error) throw error;
 
       await queryClient.invalidateQueries({ queryKey: ["entries", dogId] });
@@ -338,98 +375,122 @@ export function EntryForm({
         </div>
         <div className="grid gap-3">
           <Label>Wideo (opcjonalnie)</Label>
-          <div className="flex gap-2" role="group" aria-label="Sposób dodania wideo">
-            <Button
-              type="button"
-              size="sm"
-              variant={videoMode === "file" ? "default" : "outline"}
-              onClick={() => setVideoMode("file")}
-            >
-              <Video className="size-4" /> Dodaj wideo z telefonu
-            </Button>
-            <Button
-              type="button"
-              size="sm"
-              variant={videoMode === "link" ? "default" : "outline"}
-              onClick={() => setVideoMode("link")}
-            >
-              <Link2 className="size-4" /> Lub wklej link
-            </Button>
-          </div>
-          {videoMode === "file" ? (
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept={VIDEO_ACCEPT}
+            className="sr-only"
+            aria-label="Plik wideo"
+            tabIndex={-1}
+            onChange={(e) => {
+              pickVideo(e.target.files?.[0]);
+              e.target.value = "";
+            }}
+          />
+          {videoPath ? (
             <div className="grid gap-2">
-              {videoPreview ? (
-                <VideoFilePlayer src={videoPreview} />
-              ) : existingVideo ? (
-                <VideoFilePlayer path={existingVideo} />
-              ) : null}
-              {videoPreview || existingVideo ? (
-                <Button
-                  type="button"
-                  variant="outline"
-                  size="sm"
-                  className="w-fit text-destructive hover:text-destructive"
-                  disabled={saving}
-                  onClick={() => {
-                    setVideoFile(null);
-                    setExistingVideo(null);
-                  }}
-                >
+              <VideoFilePlayer path={videoPath} />
+              <div className="flex flex-wrap items-center gap-3">
+                <span className="inline-flex items-center gap-1 text-sm font-medium text-good">
+                  <Check className="size-4" /> Wideo załączone
+                </span>
+                <Button type="button" variant="outline" size="sm" className="text-destructive hover:text-destructive" disabled={saving || uploading} onClick={() => void removeAttachedVideo()}>
                   <X className="size-4" /> Usuń wideo
                 </Button>
-              ) : (
-                <label className="grid cursor-pointer gap-1 rounded-lg border border-dashed p-4 text-sm hover:bg-muted">
-                  <span className="font-medium text-primary">Wybierz lub nagraj wideo</span>
-                  <span className="text-muted-foreground">
-                    MP4, MOV lub WebM, maks. 20 MB. Najlepiej 15–45 sekund kluczowej sytuacji.
-                  </span>
-                  <input
-                    type="file"
-                    accept={VIDEO_ACCEPT}
-                    className="sr-only"
-                    aria-label="Plik wideo"
-                    onChange={(e) => {
-                      pickVideo(e.target.files?.[0]);
-                      e.target.value = "";
-                    }}
-                  />
-                </label>
-              )}
-              {existingVideo && !videoFile && (
-                <p className="text-xs text-muted-foreground">
-                  Po usunięciu możesz dodać nowe wideo i zapisać zmiany.
-                </p>
-              )}
-              {progress !== null && (
+              </div>
+            </div>
+          ) : videoFile && videoPreview ? (
+            <div className="grid gap-2">
+              <VideoFilePlayer src={videoPreview} />
+              <p className="text-xs text-muted-foreground">
+                {videoFile.name} · {formatMb(videoFile.size)}
+              </p>
+              {progress !== null ? (
                 <div className="grid gap-1" aria-live="polite">
                   <div className="h-2 overflow-hidden rounded-full bg-muted">
                     <div className="h-full bg-primary transition-all" style={{ width: `${Math.round(progress * 100)}%` }} />
                   </div>
                   <span className="text-xs text-muted-foreground">Wysyłanie wideo… {Math.round(progress * 100)}%</span>
                 </div>
-              )}
-              {usage !== undefined && usage >= STORAGE_WARN_BYTES && (
-                <p className="text-sm text-warn">
-                  Kończy się miejsce na pliki wideo ({formatMb(usage)} z 50 MB). Usuń starsze wideo w Ustawieniach — inaczej najstarsze zostaną usunięte automatycznie.
-                </p>
+              ) : (
+                <div className="flex flex-wrap gap-2">
+                  <Button type="button" size="sm" onClick={() => void uploadPicked()} disabled={uploading}>
+                    <Upload className="size-4" /> Prześlij wideo
+                  </Button>
+                  <Button type="button" variant="outline" size="sm" onClick={() => setVideoFile(null)} disabled={uploading}>
+                    <X className="size-4" /> Usuń
+                  </Button>
+                </div>
               )}
             </div>
           ) : (
-            <div className="grid gap-2">
-              <Input
-                type="url"
-                inputMode="url"
-                value={videoUrl}
-                onChange={(e) => setVideoUrl(e.target.value)}
-                placeholder="https://youtu.be/… lub link z Dysku Google"
-                aria-label="Link do wideo"
-              />
-              <p className="text-xs text-muted-foreground">
-                YouTube, Dysk Google i Vimeo odtworzą się w Psienniku. Na Dysku ustaw „Każda osoba mająca link”.
-              </p>
-              {videoUrl.trim() && parseVideoUrl(videoUrl) && <VideoLinkPlayer url={videoUrl.trim()} />}
+            <div
+              onDragOver={(e) => e.preventDefault()}
+              onDrop={(e) => {
+                e.preventDefault();
+                pickVideo(e.dataTransfer.files?.[0]);
+              }}
+              className="grid gap-2 rounded-lg border border-dashed p-4 text-sm"
+            >
+              <Button type="button" size="sm" className="w-fit" onClick={() => fileInputRef.current?.click()}>
+                <Video className="size-4" /> Prześlij wideo
+              </Button>
+              <span className="text-muted-foreground">
+                Albo przeciągnij plik tutaj. MP4, MOV lub WebM, maks. 20 MB. Najlepiej 15–45 sekund kluczowej sytuacji.
+              </span>
             </div>
           )}
+          {usage !== undefined && usage >= STORAGE_WARN_BYTES && (
+            <p className="text-sm text-warn">
+              Kończy się miejsce na pliki wideo ({formatMb(usage)} z 50 MB). Usuń starsze wideo w Ustawieniach — inaczej najstarsze zostaną usunięte automatycznie.
+            </p>
+          )}
+
+          <div className="grid gap-2">
+            <Label htmlFor="entry-video-url" className="text-sm font-normal text-muted-foreground">
+              Lub wklej link do wideo
+            </Label>
+            {videoUrl ? (
+              <div className="grid gap-2">
+                <VideoLinkPlayer url={videoUrl} />
+                <div className="flex flex-wrap items-center gap-3">
+                  <span className="inline-flex items-center gap-1 text-sm font-medium text-good">
+                    <Check className="size-4" /> Link załączony
+                  </span>
+                  <Button type="button" variant="outline" size="sm" className="text-destructive hover:text-destructive" onClick={() => setVideoUrl("")}>
+                    <X className="size-4" /> Usuń
+                  </Button>
+                </div>
+              </div>
+            ) : (
+              <>
+                <div className="flex gap-2">
+                  <div className="relative flex-1">
+                    <Input
+                      id="entry-video-url"
+                      type="url"
+                      inputMode="url"
+                      value={urlDraft}
+                      onChange={(e) => setUrlDraft(e.target.value)}
+                      placeholder="https://youtu.be/… lub link z Dysku Google"
+                      className="pr-9"
+                    />
+                    {urlDraft && (
+                      <button type="button" aria-label="Wyczyść link" onClick={() => setUrlDraft("")} className="absolute right-2 top-1/2 -translate-y-1/2 rounded p-1 text-muted-foreground hover:text-foreground">
+                        <X className="size-4" />
+                      </button>
+                    )}
+                  </div>
+                  <Button type="button" variant="outline" onClick={attachLink} disabled={!urlDraft.trim()}>
+                    <Link2 className="size-4" /> Załącz link
+                  </Button>
+                </div>
+                <p className="text-xs text-muted-foreground">
+                  YouTube, Dysk Google i Vimeo odtworzą się w Psienniku. Na Dysku ustaw „Każda osoba mająca link”.
+                </p>
+              </>
+            )}
+          </div>
         </div>
         <div className="grid gap-2">
           <Label>Ocena wydarzenia</Label>
