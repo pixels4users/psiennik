@@ -2,7 +2,8 @@ import { useState } from "react";
 import { ExternalLink, Link2, Play } from "lucide-react";
 import { isImageUrl, parseVideoUrl, useVideoUrl, type MediaItem, type MediaLinkItem } from "@/lib/video";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
+import { Dialog, DialogClose, DialogContent, DialogTitle } from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
 import { Paw } from "@/components/dog-motifs";
 import { cn } from "@/lib/utils";
 
@@ -197,20 +198,27 @@ export function MediaGallery({ media }: { media: MediaItem[] }) {
         })}
       </ul>
       <Dialog open={open !== null} onOpenChange={(v) => !v && setOpen(null)}>
-        <DialogContent className="max-w-5xl gap-3 p-3 sm:p-4">
+        <DialogContent className="max-w-5xl gap-3 p-3 sm:p-4 [&>button:last-child]:z-10 [&>button:last-child]:bg-background/90 [&>button:last-child]:opacity-100 [&>button:last-child]:shadow-md">
           <DialogTitle className="sr-only">{current ? itemLabel(current) : "Podgląd"}</DialogTitle>
           {current && <MediaFull item={current} />}
-          {media.length > 1 && open !== null && (
-            <div className="flex items-center justify-between text-sm">
-              <button type="button" className="rounded px-3 py-1.5 hover:bg-muted" onClick={() => setOpen((open - 1 + media.length) % media.length)}>
-                ‹ Poprzednie
-              </button>
-              <span className="text-muted-foreground">
-                {open + 1} / {media.length}
+          {open !== null && (
+            <div className="grid grid-cols-3 items-center gap-2 text-sm">
+              <DialogClose asChild>
+                <Button variant="outline" size="sm" className="w-fit">Zamknij</Button>
+              </DialogClose>
+              <span className="text-center text-muted-foreground">
+                {media.length > 1 ? `${open + 1} / ${media.length}` : ""}
               </span>
-              <button type="button" className="rounded px-3 py-1.5 hover:bg-muted" onClick={() => setOpen((open + 1) % media.length)}>
-                Następne ›
-              </button>
+              {media.length > 1 ? (
+                <div className="flex justify-end gap-1">
+                  <Button variant="ghost" size="sm" onClick={() => setOpen((open - 1 + media.length) % media.length)}>
+                    ‹ Poprzednie
+                  </Button>
+                  <Button variant="ghost" size="sm" onClick={() => setOpen((open + 1) % media.length)}>
+                    Następne ›
+                  </Button>
+                </div>
+              ) : <span />}
             </div>
           )}
         </DialogContent>
