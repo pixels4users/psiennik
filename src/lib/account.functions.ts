@@ -64,19 +64,21 @@ export const deleteMyAccount = createServerFn({ method: "POST" })
       }
     }
 
-    // Wideo z wydarzeń: dogId/entryId/plik oraz pliki dodane przez użytkownika do cudzych psów.
-    {
-      const { data: videoRows, error: videoError } = await supabaseAdmin
-        .schema("storage" as never)
-        .from("objects" as never)
-        .select("name")
-        .eq("bucket_id", "dog-videos")
-        .or(`owner.eq.${userId}${dogIds.length ? `,name.like.${dogIds.map((d) => d).join("/%,name.like.")}/%` : ""}`);
-      if (videoError) throw new Error(`Nie udało się odczytać wideo: ${videoError.message}`);
-      const names = ((videoRows ?? []) as { name: string }[]).map((r) => r.name);
-      if (names.length > 0) {
-        const { error: rmVideo } = await supabaseAdmin.storage.from("dog-videos").remove(names);
-        if (rmVideo) throw new Error(`Nie udało się usunąć wideo: ${rmVideo.message}`);
+    // Wideo z wydarzeń usuwanych psów: dogId/entryId/plik.
+    for (const dogId of dogIds) {
+      const { data: folders, error: folderError } = await supabaseAdmin.storage.from("dog-videos").list(dogId);
+      if (folderError) throw new Error(`Nie udało się odczytać wideo: ${folderError.message}`);
+      for (const folder of folders ?? []) {
+        const { data: files, error: listError } = await supabaseAdmin.storage
+          .from("dog-videos")
+          .list(`${dogId}/${folder.name}`);
+        if (listError) throw new Error(`Nie udało się odczytać wideo: ${listError.message}`);
+        if (files && files.length > 0) {
+          const { error: rmVideo } = await supabaseAdmin.storage
+            .from("dog-videos")
+            .remove(files.map((f) => `${dogId}/${folder.name}/${f.name}`));
+          if (rmVideo) throw new Error(`Nie udało się usunąć wideo: ${rmVideo.message}`);
+        }
       }
     }
 
