@@ -44,3 +44,14 @@ test("galeria: maks. 5 zdjęć, 1 wideo, 10 linków", () => {
 test("galeria: stare pola wideo są odczytywane", () => {
   assert.deepEqual(entryMedia({ media: [], video_path: "x", video_size: 5, video_url: null }), [{ type: "video", path: "x", size: 5 }]);
 });
+
+import { pickListThumb } from "../src/lib/video-core";
+describe("pickListThumb", () => {
+  const photo = { type: "photo" as const, path: "a.jpg", size: 1 };
+  const yt = { type: "link" as const, url: "https://youtu.be/dQw4w9WgXcQ" };
+  const drive = { type: "link" as const, url: "https://example.com/page" };
+  it("prefers first uploaded file over links", () => expect(pickListThumb([yt, photo])).toBe(photo));
+  it("uses link with frame when no files", () => expect(pickListThumb([drive, yt])).toBe(yt));
+  it("shows video icon for links without frame", () => expect(pickListThumb([drive])).toBe("icon"));
+  it("returns null with no media", () => expect(pickListThumb([])).toBeNull());
+});

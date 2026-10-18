@@ -149,3 +149,22 @@ export function isImageUrl(raw: string): boolean {
     return false;
   }
 }
+
+/** Czy z linku da się pokazać kadr (YouTube albo bezpośredni obrazek). */
+export function linkHasThumb(url: string): boolean {
+  if (isImageUrl(url)) return true;
+  const e = parseVideoUrl(url);
+  return e?.kind === "iframe" && e.provider === "youtube";
+}
+
+/**
+ * Miniatura na liście wydarzeń: pierwszy plik → link z kadrem →
+ * "icon" (tylko linki bez kadru) → null (brak materiałów, łapka).
+ */
+export function pickListThumb(media: MediaItem[]): MediaItem | "icon" | null {
+  const file = media.find((m) => m.type !== "link");
+  if (file) return file;
+  const link = media.find((m) => m.type === "link" && linkHasThumb(m.url));
+  if (link) return link;
+  return media.length > 0 ? "icon" : null;
+}
