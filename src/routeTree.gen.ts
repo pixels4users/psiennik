@@ -13,12 +13,15 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as KontaktRouteImport } from './routes/kontakt'
+import { Route as McpRouteImport } from './routes/mcp'
 import { Route as PrywatnoscRouteImport } from './routes/prywatnosc'
 import { Route as RegulaminRouteImport } from './routes/regulamin'
+import { Route as Char91DotwellKnownChar93OauthProtectedResourceRouteImport } from './routes/[.well-known]/oauth-protected-resource'
 import { Route as AuthenticatedProfilRouteImport } from './routes/_authenticated/profil'
 import { Route as AuthenticatedPsyRouteImport } from './routes/_authenticated/psy'
 import { Route as PoradnikIndexRouteImport } from './routes/poradnik.index'
 import { Route as PoradnikSlugRouteImport } from './routes/poradnik.$slug'
+import { Route as DotlovableOauthConsentRouteImport } from './routes/[.]lovable.oauth.consent'
 import { Route as AuthenticatedPiesIdRouteImport } from './routes/_authenticated/pies.$id'
 import { Route as AuthenticatedPiesIdIndexRouteImport } from './routes/_authenticated/pies.$id.index'
 import { Route as AuthenticatedPiesIdAnalizaRouteImport } from './routes/_authenticated/pies.$id.analiza'
@@ -53,6 +56,11 @@ const KontaktRoute = KontaktRouteImport.update({
   path: '/kontakt',
   getParentRoute: () => rootRouteImport,
 } as any)
+const McpRoute = McpRouteImport.update({
+  id: '/mcp',
+  path: '/mcp',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const PrywatnoscRoute = PrywatnoscRouteImport.update({
   id: '/prywatnosc',
   path: '/prywatnosc',
@@ -63,6 +71,12 @@ const RegulaminRoute = RegulaminRouteImport.update({
   path: '/regulamin',
   getParentRoute: () => rootRouteImport,
 } as any)
+const Char91DotwellKnownChar93OauthProtectedResourceRoute =
+  Char91DotwellKnownChar93OauthProtectedResourceRouteImport.update({
+    id: '/.well-known/oauth-protected-resource',
+    path: '/.well-known/oauth-protected-resource',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const AuthenticatedProfilRoute = AuthenticatedProfilRouteImport.update({
   id: '/profil',
   path: '/profil',
@@ -81,6 +95,11 @@ const PoradnikIndexRoute = PoradnikIndexRouteImport.update({
 const PoradnikSlugRoute = PoradnikSlugRouteImport.update({
   id: '/poradnik/$slug',
   path: '/poradnik/$slug',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DotlovableOauthConsentRoute = DotlovableOauthConsentRouteImport.update({
+  id: '/.lovable/oauth/consent',
+  path: '/.lovable/oauth/consent',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AuthenticatedPiesIdRoute = AuthenticatedPiesIdRouteImport.update({
@@ -169,12 +188,15 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/kontakt': typeof KontaktRoute
+  '/mcp': typeof McpRoute
   '/prywatnosc': typeof PrywatnoscRoute
   '/regulamin': typeof RegulaminRoute
+  '/.well-known/oauth-protected-resource': typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
   '/profil': typeof AuthenticatedProfilRoute
   '/psy': typeof AuthenticatedPsyRoute
   '/poradnik/$slug': typeof PoradnikSlugRoute
   '/poradnik/': typeof PoradnikIndexRoute
+  '/.lovable/oauth/consent': typeof DotlovableOauthConsentRoute
   '/pies/$id': typeof AuthenticatedPiesIdRouteWithChildren
   '/pies/$id/analiza': typeof AuthenticatedPiesIdAnalizaRoute
   '/pies/$id/kalendarz': typeof AuthenticatedPiesIdKalendarzRoute
@@ -194,12 +216,15 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/kontakt': typeof KontaktRoute
+  '/mcp': typeof McpRoute
   '/prywatnosc': typeof PrywatnoscRoute
   '/regulamin': typeof RegulaminRoute
+  '/.well-known/oauth-protected-resource': typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
   '/profil': typeof AuthenticatedProfilRoute
   '/psy': typeof AuthenticatedPsyRoute
   '/poradnik/$slug': typeof PoradnikSlugRoute
   '/poradnik': typeof PoradnikIndexRoute
+  '/.lovable/oauth/consent': typeof DotlovableOauthConsentRoute
   '/pies/$id/analiza': typeof AuthenticatedPiesIdAnalizaRoute
   '/pies/$id/kalendarz': typeof AuthenticatedPiesIdKalendarzRoute
   '/pies/$id/tabela': typeof AuthenticatedPiesIdTabelaRoute
@@ -219,12 +244,15 @@ export interface FileRoutesById {
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
   '/auth': typeof AuthRoute
   '/kontakt': typeof KontaktRoute
+  '/mcp': typeof McpRoute
   '/prywatnosc': typeof PrywatnoscRoute
   '/regulamin': typeof RegulaminRoute
+  '/.well-known/oauth-protected-resource': typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
   '/_authenticated/profil': typeof AuthenticatedProfilRoute
   '/_authenticated/psy': typeof AuthenticatedPsyRoute
   '/poradnik/$slug': typeof PoradnikSlugRoute
   '/poradnik/': typeof PoradnikIndexRoute
+  '/.lovable/oauth/consent': typeof DotlovableOauthConsentRoute
   '/_authenticated/pies/$id': typeof AuthenticatedPiesIdRouteWithChildren
   '/_authenticated/pies/$id/analiza': typeof AuthenticatedPiesIdAnalizaRoute
   '/_authenticated/pies/$id/kalendarz': typeof AuthenticatedPiesIdKalendarzRoute
@@ -246,12 +274,15 @@ export interface FileRouteTypes {
     | '/'
     | '/auth'
     | '/kontakt'
+    | '/mcp'
     | '/prywatnosc'
     | '/regulamin'
+    | '/.well-known/oauth-protected-resource'
     | '/profil'
     | '/psy'
     | '/poradnik/$slug'
     | '/poradnik/'
+    | '/.lovable/oauth/consent'
     | '/pies/$id'
     | '/pies/$id/analiza'
     | '/pies/$id/kalendarz'
@@ -271,12 +302,15 @@ export interface FileRouteTypes {
     | '/'
     | '/auth'
     | '/kontakt'
+    | '/mcp'
     | '/prywatnosc'
     | '/regulamin'
+    | '/.well-known/oauth-protected-resource'
     | '/profil'
     | '/psy'
     | '/poradnik/$slug'
     | '/poradnik'
+    | '/.lovable/oauth/consent'
     | '/pies/$id/analiza'
     | '/pies/$id/kalendarz'
     | '/pies/$id/tabela'
@@ -295,12 +329,15 @@ export interface FileRouteTypes {
     | '/_authenticated'
     | '/auth'
     | '/kontakt'
+    | '/mcp'
     | '/prywatnosc'
     | '/regulamin'
+    | '/.well-known/oauth-protected-resource'
     | '/_authenticated/profil'
     | '/_authenticated/psy'
     | '/poradnik/$slug'
     | '/poradnik/'
+    | '/.lovable/oauth/consent'
     | '/_authenticated/pies/$id'
     | '/_authenticated/pies/$id/analiza'
     | '/_authenticated/pies/$id/kalendarz'
@@ -322,10 +359,13 @@ export interface RootRouteChildren {
   AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
   AuthRoute: typeof AuthRoute
   KontaktRoute: typeof KontaktRoute
+  McpRoute: typeof McpRoute
   PrywatnoscRoute: typeof PrywatnoscRoute
   RegulaminRoute: typeof RegulaminRoute
+  Char91DotwellKnownChar93OauthProtectedResourceRoute: typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
   PoradnikSlugRoute: typeof PoradnikSlugRoute
   PoradnikIndexRoute: typeof PoradnikIndexRoute
+  DotlovableOauthConsentRoute: typeof DotlovableOauthConsentRoute
   ApiPublicNotificationsSendRoute: typeof ApiPublicNotificationsSendRoute
   LovableEmailAuthPreviewRoute: typeof LovableEmailAuthPreviewRoute
   LovableEmailAuthWebhookRoute: typeof LovableEmailAuthWebhookRoute
@@ -362,6 +402,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof KontaktRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/mcp': {
+      id: '/mcp'
+      path: '/mcp'
+      fullPath: '/mcp'
+      preLoaderRoute: typeof McpRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/prywatnosc': {
       id: '/prywatnosc'
       path: '/prywatnosc'
@@ -374,6 +421,13 @@ declare module '@tanstack/react-router' {
       path: '/regulamin'
       fullPath: '/regulamin'
       preLoaderRoute: typeof RegulaminRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/.well-known/oauth-protected-resource': {
+      id: '/.well-known/oauth-protected-resource'
+      path: '/.well-known/oauth-protected-resource'
+      fullPath: '/.well-known/oauth-protected-resource'
+      preLoaderRoute: typeof Char91DotwellKnownChar93OauthProtectedResourceRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_authenticated/profil': {
@@ -402,6 +456,13 @@ declare module '@tanstack/react-router' {
       path: '/poradnik/$slug'
       fullPath: '/poradnik/$slug'
       preLoaderRoute: typeof PoradnikSlugRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/.lovable/oauth/consent': {
+      id: '/.lovable/oauth/consent'
+      path: '/.lovable/oauth/consent'
+      fullPath: '/.lovable/oauth/consent'
+      preLoaderRoute: typeof DotlovableOauthConsentRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_authenticated/pies/$id': {
@@ -568,10 +629,14 @@ const rootRouteChildren: RootRouteChildren = {
   AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
   AuthRoute: AuthRoute,
   KontaktRoute: KontaktRoute,
+  McpRoute: McpRoute,
   PrywatnoscRoute: PrywatnoscRoute,
   RegulaminRoute: RegulaminRoute,
+  Char91DotwellKnownChar93OauthProtectedResourceRoute:
+    Char91DotwellKnownChar93OauthProtectedResourceRoute,
   PoradnikSlugRoute: PoradnikSlugRoute,
   PoradnikIndexRoute: PoradnikIndexRoute,
+  DotlovableOauthConsentRoute: DotlovableOauthConsentRoute,
   ApiPublicNotificationsSendRoute: ApiPublicNotificationsSendRoute,
   LovableEmailAuthPreviewRoute: LovableEmailAuthPreviewRoute,
   LovableEmailAuthWebhookRoute: LovableEmailAuthWebhookRoute,

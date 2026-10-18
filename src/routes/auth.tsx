@@ -28,10 +28,12 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { socialMeta } from "@/lib/seo";
+import { oauthReturnPath } from "@/lib/oauth-return-path";
 
 const searchSchema = z.object({
   code: z.string().optional(),
   rola: z.enum(["owner", "behaviorist"]).optional(),
+  next: z.string().optional(),
 });
 
 const PENDING_ROLE_KEY = "psiennik.pending-role";
@@ -54,7 +56,9 @@ export const Route = createFileRoute("/auth")({
 function AuthPage() {
   const navigate = useNavigate();
   const { user, loading } = useAuth();
-  const { code, rola } = useSearch({ from: "/auth" });
+  const { code, rola, next: rawNext } = useSearch({ from: "/auth" });
+  const nextPath = rawNext ? oauthReturnPath(rawNext) : null;
+  const nextTarget = nextPath && nextPath !== "/" ? nextPath : null;
   const redeem = useRedeemInvite();
   const queryClient = useQueryClient();
   const claimBehaviorist = useServerFn(claimBehavioristRole);
@@ -104,9 +108,10 @@ function AuthPage() {
         },
       });
     } else if (!searchCode) {
-      navigate({ to: "/psy", replace: true });
+      if (nextTarget) window.location.replace(nextTarget);
+      else navigate({ to: "/psy", replace: true });
     }
-  }, [loading, user, searchCode, navigate, redeem]);
+  }, [loading, user, searchCode, navigate, redeem, nextTarget]);
 
   const oauth = async (provider: "google" | "apple", chosenRole?: "owner" | "behaviorist") => {
     setBusy(true);
@@ -115,7 +120,9 @@ function AuthPage() {
       else sessionStorage.removeItem(PENDING_ROLE_KEY);
       const redirectTo = searchCode
         ? `${window.location.origin}/auth?code=${encodeURIComponent(searchCode)}`
-        : window.location.origin;
+        : nextTarget
+          ? new URL(nextTarget, window.location.origin).href
+          : window.location.origin;
       const result = await lovable.auth.signInWithOAuth(provider, {
         redirect_uri: redirectTo,
       });
@@ -153,7 +160,9 @@ function AuthPage() {
         options: {
           emailRedirectTo: searchCode
             ? `${window.location.origin}/auth?code=${encodeURIComponent(searchCode)}`
-            : window.location.origin,
+            : nextTarget
+              ? new URL(nextTarget, window.location.origin).href
+              : window.location.origin,
           data: { display_name: name, role },
         },
       });
