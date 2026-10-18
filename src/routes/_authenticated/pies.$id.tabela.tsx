@@ -1,5 +1,5 @@
 import { useMemo, useState } from "react";
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { format, parseISO } from "date-fns";
 import { pl } from "date-fns/locale";
 import { CalendarIcon, RotateCcw } from "lucide-react";
@@ -232,7 +232,16 @@ function DogTablePage() {
                     <TableCell className="px-4 align-top font-medium">
                       {format(parseISO(entry.date), "d MMM yyyy", { locale: pl })}
                     </TableCell>
-                    <TableCell className="align-top font-medium">{entry.title}</TableCell>
+                    <TableCell className="align-top font-medium">
+                      <Link
+                        to="/pies/$id/wydarzenie/$entryId"
+                        params={{ id, entryId: entry.id }}
+                        search={{ wroc: undefined }}
+                        className="text-primary underline underline-offset-4 hover:decoration-2"
+                      >
+                        {entry.title}
+                      </Link>
+                    </TableCell>
                     <TableCell className="align-top">
                       {labelsFor(ACTIVITY_TYPES, entryActivities(entry))}
                     </TableCell>

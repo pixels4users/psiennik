@@ -119,7 +119,7 @@ function RecentEntryCard({ entry }: { entry: RecentEntry }) {
         <CardContent className="flex items-start gap-4 p-4">
           <RecentEntryDogPhoto photoUrl={entry.dogs?.photo_url ?? null} />
           <div className="grid min-w-0 flex-1 grid-cols-1 gap-1.5">
-            <p className="font-display text-lg leading-tight [overflow-wrap:anywhere]">
+            <p className="font-display text-lg leading-tight underline underline-offset-4 [overflow-wrap:anywhere]">
               {entry.title}
             </p>
             <p className="text-sm text-muted-foreground">
