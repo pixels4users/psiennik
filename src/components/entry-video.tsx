@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { ExternalLink, ImageIcon, Link2, Play } from "lucide-react";
+import { ExternalLink, Link2, Play } from "lucide-react";
 import { isImageUrl, parseVideoUrl, useVideoUrl, type MediaItem } from "@/lib/video";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
@@ -214,4 +214,3 @@ export function MediaGallery({ media }: { media: MediaItem[] }) {
   );
 }
 
-export { ImageIcon };
