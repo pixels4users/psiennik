@@ -14,6 +14,7 @@ import {
 } from "@/lib/access";
 import { BehavioristInviteCard } from "@/components/behaviorist-invite";
 import { JoinDialog } from "@/components/join-dialog";
+import { StorageCard } from "@/components/storage-card";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -256,6 +257,7 @@ function ProfilePage() {
         </CardContent>
       </Card>
 
+      <StorageCard />
       <ExportDataCard />
       <BehavioristCodeCard />
       <OwnerBehavioristsCard />

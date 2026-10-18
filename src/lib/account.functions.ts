@@ -64,6 +64,22 @@ export const deleteMyAccount = createServerFn({ method: "POST" })
       }
     }
 
+    // Wideo z wydarzeń: dogId/entryId/plik oraz pliki dodane przez użytkownika do cudzych psów.
+    {
+      const { data: videoRows, error: videoError } = await supabaseAdmin
+        .schema("storage" as never)
+        .from("objects" as never)
+        .select("name")
+        .eq("bucket_id", "dog-videos")
+        .or(`owner.eq.${userId}${dogIds.length ? `,name.like.${dogIds.map((d) => d).join("/%,name.like.")}/%` : ""}`);
+      if (videoError) throw new Error(`Nie udało się odczytać wideo: ${videoError.message}`);
+      const names = ((videoRows ?? []) as { name: string }[]).map((r) => r.name);
+      if (names.length > 0) {
+        const { error: rmVideo } = await supabaseAdmin.storage.from("dog-videos").remove(names);
+        if (rmVideo) throw new Error(`Nie udało się usunąć wideo: ${rmVideo.message}`);
+      }
+    }
+
     if (dogIds.length > 0) {
       // Wpisy, dostępy, zaproszenia i odsłony znikają razem z psem (kaskada),
       // ale kasujemy je jawnie, aby nie zależeć od konfiguracji kluczy obcych.
