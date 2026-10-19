@@ -17,12 +17,12 @@ export const Route = createRootRoute({
   head: () => ({
     meta: [
       {
-        title: "Psiennik — dziennik behawioralny",
+        title: "Psiennik — darmowy dziennik behawioralny psa",
       },
       {
         name: "description",
         content:
-          "Wspólny dziennik behawioralny psa dla właścicieli i behawiorystów: wydarzenia, oceny i zalecenia.",
+          "Bezpłatny dziennik behawioralny psa dla właścicieli i behawiorystów: wydarzenia, oceny i zalecenia. Za darmo, bez abonamentu.",
       },
       {
         name: "viewport",

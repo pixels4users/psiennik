@@ -16,13 +16,28 @@ import { SITE_URL, socialMeta } from "@/lib/seo";
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: socialMeta({
-      title: "Psiennik — dziennik behawioralny psa",
+      title: "Psiennik — darmowy dziennik behawioralny psa",
       description:
-        "Wspólny dziennik behawioralny psa dla właścicieli i behawiorystów: wydarzenia dnia, oceny, kalendarz i zalecenia.",
+        "Bezpłatna aplikacja dla opiekuna psa: wspólny dziennik behawioralny z behawiorystą. Wydarzenia, oceny, kalendarz i zalecenia — za darmo, bez abonamentu.",
       path: "/",
       image: "homepage",
     }),
     links: [{ rel: "canonical", href: `${SITE_URL}/` }],
+    scripts: [
+      {
+        type: "application/ld+json",
+        children: JSON.stringify({
+          "@context": "https://schema.org",
+          "@type": "SoftwareApplication",
+          name: "Psiennik",
+          applicationCategory: "LifestyleApplication",
+          operatingSystem: "Web",
+          description:
+            "Darmowy dziennik behawioralny psa dla opiekunów i behawiorystów: wydarzenia, oceny, kalendarz i zalecenia.",
+          offers: { "@type": "Offer", price: "0", priceCurrency: "PLN" },
+        }),
+      },
+    ],
   }),
   component: LandingPage,
 });
