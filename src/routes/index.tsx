@@ -1,13 +1,12 @@
 import { useEffect } from "react";
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { ArrowDown, ArrowUpRight, CalendarRange, Check, MessageSquareText, PawPrint, Play, Video } from "lucide-react";
+import { ArrowDown, ArrowUpRight, CalendarRange, MessageSquareText, PawPrint, Play, Video } from "lucide-react";
 import exampleVideo from "@/assets/example-video.jpg";
 import { useAuth } from "@/lib/auth";
 import { Button } from "@/components/ui/button";
 import { DogDoodle, Paw, PawTrail } from "@/components/dog-motifs";
 import { Reveal } from "@/components/reveal";
 import { DogJournalPreviewCard } from "@/components/dog-journal-preview-card";
-import heroAsset from "@/assets/hero.jpg.asset.json";
 import socialProofAsset from "@/assets/social-proof.jpg.asset.json";
 import dogProfile1Asset from "@/assets/dog-profile-1.jpg.asset.json";
 import dogProfile2Asset from "@/assets/dog-profile-2.jpg.asset.json";
