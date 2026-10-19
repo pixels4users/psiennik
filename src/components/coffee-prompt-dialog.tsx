@@ -1,5 +1,11 @@
-import { Coffee } from "lucide-react";
-import { BUYCOFFEE_URL } from "@/components/app-header";
+import { Coffee, CupSoda, Heart } from "lucide-react";
+
+const COFFEE_BASE = "https://buycoffee.to/psiennik";
+const COFFEE_OPTIONS = [
+  { size: "small", amount: "9 zł", Icon: Coffee },
+  { size: "medium", amount: "16 zł", Icon: Heart },
+  { size: "large", amount: "25 zł", Icon: CupSoda },
+] as const;
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -31,7 +37,6 @@ export function CoffeePromptDialog({
 
   const handleSupport = () => {
     void snoozeCoffeePrompt(SNOOZE_DAYS_AFTER_SUPPORT);
-    window.open(BUYCOFFEE_URL, "_blank", "noopener,noreferrer");
     close();
   };
 
@@ -60,11 +65,27 @@ export function CoffeePromptDialog({
             jej utrzymanie i rozwój, możesz postawić mi kawę.
           </DialogDescription>
         </DialogHeader>
-        <div className="grid gap-2 pt-2">
-          <Button onClick={handleSupport} className="gap-2">
-            <Coffee className="size-4" aria-hidden="true" />
-            Postaw kawę
-          </Button>
+        <p className="pt-2 text-center text-sm font-semibold text-foreground">
+          Postaw kawę za:
+        </p>
+        <div className="grid grid-cols-3 gap-2 sm:gap-3">
+          {COFFEE_OPTIONS.map(({ size, amount, Icon }) => (
+            <a
+              key={size}
+              href={`${COFFEE_BASE}?coffeeSize=${size}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              onClick={handleSupport}
+              aria-label={`Postaw kawę za ${amount}`}
+              className="flex flex-col items-center gap-2 rounded-2xl border border-border bg-card px-2 py-4 text-card-foreground shadow-sm transition hover:border-primary hover:bg-primary/5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+            >
+              <Icon className="size-7 text-primary" aria-hidden="true" />
+              <span className="text-lg font-semibold">{amount}</span>
+            </a>
+          ))}
+        </div>
+        <div className="grid gap-2">
+
           <Button variant="ghost" onClick={handleLater}>
             Może później
           </Button>
