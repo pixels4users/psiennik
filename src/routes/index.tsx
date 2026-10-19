@@ -199,7 +199,7 @@ function LandingPage() {
                     Zalecenie behawiorysty
                   </p>
                   <p className="mt-2 text-sm leading-relaxed text-primary">
-                    Zostańcie przy tym dystansie. Zwróć uwagę, jak szybko Humus wraca do spokoju.
+                    Zostańcie przy tym dystansie. Zwróć uwagę, jak szybko Humus się uspokaja.
                   </p>
                 </div>
               </Reveal>
