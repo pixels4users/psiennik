@@ -130,6 +130,9 @@ function LandingPage() {
             </Link>
           </Button>
         </div>
+        <p className="mt-4 text-sm text-muted-foreground">
+          Całkowicie za darmo — bez abonamentu i bez limitu psów.
+        </p>
         <a
           href="#dziennik-w-praktyce"
           className="mt-7 inline-flex min-h-11 items-center gap-2 rounded-full px-3 text-sm text-muted-foreground hover:text-primary"
@@ -361,7 +364,7 @@ function LandingPage() {
             zaczynają się od łapy.
           </h2>
           <p className="mx-auto mt-5 max-w-md text-sm leading-relaxed text-primary-foreground/80">
-            Zacznij od pierwszego wydarzenia. Resztę zapiszecie po drodze.
+            Zacznij od pierwszego wydarzenia. Resztę zapiszecie po drodze. Psiennik jest i pozostanie darmowy.
           </p>
           <div className="mt-8 flex flex-col justify-center gap-3 sm:flex-row">
             <Button asChild size="lg" variant="secondary">
