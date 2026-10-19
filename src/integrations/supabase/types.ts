@@ -419,6 +419,7 @@ export type Database = {
       }
       profiles: {
         Row: {
+          coffee_snooze_until: string | null
           created_at: string
           display_name: string | null
           email: string | null
@@ -436,6 +437,7 @@ export type Database = {
           updated_at: string
         }
         Insert: {
+          coffee_snooze_until?: string | null
           created_at?: string
           display_name?: string | null
           email?: string | null
@@ -453,6 +455,7 @@ export type Database = {
           updated_at?: string
         }
         Update: {
+          coffee_snooze_until?: string | null
           created_at?: string
           display_name?: string | null
           email?: string | null

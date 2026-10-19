@@ -1,0 +1,1 @@
+ALTER TABLE public.profiles ADD COLUMN coffee_snooze_until timestamp with time zone;
