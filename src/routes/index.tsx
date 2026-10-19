@@ -1,6 +1,7 @@
 import { useEffect } from "react";
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { ArrowDown, ArrowUpRight, CalendarRange, Check, MessageSquareText, PawPrint } from "lucide-react";
+import { ArrowDown, ArrowUpRight, CalendarRange, Check, MessageSquareText, PawPrint, Play, Video } from "lucide-react";
+import exampleVideo from "@/assets/example-video.jpg";
 import { useAuth } from "@/lib/auth";
 import { Button } from "@/components/ui/button";
 import { DogDoodle, Paw, PawTrail } from "@/components/dog-motifs";
@@ -57,6 +58,11 @@ const FEATURES = [
     icon: MessageSquareText,
     title: "Behawiorysta w zespole",
     description: "Zaproś behawiorystkę kodem — doda zalecenia do wydarzeń.",
+  },
+  {
+    icon: Video,
+    title: "Zdjęcia i wideo",
+    description: "Dodaj do wydarzenia nagranie ze spaceru lub kilka zdjęć.",
   },
 ];
 
@@ -193,6 +199,22 @@ function LandingPage() {
                 <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
                   Minęliśmy dwa psy bez szczekania. Pomogło zwiększenie dystansu i spokojna komenda.
                 </p>
+                <div className="relative mt-4 aspect-video overflow-hidden rounded-xl bg-muted">
+                  <img
+                    src={exampleVideo}
+                    alt="Kadr z nagrania spaceru Humusa"
+                    width={1280}
+                    height={720}
+                    loading="lazy"
+                    className="size-full object-cover"
+                  />
+                  <span className="absolute inset-0 m-auto flex size-12 items-center justify-center rounded-full bg-background/90 text-primary shadow">
+                    <Play className="ml-0.5 size-5 fill-current" aria-hidden="true" />
+                  </span>
+                  <span className="absolute bottom-2 right-2 rounded-full bg-background/90 px-2 py-0.5 text-xs text-primary">
+                    0:32
+                  </span>
+                </div>
                 <div className="mt-4 rounded-xl bg-secondary p-3.5">
                   <p className="flex items-center gap-2 text-xs font-medium text-primary">
                     <MessageSquareText className="size-4" />
@@ -205,7 +227,7 @@ function LandingPage() {
               </Reveal>
               <p className="mt-5 flex items-center gap-2 text-xs text-muted-foreground">
                 <Check className="size-4 text-primary" />
-                Wydarzenie i zalecenie zawsze obok siebie.
+                Wydarzenie, wideo i zalecenie zawsze w jednym miejscu.
               </p>
             </div>
           </div>
@@ -231,12 +253,12 @@ function LandingPage() {
             </h2>
           </div>
         </Reveal>
-        <div className="mt-12 grid gap-8 md:grid-cols-3 md:gap-0">
+        <div className="mt-12 grid gap-8 md:grid-cols-2 lg:grid-cols-4 lg:gap-0">
           {FEATURES.map(({ icon: Icon, title, description }, index) => (
             <Reveal
               key={title}
               order={index}
-              className="feature-column border-t border-primary/15 pt-6 md:border-l md:border-t-0 md:px-8 md:pt-0 md:first:border-l-0 md:first:pl-0 md:last:pr-0"
+              className="feature-column border-t border-primary/15 pt-6 lg:border-l lg:border-t-0 lg:px-8 lg:pt-0 lg:first:border-l-0 lg:first:pl-0 lg:last:pr-0"
             >
               <div className="flex items-center justify-between">
                 <span className="flex size-12 items-center justify-center rounded-2xl bg-secondary">
