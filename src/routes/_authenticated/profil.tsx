@@ -387,6 +387,29 @@ function ExportDataCard() {
   );
 }
 
+/** Podgląd modala „Postaw kawę” — tylko w trybie deweloperskim. */
+function CoffeePreviewCard() {
+  const [open, setOpen] = useState(false);
+  return (
+    <Card className="mt-6 shadow-none">
+      <CardHeader>
+        <CardTitle className="text-xl">Prośba o kawę (podgląd)</CardTitle>
+      </CardHeader>
+      <CardContent className="grid gap-4">
+        <p className="text-sm leading-relaxed text-muted-foreground">
+          Widoczne tylko w trybie testowym. Uwaga: kliknięcie „Postaw kawę” albo „Może później”
+          zapisze wyciszenie modala na Twoim koncie.
+        </p>
+        <Button variant="outline" className="justify-self-start" onClick={() => setOpen(true)}>
+          <Coffee className="mr-2 size-4" aria-hidden="true" />
+          Podejrzyj modal
+        </Button>
+        <CoffeePromptDialog open={open} onOpenChange={setOpen} />
+      </CardContent>
+    </Card>
+  );
+}
+
 function ChatGptCard() {
   return (
     <Card className="mt-6 shadow-none">
