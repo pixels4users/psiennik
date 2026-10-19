@@ -15,6 +15,7 @@ import { Route as AuthRouteImport } from './routes/auth'
 import { Route as KontaktRouteImport } from './routes/kontakt'
 import { Route as McpRouteImport } from './routes/mcp'
 import { Route as PrywatnoscRouteImport } from './routes/prywatnosc'
+import { Route as PsiennikWChatgptRouteImport } from './routes/psiennik-w-chatgpt'
 import { Route as RegulaminRouteImport } from './routes/regulamin'
 import { Route as Char91DotwellKnownChar93OauthProtectedResourceRouteImport } from './routes/[.well-known]/oauth-protected-resource'
 import { Route as AuthenticatedProfilRouteImport } from './routes/_authenticated/profil'
@@ -64,6 +65,11 @@ const McpRoute = McpRouteImport.update({
 const PrywatnoscRoute = PrywatnoscRouteImport.update({
   id: '/prywatnosc',
   path: '/prywatnosc',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PsiennikWChatgptRoute = PsiennikWChatgptRouteImport.update({
+  id: '/psiennik-w-chatgpt',
+  path: '/psiennik-w-chatgpt',
   getParentRoute: () => rootRouteImport,
 } as any)
 const RegulaminRoute = RegulaminRouteImport.update({
@@ -190,6 +196,7 @@ export interface FileRoutesByFullPath {
   '/kontakt': typeof KontaktRoute
   '/mcp': typeof McpRoute
   '/prywatnosc': typeof PrywatnoscRoute
+  '/psiennik-w-chatgpt': typeof PsiennikWChatgptRoute
   '/regulamin': typeof RegulaminRoute
   '/.well-known/oauth-protected-resource': typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
   '/profil': typeof AuthenticatedProfilRoute
@@ -218,6 +225,7 @@ export interface FileRoutesByTo {
   '/kontakt': typeof KontaktRoute
   '/mcp': typeof McpRoute
   '/prywatnosc': typeof PrywatnoscRoute
+  '/psiennik-w-chatgpt': typeof PsiennikWChatgptRoute
   '/regulamin': typeof RegulaminRoute
   '/.well-known/oauth-protected-resource': typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
   '/profil': typeof AuthenticatedProfilRoute
@@ -246,6 +254,7 @@ export interface FileRoutesById {
   '/kontakt': typeof KontaktRoute
   '/mcp': typeof McpRoute
   '/prywatnosc': typeof PrywatnoscRoute
+  '/psiennik-w-chatgpt': typeof PsiennikWChatgptRoute
   '/regulamin': typeof RegulaminRoute
   '/.well-known/oauth-protected-resource': typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
   '/_authenticated/profil': typeof AuthenticatedProfilRoute
@@ -276,6 +285,7 @@ export interface FileRouteTypes {
     | '/kontakt'
     | '/mcp'
     | '/prywatnosc'
+    | '/psiennik-w-chatgpt'
     | '/regulamin'
     | '/.well-known/oauth-protected-resource'
     | '/profil'
@@ -304,6 +314,7 @@ export interface FileRouteTypes {
     | '/kontakt'
     | '/mcp'
     | '/prywatnosc'
+    | '/psiennik-w-chatgpt'
     | '/regulamin'
     | '/.well-known/oauth-protected-resource'
     | '/profil'
@@ -331,6 +342,7 @@ export interface FileRouteTypes {
     | '/kontakt'
     | '/mcp'
     | '/prywatnosc'
+    | '/psiennik-w-chatgpt'
     | '/regulamin'
     | '/.well-known/oauth-protected-resource'
     | '/_authenticated/profil'
@@ -361,6 +373,7 @@ export interface RootRouteChildren {
   KontaktRoute: typeof KontaktRoute
   McpRoute: typeof McpRoute
   PrywatnoscRoute: typeof PrywatnoscRoute
+  PsiennikWChatgptRoute: typeof PsiennikWChatgptRoute
   RegulaminRoute: typeof RegulaminRoute
   Char91DotwellKnownChar93OauthProtectedResourceRoute: typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
   PoradnikSlugRoute: typeof PoradnikSlugRoute
@@ -414,6 +427,13 @@ declare module '@tanstack/react-router' {
       path: '/prywatnosc'
       fullPath: '/prywatnosc'
       preLoaderRoute: typeof PrywatnoscRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/psiennik-w-chatgpt': {
+      id: '/psiennik-w-chatgpt'
+      path: '/psiennik-w-chatgpt'
+      fullPath: '/psiennik-w-chatgpt'
+      preLoaderRoute: typeof PsiennikWChatgptRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/regulamin': {
@@ -631,6 +651,7 @@ const rootRouteChildren: RootRouteChildren = {
   KontaktRoute: KontaktRoute,
   McpRoute: McpRoute,
   PrywatnoscRoute: PrywatnoscRoute,
+  PsiennikWChatgptRoute: PsiennikWChatgptRoute,
   RegulaminRoute: RegulaminRoute,
   Char91DotwellKnownChar93OauthProtectedResourceRoute:
     Char91DotwellKnownChar93OauthProtectedResourceRoute,
