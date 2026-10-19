@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { Check, Download, Ticket, Trash2 } from "lucide-react";
@@ -258,6 +258,7 @@ function ProfilePage() {
       </Card>
 
       <StorageCard />
+      <ChatGptCard />
       <ExportDataCard />
       <BehavioristCodeCard />
       <OwnerBehavioristsCard />
@@ -349,19 +350,28 @@ function SignOutCard() {
 
   return (
     <Card className="mt-6 shadow-none">
+      <CardContent className="p-6">
+        <Button variant="outline" className="w-full" onClick={() => void signOut()}>
+          Wyloguj się
+        </Button>
+      </CardContent>
+    </Card>
+  );
+}
+
+function ChatGptCard() {
+  return (
+    <Card className="mt-6 shadow-none">
       <CardHeader>
-        <CardTitle className="text-xl">Konto</CardTitle>
+        <CardTitle className="text-xl">Połącz swój Psiennik z ChatGPT</CardTitle>
       </CardHeader>
       <CardContent className="grid gap-4">
         <p className="text-sm leading-relaxed text-muted-foreground">
-          Wylogujesz się z Psiennika na tym urządzeniu. Twoje dane pozostają bezpieczne.
+          Zadawaj ChatGPT pytania o swoje psy, wpisy i komentarze. ChatGPT może tylko odczytywać
+          dane — niczego nie zmieni.
         </p>
-        <Button
-          variant="outline"
-          className="justify-self-start"
-          onClick={() => void signOut()}
-        >
-          Wyloguj się
+        <Button asChild variant="outline" className="justify-self-start">
+          <Link to="/psiennik-w-chatgpt">Zobacz, jak to zrobić</Link>
         </Button>
       </CardContent>
     </Card>
@@ -455,11 +465,7 @@ function DeleteAccountCard() {
         </div>
         <AlertDialog open={open} onOpenChange={setOpen}>
           <AlertDialogTrigger asChild>
-            <Button
-              variant="outline"
-              className="justify-self-start text-destructive"
-              disabled={deleting}
-            >
+            <Button variant="destructive" className="justify-self-start" disabled={deleting}>
               <Trash2 className="mr-2 size-4" />
               Usuń konto
             </Button>
