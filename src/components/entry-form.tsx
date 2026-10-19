@@ -16,6 +16,8 @@ import {
 } from "@/lib/dogs";
 import { MultiToggle } from "@/components/multi-toggle";
 import { MediaThumb } from "@/components/entry-video";
+import { CoffeePromptDialog } from "@/components/coffee-prompt-dialog";
+import { checkCoffeePromptEligible } from "@/lib/coffee-prompt";
 import type { Json } from "@/integrations/supabase/types";
 import {
   MEDIA_ACCEPT,
@@ -88,6 +90,7 @@ export function EntryForm({
   const [saving, setSaving] = useState(false);
   const [deleting, setDeleting] = useState(false);
   const [confirmDeleteOpen, setConfirmDeleteOpen] = useState(false);
+  const [coffeeOpen, setCoffeeOpen] = useState(false);
   const [entryId] = useState(() => entry?.id ?? crypto.randomUUID());
   const fileInputRef = useRef<HTMLInputElement>(null);
   const originalMedia = useState(() => (entry ? entryMedia(entry) : []))[0];
@@ -246,6 +249,8 @@ export function EntryForm({
       void queryClient.invalidateQueries({ queryKey: ["video-files"] });
       toast.success(isEdit ? "Wydarzenie zaktualizowane" : "Wydarzenie dodane");
       onDone();
+      // Prośba o wsparcie tylko po dodaniu nowego wydarzenia, nie przy edycji.
+      if (!isEdit && (await checkCoffeePromptEligible())) setCoffeeOpen(true);
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Nie udało się zapisać wydarzenia");
     } finally {
@@ -278,6 +283,7 @@ export function EntryForm({
 
   return (
     <>
+      <CoffeePromptDialog open={coffeeOpen} onOpenChange={setCoffeeOpen} />
       <AlertDialog open={confirmDeleteOpen} onOpenChange={setConfirmDeleteOpen}>
         <AlertDialogContent>
           <AlertDialogHeader>
