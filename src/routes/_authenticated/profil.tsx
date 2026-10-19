@@ -505,148 +505,96 @@ function BehavioristCodeCard() {
   return <BehavioristInviteCard />;
 }
 
-function OwnerBehavioristsCard() {
-  const { data: rows, isLoading, isError, refetch } = useOwnerBehaviorists();
-  const remove = useRemoveOwnerBehaviorist();
+function DogAccessOverview() {
+  const { data: dogs, isLoading, isError, refetch } = useDogs();
 
   if (isLoading) {
     return (
+      <div className="mt-6 grid gap-4">
+        <Skeleton className="h-28 w-full" />
+        <Skeleton className="h-28 w-full" />
+      </div>
+    );
+  }
+
+  if (isError) {
+    return (
       <Card className="mt-6 shadow-none">
-        <CardHeader>
-          <CardTitle className="text-xl">Twoi behawioryści</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <Skeleton className="h-10 w-full" />
+        <CardContent className="grid justify-items-start gap-3 p-6">
+          <p role="alert" className="text-sm text-muted-foreground">
+            Nie udało się wczytać listy psów.
+          </p>
+          <Button variant="outline" size="sm" onClick={() => void refetch()}>
+            Spróbuj ponownie
+          </Button>
         </CardContent>
       </Card>
     );
   }
 
-  if (isError) {
-    return <CollaborationErrorCard title="Twoi behawioryści" onRetry={() => void refetch()} />;
-  }
-
-  if (!rows?.length) return null;
-
-  return (
-    <Card className="mt-6 shadow-none">
-      <CardHeader>
-        <CardTitle className="text-xl">Twoi behawioryści</CardTitle>
-      </CardHeader>
-      <CardContent className="grid gap-3">
-        {rows.map((row) => (
-          <BehavioristRow
-            key={row.id}
-            row={row}
-            onRemove={() => remove.mutate(row.behaviorist_id)}
-          />
-        ))}
-      </CardContent>
-    </Card>
-  );
-}
-
-function BehavioristOwnersCard() {
-  const { data: rows, isLoading, isError, refetch } = useBehavioristOwners();
-  const remove = useRemoveOwnerBehaviorist();
-
-  if (isLoading) {
+  if (!dogs?.length) {
     return (
       <Card className="mt-6 shadow-none">
-        <CardHeader>
-          <CardTitle className="text-xl">Twoi klienci</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <Skeleton className="h-10 w-full" />
+        <CardContent className="grid justify-items-start gap-3 p-6">
+          <p className="text-sm text-muted-foreground">Nie masz jeszcze żadnego psa.</p>
+          <Button asChild variant="outline">
+            <Link to="/psy">Dodaj psa</Link>
+          </Button>
         </CardContent>
       </Card>
     );
   }
 
-  if (isError) {
-    return <CollaborationErrorCard title="Twoi klienci" onRetry={() => void refetch()} />;
-  }
-
-  if (!rows?.length) return null;
-
   return (
-    <Card className="mt-6 shadow-none">
-      <CardHeader>
-        <CardTitle className="text-xl">Twoi klienci</CardTitle>
-      </CardHeader>
-      <CardContent className="grid gap-3">
-        {rows.map((row) => (
-          <OwnerRow key={row.id} row={row} onRemove={() => remove.mutate(row.owner_id)} />
-        ))}
-      </CardContent>
-    </Card>
+    <div className="mt-6 grid gap-4">
+      {dogs.map((dog) => (
+        <DogAccessCard key={dog.id} dog={dog} />
+      ))}
+    </div>
   );
 }
 
-function CollaborationErrorCard({ title, onRetry }: { title: string; onRetry: () => void }) {
+function DogAccessCard({ dog }: { dog: Dog }) {
+  const { data: access, isLoading } = useDogAccess(dog.id);
+  const [open, setOpen] = useState(false);
+
+  const coOwner = access?.find((row) => row.role === "owner" && row.user_id !== dog.owner_id);
+  const behaviorist = access?.find((row) => row.role === "behaviorist");
+  const personName = (row?: AccessWithProfile) =>
+    row ? row.profile?.display_name || row.profile?.email || "Bez nazwy" : "Brak";
+
   return (
-    <Card className="mt-6 shadow-none">
-      <CardHeader>
-        <CardTitle className="text-xl">{title}</CardTitle>
-      </CardHeader>
-      <CardContent className="grid justify-items-start gap-3">
-        <p role="alert" className="text-sm text-muted-foreground">
-          Nie udało się wczytać listy.
-        </p>
-        <Button variant="outline" size="sm" onClick={onRetry}>
-          Spróbuj ponownie
+    <Card className="shadow-none">
+      <CardContent className="flex flex-col gap-4 p-5 sm:flex-row sm:items-center">
+        <div className="flex min-w-0 flex-1 items-center gap-4">
+          <DogAvatar dog={dog} className="size-12" />
+          <div className="min-w-0">
+            <p className="break-words font-display text-lg">{dog.name}</p>
+            {isLoading ? (
+              <Skeleton className="mt-1 h-4 w-40" />
+            ) : (
+              <dl className="mt-1 grid gap-0.5 text-sm">
+                <div className="flex flex-wrap gap-1">
+                  <dt className="text-muted-foreground">Współwłaściciel:</dt>
+                  <dd>{personName(coOwner)}</dd>
+                </div>
+                <div className="flex flex-wrap gap-1">
+                  <dt className="text-muted-foreground">Behawiorysta:</dt>
+                  <dd>
+                    {personName(behaviorist)}
+                    {behaviorist &&
+                      ` · współpraca ${STATUS_LABELS[behaviorist.process_status] ?? behaviorist.process_status}`}
+                  </dd>
+                </div>
+              </dl>
+            )}
+          </div>
+        </div>
+        <Button variant="outline" className="shrink-0" onClick={() => setOpen(true)}>
+          Zarządzaj dostępem
         </Button>
       </CardContent>
+      <AccessDialog dog={dog} open={open} onOpenChange={setOpen} />
     </Card>
-  );
-}
-
-function BehavioristRow({
-  row,
-  onRemove,
-}: {
-  row: OwnerBehavioristWithProfile;
-  onRemove: () => void;
-}) {
-  const name = row.profile?.display_name || row.profile?.email;
-  return (
-    <div className="flex items-center justify-between gap-3 rounded-lg border border-border px-4 py-2.5">
-      <div className="min-w-0">
-        <p className="break-words text-sm font-medium">
-          {name ? `Behawiorysta: ${name}` : "Behawiorysta"}
-        </p>
-        <p className="text-xs text-muted-foreground">
-          Współpraca {STATUS_LABELS[row.process_status] ?? row.process_status}
-          {row.link && ` · kod ${row.link.invite_code}`}
-        </p>
-      </div>
-      <Button
-        variant="ghost"
-        size="icon"
-        className="shrink-0"
-        aria-label={name ? `Usuń powiązanie: ${name}` : "Usuń powiązanie"}
-        onClick={onRemove}
-      >
-        <Trash2 className="size-4" />
-      </Button>
-    </div>
-  );
-}
-
-function OwnerRow({ row, onRemove }: { row: OwnerBehavioristWithProfile; onRemove: () => void }) {
-  return (
-    <div className="flex items-center justify-between gap-3 rounded-lg border border-border px-4 py-2.5">
-      <div>
-        <p className="text-sm font-medium">
-          {row.profile?.display_name || row.profile?.email || "Właściciel"}
-        </p>
-        <p className="text-xs text-muted-foreground">
-          Współpraca {STATUS_LABELS[row.process_status] ?? row.process_status}
-        </p>
-      </div>
-      <Button variant="ghost" size="icon" aria-label="Usuń powiązanie" onClick={onRemove}>
-        <Trash2 className="size-4" />
-      </Button>
-    </div>
   );
 }
