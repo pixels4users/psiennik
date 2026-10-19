@@ -46,7 +46,7 @@ export const Route = createFileRoute("/_authenticated/profil")({
       privatePage: true,
     }),
   }),
-  validateSearch: (search: Record<string, unknown>): { tab?: SettingsTab } => ({
+  validateSearch: (search: Record<string, unknown>): { tab?: SettingsTab | undefined } => ({
     tab: SETTINGS_TABS.includes(search["tab"] as SettingsTab)
       ? (search["tab"] as SettingsTab)
       : undefined,
