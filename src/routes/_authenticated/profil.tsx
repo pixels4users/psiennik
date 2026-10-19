@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { Check, Download, Ticket, Trash2 } from "lucide-react";
+import { Check, Coffee, Download, Ticket, Trash2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth, useProfile } from "@/lib/auth";
 import { useIsBehaviorist, useDogAccess, type AccessWithProfile } from "@/lib/access";
@@ -12,6 +12,7 @@ import { DogAvatar } from "@/components/dog-avatar";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { BehavioristInviteCard } from "@/components/behaviorist-invite";
 import { JoinDialog } from "@/components/join-dialog";
+import { CoffeePromptDialog } from "@/components/coffee-prompt-dialog";
 import { StorageCard } from "@/components/storage-card";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -237,6 +238,7 @@ function ProfilePage() {
           <ChatGptCard />
           <ExportDataCard />
           <DeleteAccountCard />
+          {import.meta.env.DEV && <CoffeePreviewCard />}
         </TabsContent>
 
         <TabsContent value="dostepy">
@@ -380,6 +382,29 @@ function ExportDataCard() {
           <Download className="mr-2 size-4" />
           {exporting ? "Pobieranie…" : "Pobierz moje dane"}
         </Button>
+      </CardContent>
+    </Card>
+  );
+}
+
+/** Podgląd modala „Postaw kawę” — tylko w trybie deweloperskim. */
+function CoffeePreviewCard() {
+  const [open, setOpen] = useState(false);
+  return (
+    <Card className="mt-6 shadow-none">
+      <CardHeader>
+        <CardTitle className="text-xl">Prośba o kawę (podgląd)</CardTitle>
+      </CardHeader>
+      <CardContent className="grid gap-4">
+        <p className="text-sm leading-relaxed text-muted-foreground">
+          Widoczne tylko w trybie testowym. Uwaga: kliknięcie „Postaw kawę” albo „Może później”
+          zapisze wyciszenie modala na Twoim koncie.
+        </p>
+        <Button variant="outline" className="justify-self-start" onClick={() => setOpen(true)}>
+          <Coffee className="mr-2 size-4" aria-hidden="true" />
+          Podejrzyj modal
+        </Button>
+        <CoffeePromptDialog open={open} onOpenChange={setOpen} />
       </CardContent>
     </Card>
   );

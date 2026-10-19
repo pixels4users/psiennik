@@ -17,23 +17,37 @@ import {
 export function CoffeePromptDialog({
   open,
   onOpenChange,
+  onCloseComplete,
 }: {
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  /** Wywoływane po każdym zamknięciu (przyciski, krzyżyk, Escape). */
+  onCloseComplete?: () => void;
 }) {
+  const close = () => {
+    onOpenChange(false);
+    onCloseComplete?.();
+  };
+
   const handleSupport = () => {
     void snoozeCoffeePrompt(SNOOZE_DAYS_AFTER_SUPPORT);
     window.open(BUYCOFFEE_URL, "_blank", "noopener,noreferrer");
-    onOpenChange(false);
+    close();
   };
 
   const handleLater = () => {
     void snoozeCoffeePrompt(SNOOZE_DAYS_AFTER_LATER);
-    onOpenChange(false);
+    close();
   };
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
+    <Dialog
+      open={open}
+      onOpenChange={(next) => {
+        if (next) onOpenChange(true);
+        else close();
+      }}
+    >
       <DialogContent className="max-w-md">
         <DialogHeader className="items-center text-center">
           <span className="mx-auto grid size-12 place-items-center rounded-full bg-primary/10">

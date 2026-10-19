@@ -91,6 +91,7 @@ export function EntryForm({
   const [deleting, setDeleting] = useState(false);
   const [confirmDeleteOpen, setConfirmDeleteOpen] = useState(false);
   const [coffeeOpen, setCoffeeOpen] = useState(false);
+  const [pendingDone, setPendingDone] = useState(false);
   const [entryId] = useState(() => entry?.id ?? crypto.randomUUID());
   const fileInputRef = useRef<HTMLInputElement>(null);
   const originalMedia = useState(() => (entry ? entryMedia(entry) : []))[0];
@@ -248,9 +249,14 @@ export function EntryForm({
       void queryClient.invalidateQueries({ queryKey: ["storage-usage"] });
       void queryClient.invalidateQueries({ queryKey: ["video-files"] });
       toast.success(isEdit ? "Wydarzenie zaktualizowane" : "Wydarzenie dodane");
-      onDone();
       // Prośba o wsparcie tylko po dodaniu nowego wydarzenia, nie przy edycji.
-      if (!isEdit && (await checkCoffeePromptEligible())) setCoffeeOpen(true);
+      // Gdy modal się otwiera, powrót do widoku psa następuje dopiero po jego zamknięciu.
+      if (!isEdit && (await checkCoffeePromptEligible())) {
+        setPendingDone(true);
+        setCoffeeOpen(true);
+      } else {
+        onDone();
+      }
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Nie udało się zapisać wydarzenia");
     } finally {
@@ -283,7 +289,16 @@ export function EntryForm({
 
   return (
     <>
-      <CoffeePromptDialog open={coffeeOpen} onOpenChange={setCoffeeOpen} />
+      <CoffeePromptDialog
+        open={coffeeOpen}
+        onOpenChange={setCoffeeOpen}
+        onCloseComplete={() => {
+          if (pendingDone) {
+            setPendingDone(false);
+            onDone();
+          }
+        }}
+      />
       <AlertDialog open={confirmDeleteOpen} onOpenChange={setConfirmDeleteOpen}>
         <AlertDialogContent>
           <AlertDialogHeader>
