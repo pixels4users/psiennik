@@ -46,8 +46,10 @@ export const Route = createFileRoute("/_authenticated/profil")({
       privatePage: true,
     }),
   }),
-  validateSearch: (search: Record<string, unknown>): { tab: SettingsTab } => ({
-    tab: SETTINGS_TABS.includes(search.tab as SettingsTab) ? (search.tab as SettingsTab) : "profil",
+  validateSearch: (search: Record<string, unknown>): { tab?: SettingsTab } => ({
+    tab: SETTINGS_TABS.includes(search["tab"] as SettingsTab)
+      ? (search["tab"] as SettingsTab)
+      : undefined,
   }),
   component: ProfilePage,
 });
@@ -82,7 +84,7 @@ function ProfilePage() {
   const { data: profile, isLoading } = useProfile();
   const { data: isBehaviorist } = useIsBehaviorist();
   const queryClient = useQueryClient();
-  const { tab } = Route.useSearch();
+  const tab = Route.useSearch().tab ?? "profil";
   const navigate = useNavigate();
 
   const [displayName, setDisplayName] = useState("");
