@@ -263,7 +263,6 @@ function ProfilePage() {
       <BehavioristCodeCard />
       <OwnerBehavioristsCard />
       <BehavioristOwnersCard />
-      <SignOutCard />
       <DeleteAccountCard />
       <JoinDialog open={joinOpen} onOpenChange={setJoinOpen} />
     </div>
@@ -331,28 +330,6 @@ function ExportDataCard() {
         >
           <Download className="mr-2 size-4" />
           {exporting ? "Pobieranie…" : "Pobierz moje dane"}
-        </Button>
-      </CardContent>
-    </Card>
-  );
-}
-
-function SignOutCard() {
-  const queryClient = useQueryClient();
-  const navigate = useNavigate();
-
-  const signOut = async () => {
-    await queryClient.cancelQueries();
-    queryClient.clear();
-    await supabase.auth.signOut();
-    navigate({ to: "/auth", replace: true });
-  };
-
-  return (
-    <Card className="mt-6 shadow-none">
-      <CardContent className="p-6">
-        <Button variant="outline" className="w-full" onClick={() => void signOut()}>
-          Wyloguj się
         </Button>
       </CardContent>
     </Card>
@@ -429,43 +406,25 @@ function DeleteAccountCard() {
     }
   };
 
+  const signOut = async () => {
+    await queryClient.cancelQueries();
+    queryClient.clear();
+    await supabase.auth.signOut();
+    navigate({ to: "/auth", replace: true });
+  };
+
   return (
-    <Card className="mt-6 border-destructive/30 shadow-none">
+    <Card className="mt-6 shadow-none">
       <CardHeader>
-        <CardTitle className="text-xl">Usunięcie konta</CardTitle>
+        <CardTitle className="text-xl">Konto</CardTitle>
       </CardHeader>
-      <CardContent className="grid gap-4">
-        <div className="text-sm leading-relaxed text-muted-foreground">
-          <p>Usunięcie konta jest nieodwracalne. Skasujemy:</p>
-          <ul className="mt-2 list-disc pl-5">
-            <li>Twój profil i dane logowania,</li>
-            <li>
-              psy, których jesteś głównym właścicielem — razem z wpisami, zaleceniami i zdjęciami,
-            </li>
-            <li>Twoje dostępy do cudzych psów oraz powiązania z behawiorystami.</li>
-          </ul>
-          {impactLoading ? (
-            <p className="mt-3">Obliczam skutki usunięcia…</p>
-          ) : impact && impact.dogs.length > 0 ? (
-            <p className="mt-3">
-              Psy, które znikną: {impact.dogs.map((d) => d.name).join(", ")}.
-              {impact.otherPeople > 0 && (
-                <>
-                  {" "}
-                  Dostęp straci {impact.otherPeople}{" "}
-                  {impact.otherPeople === 1 ? "osoba" : impact.otherPeople < 5 ? "osoby" : "osób"},
-                  którym udostępniłeś/aś te dzienniki.
-                </>
-              )}
-            </p>
-          ) : null}
-          <p className="mt-3">
-            Jeśli chcesz zachować dane, pobierz je najpierw przyciskiem „Pobierz moje dane".
-          </p>
-        </div>
+      <CardContent className="flex flex-wrap gap-3">
+        <Button variant="outline" onClick={() => void signOut()}>
+          Wyloguj się
+        </Button>
         <AlertDialog open={open} onOpenChange={setOpen}>
           <AlertDialogTrigger asChild>
-            <Button variant="destructive" className="justify-self-start" disabled={deleting}>
+            <Button variant="destructive" disabled={deleting}>
               <Trash2 className="mr-2 size-4" />
               Usuń konto
             </Button>
@@ -473,9 +432,44 @@ function DeleteAccountCard() {
           <AlertDialogContent>
             <AlertDialogHeader>
               <AlertDialogTitle>Potwierdź usunięcie konta</AlertDialogTitle>
-              <AlertDialogDescription>
-                Tej operacji nie da się cofnąć. Aby potwierdzić, wpisz poniżej słowo{" "}
-                <strong>usuń</strong>.
+              <AlertDialogDescription asChild>
+                <div className="text-sm leading-relaxed text-muted-foreground">
+                  <p>Usunięcie konta jest nieodwracalne. Skasujemy:</p>
+                  <ul className="mt-2 list-disc pl-5">
+                    <li>Twój profil i dane logowania,</li>
+                    <li>
+                      psy, których jesteś głównym właścicielem — razem z wpisami, zaleceniami i
+                      zdjęciami,
+                    </li>
+                    <li>Twoje dostępy do cudzych psów oraz powiązania z behawiorystami.</li>
+                  </ul>
+                  {impactLoading ? (
+                    <p className="mt-3">Obliczam skutki usunięcia…</p>
+                  ) : impact && impact.dogs.length > 0 ? (
+                    <p className="mt-3">
+                      Psy, które znikną: {impact.dogs.map((d) => d.name).join(", ")}.
+                      {impact.otherPeople > 0 && (
+                        <>
+                          {" "}
+                          Dostęp straci {impact.otherPeople}{" "}
+                          {impact.otherPeople === 1
+                            ? "osoba"
+                            : impact.otherPeople < 5
+                              ? "osoby"
+                              : "osób"}
+                          , którym udostępniłeś/aś te dzienniki.
+                        </>
+                      )}
+                    </p>
+                  ) : null}
+                  <p className="mt-3">
+                    Jeśli chcesz zachować dane, pobierz je najpierw przyciskiem „Pobierz moje
+                    dane”.
+                  </p>
+                  <p className="mt-3">
+                    Aby potwierdzić, wpisz poniżej słowo <strong>usuń</strong>.
+                  </p>
+                </div>
               </AlertDialogDescription>
             </AlertDialogHeader>
             <Input
