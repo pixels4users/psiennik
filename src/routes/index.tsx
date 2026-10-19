@@ -16,13 +16,28 @@ import { SITE_URL, socialMeta } from "@/lib/seo";
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: socialMeta({
-      title: "Psiennik — dziennik behawioralny psa",
+      title: "Psiennik — darmowy dziennik behawioralny psa",
       description:
-        "Wspólny dziennik behawioralny psa dla właścicieli i behawiorystów: wydarzenia dnia, oceny, kalendarz i zalecenia.",
+        "Bezpłatna aplikacja dla opiekuna psa: wspólny dziennik behawioralny z behawiorystą. Wydarzenia, oceny, kalendarz i zalecenia — za darmo, bez abonamentu.",
       path: "/",
       image: "homepage",
     }),
     links: [{ rel: "canonical", href: `${SITE_URL}/` }],
+    scripts: [
+      {
+        type: "application/ld+json",
+        children: JSON.stringify({
+          "@context": "https://schema.org",
+          "@type": "SoftwareApplication",
+          name: "Psiennik",
+          applicationCategory: "LifestyleApplication",
+          operatingSystem: "Web",
+          description:
+            "Darmowy dziennik behawioralny psa dla opiekunów i behawiorystów: wydarzenia, oceny, kalendarz i zalecenia.",
+          offers: { "@type": "Offer", price: "0", priceCurrency: "PLN" },
+        }),
+      },
+    ],
   }),
   component: LandingPage,
 });
@@ -115,6 +130,9 @@ function LandingPage() {
             </Link>
           </Button>
         </div>
+        <p className="mt-4 text-sm text-muted-foreground">
+          Całkowicie za darmo — bez abonamentu i bez limitu psów.
+        </p>
         <a
           href="#dziennik-w-praktyce"
           className="mt-7 inline-flex min-h-11 items-center gap-2 rounded-full px-3 text-sm text-muted-foreground hover:text-primary"
@@ -346,7 +364,7 @@ function LandingPage() {
             zaczynają się od łapy.
           </h2>
           <p className="mx-auto mt-5 max-w-md text-sm leading-relaxed text-primary-foreground/80">
-            Zacznij od pierwszego wydarzenia. Resztę zapiszecie po drodze.
+            Zacznij od pierwszego wydarzenia. Resztę zapiszecie po drodze. Psiennik jest i pozostanie darmowy.
           </p>
           <div className="mt-8 flex flex-col justify-center gap-3 sm:flex-row">
             <Button asChild size="lg" variant="secondary">

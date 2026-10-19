@@ -6,9 +6,9 @@ import { SITE_URL, socialMeta } from "@/lib/seo";
 export const Route = createFileRoute("/poradnik/")({
   head: () => ({
     meta: socialMeta({
-      title: "Poradniki dla opiekunów psów — Psiennik",
+      title: "Darmowe poradniki dla opiekunów psów — Psiennik",
       description:
-        "Praktyczne poradniki: jak obserwować reaktywność, lęk separacyjny i niszczenie przedmiotów oraz jak przygotować się do wizyty u behawiorysty.",
+        "Bezpłatne, praktyczne poradniki: reaktywność, lęk separacyjny, niszczenie przedmiotów i przygotowanie do wizyty u behawiorysty.",
       path: "/poradnik",
       image: "homepage",
     }),
