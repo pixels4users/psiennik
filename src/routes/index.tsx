@@ -149,97 +149,72 @@ function LandingPage() {
         <PawTrail className="hero-paws hidden lg:block" />
       </section>
 
-      <section id="dziennik-w-praktyce" className="showcase-section mx-auto max-w-6xl scroll-mt-8 px-5 sm:px-8">
-        <div className="relative">
-          <div className="showcase-frame grid gap-0 overflow-hidden rounded-[2rem] border border-primary/15 bg-secondary lg:grid-cols-[1.05fr_1fr]">
-            <div className="relative min-h-72 overflow-hidden">
-              <img
-                src={heroAsset.url}
-                alt="Para z border collie na spacerze"
-                width="900"
-                height="675"
-                className="h-full max-h-[540px] w-full object-cover"
-              />
-              <div className="absolute bottom-5 left-5 right-5 flex items-center gap-3 rounded-2xl bg-background/95 p-4 text-left sm:bottom-7 sm:left-7 sm:right-7">
-                <Paw className="w-9 shrink-0 text-primary" />
-                <p className="font-display text-2xl leading-tight text-primary">
-                  Za każdym wpisem
-                  <br />
-                  stoi Wasz wspólny dzień.
-                </p>
-              </div>
-            </div>
-            <div className="flex flex-col justify-center p-5 text-left sm:p-9">
-              <div className="mb-6 flex items-center justify-between gap-3">
-                <p className="eyebrow">Tak wygląda Wasz dziennik</p>
-                <span className="rounded-full border border-primary/20 px-2.5 py-1 text-xs text-primary">Przykład</span>
-              </div>
-              <div className="flex items-center gap-3">
-                <img
-                  src={dogProfile1Asset.url}
-                  alt=""
-                  width="56"
-                  height="56"
-                  className="size-14 rounded-full object-cover"
-                />
-                <div>
-                  <p className="font-display text-3xl leading-none text-primary">Humus</p>
-                  <p className="mt-1 text-xs text-muted-foreground">Małe kroki, zapisane na co dzień</p>
-                </div>
-              </div>
-              <Reveal distance="sm" className="mt-5 rounded-2xl border border-primary/10 bg-background p-5">
-                <div className="flex items-center justify-between gap-2">
-                  <span className="text-xs text-muted-foreground">Dziś · rano</span>
-                  <span className="inline-flex items-center gap-1.5 text-xs text-primary">
-                    <span className="size-2 rounded-full bg-good" />
-                    Dobrze
-                  </span>
-                </div>
-                <h2 className="mt-3 text-3xl">Spokojny spacer</h2>
-                <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
-                  Minęliśmy dwa psy bez szczekania. Pomogło zwiększenie dystansu i spokojna komenda.
-                </p>
-                <div className="relative mt-4 aspect-video overflow-hidden rounded-xl bg-muted">
-                  <img
-                    src={exampleVideo}
-                    alt="Kadr z nagrania spaceru Humusa"
-                    width={1280}
-                    height={720}
-                    loading="lazy"
-                    className="size-full object-cover"
-                  />
-                  <span className="absolute inset-0 m-auto flex size-12 items-center justify-center rounded-full bg-background/90 text-primary shadow">
-                    <Play className="ml-0.5 size-5 fill-current" aria-hidden="true" />
-                  </span>
-                  <span className="absolute bottom-2 right-2 rounded-full bg-background/90 px-2 py-0.5 text-xs text-primary">
-                    0:32
-                  </span>
-                </div>
-                <div className="mt-4 rounded-xl bg-secondary p-3.5">
-                  <p className="flex items-center gap-2 text-xs font-medium text-primary">
-                    <MessageSquareText className="size-4" />
-                    Zalecenie behawiorysty
-                  </p>
-                  <p className="mt-2 text-sm leading-relaxed text-primary">
-                    Zostańcie przy tym dystansie. Zwróć uwagę, jak szybko Humus się uspokaja.
-                  </p>
-                </div>
-              </Reveal>
-              <p className="mt-5 flex items-center gap-2 text-xs text-muted-foreground">
-                <Check className="size-4 text-primary" />
-                Wydarzenie, wideo i zalecenie zawsze w jednym miejscu.
-              </p>
+      <section id="dziennik-w-praktyce" className="showcase-section mx-auto max-w-6xl scroll-mt-8 px-5 text-center sm:px-8">
+        {/* Ukryte na razie — może się przydać:
+        <p className="font-display text-2xl leading-tight text-primary">
+          Za każdym wpisem <br /> stoi Wasz wspólny dzień.
+        </p>
+        */}
+        <h2 className="section-title">Tak wygląda wasz dziennik</h2>
+        <p className="mx-auto mt-4 max-w-md text-base leading-relaxed text-muted-foreground">
+          Problemy, wideo i zalecenia w jednym miejscu
+        </p>
+        <div className="mx-auto mt-10 max-w-xl text-left">
+          <div className="flex items-center gap-3">
+            <img
+              src={dogProfile1Asset.url}
+              alt=""
+              width="56"
+              height="56"
+              className="size-14 rounded-full object-cover"
+            />
+            <div>
+              <p className="font-display text-3xl leading-none text-primary">Humus</p>
+              <p className="mt-1 text-xs text-muted-foreground">Małe kroki, zapisane na co dzień</p>
             </div>
           </div>
-          <Reveal
-            distance="none"
-            speed="normal"
-            order={1}
-            className="pointer-events-none absolute -bottom-8 -right-16 hidden w-40 xl:block"
-          >
-            <DogDoodle className="w-full rotate-12 text-primary" />
+          <Reveal distance="sm" className="mt-5 rounded-2xl border border-primary/10 bg-background p-5">
+            <div className="flex items-center justify-between gap-2">
+              <span className="text-xs text-muted-foreground">Dziś · rano</span>
+              <span className="inline-flex items-center gap-1.5 text-xs text-primary">
+                <span className="size-2 rounded-full bg-good" />
+                Dobrze
+              </span>
+            </div>
+            <h3 className="mt-3 text-3xl">Spokojny spacer</h3>
+            <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
+              Minęliśmy dwa psy bez szczekania. Pomogło zwiększenie dystansu i spokojna komenda.
+            </p>
+            <div className="relative mt-4 aspect-video overflow-hidden rounded-xl bg-muted">
+              <img
+                src={exampleVideo}
+                alt="Kadr z nagrania spaceru Humusa"
+                width={1280}
+                height={720}
+                loading="lazy"
+                className="size-full object-cover"
+              />
+              <span className="absolute inset-0 m-auto flex size-12 items-center justify-center rounded-full bg-background/90 text-primary shadow">
+                <Play className="ml-0.5 size-5 fill-current" aria-hidden="true" />
+              </span>
+              <span className="absolute bottom-2 right-2 rounded-full bg-background/90 px-2 py-0.5 text-xs text-primary">
+                0:32
+              </span>
+            </div>
+            <div className="mt-4 rounded-xl bg-secondary p-3.5">
+              <p className="flex items-center gap-2 text-xs font-medium text-primary">
+                <MessageSquareText className="size-4" />
+                Zalecenie behawiorysty
+              </p>
+              <p className="mt-2 text-sm leading-relaxed text-primary">
+                Zostańcie przy tym dystansie. Zwróć uwagę, jak szybko Humus się uspokaja.
+              </p>
+            </div>
           </Reveal>
         </div>
+        <Reveal distance="none" speed="normal" order={1} className="pointer-events-none mx-auto mt-10 w-32">
+          <DogDoodle className="w-full text-primary" />
+        </Reveal>
       </section>
 
       <section className="landing-section mx-auto max-w-6xl px-5 sm:px-8">
