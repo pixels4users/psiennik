@@ -2,7 +2,7 @@
 
 ## Nowy układ (wszystko wyśrodkowane)
 
-1. Nagłówek: **„Tak wygląda Wasz dziennik”**
+1. Nagłówek: **„Tak wygląda wasz dziennik”**
 2. Podtytuł: **„Problemy, wideo i zalecenia w jednym miejscu”**
 3. Przykładowa karta wydarzenia „Spokojny spacer” (Humus, ocena, opis, podgląd wideo, zalecenie behawiorysty), bez znacznika „Przykład”. Karta ma umiarkowaną szerokość, żeby dobrze się czytała.
 4. Pod kartą grafika główki psa (ta sama, która teraz stoi w rogu sekcji).
