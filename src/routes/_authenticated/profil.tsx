@@ -337,28 +337,6 @@ function ExportDataCard() {
   );
 }
 
-function SignOutCard() {
-  const queryClient = useQueryClient();
-  const navigate = useNavigate();
-
-  const signOut = async () => {
-    await queryClient.cancelQueries();
-    queryClient.clear();
-    await supabase.auth.signOut();
-    navigate({ to: "/auth", replace: true });
-  };
-
-  return (
-    <Card className="mt-6 shadow-none">
-      <CardContent className="p-6">
-        <Button variant="outline" className="w-full" onClick={() => void signOut()}>
-          Wyloguj się
-        </Button>
-      </CardContent>
-    </Card>
-  );
-}
-
 function ChatGptCard() {
   return (
     <Card className="mt-6 shadow-none">
