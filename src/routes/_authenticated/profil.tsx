@@ -5,13 +5,11 @@ import { toast } from "sonner";
 import { Check, Download, Ticket, Trash2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth, useProfile } from "@/lib/auth";
-import {
-  useOwnerBehaviorists,
-  useBehavioristOwners,
-  useRemoveOwnerBehaviorist,
-  useIsBehaviorist,
-  type OwnerBehavioristWithProfile,
-} from "@/lib/access";
+import { useIsBehaviorist, useDogAccess, type AccessWithProfile } from "@/lib/access";
+import { useDogs, type Dog } from "@/lib/dogs";
+import { AccessDialog } from "@/components/invite-dialog";
+import { DogAvatar } from "@/components/dog-avatar";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { BehavioristInviteCard } from "@/components/behaviorist-invite";
 import { JoinDialog } from "@/components/join-dialog";
 import { StorageCard } from "@/components/storage-card";
@@ -48,8 +46,14 @@ export const Route = createFileRoute("/_authenticated/profil")({
       privatePage: true,
     }),
   }),
+  validateSearch: (search: Record<string, unknown>): { tab: SettingsTab } => ({
+    tab: SETTINGS_TABS.includes(search.tab as SettingsTab) ? (search.tab as SettingsTab) : "profil",
+  }),
   component: ProfilePage,
 });
+
+const SETTINGS_TABS = ["profil", "dostepy", "powiadomienia"] as const;
+type SettingsTab = (typeof SETTINGS_TABS)[number];
 
 const STATUS_LABELS: Record<string, string> = {
   active: "aktywna",
@@ -78,6 +82,8 @@ function ProfilePage() {
   const { data: profile, isLoading } = useProfile();
   const { data: isBehaviorist } = useIsBehaviorist();
   const queryClient = useQueryClient();
+  const { tab } = Route.useSearch();
+  const navigate = useNavigate();
 
   const [displayName, setDisplayName] = useState("");
   const [email, setEmail] = useState("");
@@ -105,10 +111,13 @@ function ProfilePage() {
     });
   }, [profile]);
 
-  const dirty = useMemo(() => {
+  const nameDirty = useMemo(
+    () => !!profile && (displayName.trim() || null) !== (profile.display_name ?? null),
+    [profile, displayName],
+  );
+  const notifyDirty = useMemo(() => {
     if (!profile) return false;
     return (
-      (displayName.trim() || null) !== (profile.display_name ?? null) ||
       (email.trim() || null) !== (profile.email ?? null) ||
       notifications !== profile.email_notifications ||
       kinds.notify_entries !== profile.notify_entries ||
@@ -116,7 +125,7 @@ function ProfilePage() {
       kinds.notify_recommendations !== profile.notify_recommendations ||
       kinds.notify_access !== profile.notify_access
     );
-  }, [profile, displayName, email, notifications, kinds]);
+  }, [profile, email, notifications, kinds]);
 
   const save = async (e: React.FormEvent) => {
     e.preventDefault();
