@@ -111,17 +111,13 @@ function LandingPage() {
       <section className="landing-hero relative mx-auto max-w-7xl px-5 text-center sm:px-8">
         <p className="eyebrow flex items-center justify-center gap-2">
           <PawPrint className="size-4" aria-hidden="true" />
-          Dla ludzi, którzy chcą lepiej rozumieć swoje psy
+          Dziennik obserwacji i zaleceń
         </p>
         <h1 className="hero-title mx-auto mt-6 max-w-5xl">
           Zgrana paczka:
           <br />
           Ty, Twój pies i specjalista.
         </h1>
-        <p className="mx-auto mt-7 max-w-xl text-base leading-relaxed text-muted-foreground sm:text-lg">
-          Wspólny dziennik treningowy dla Ciebie i specjalisty.
-          <br className="hidden sm:block" /> Wiedza i instrukcje, które nigdy nie giną.
-        </p>
         <div className="mt-8 flex flex-col justify-center gap-3 sm:flex-row">
           <Button asChild size="lg">
             <Link to="/auth" search={{ rola: "owner" }}>
