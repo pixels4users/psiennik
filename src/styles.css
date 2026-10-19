@@ -315,7 +315,7 @@
   }
 }
 
-/* Desktop paw cursor; interactive elements keep the pointer, text fields keep the I-beam. */
+/* Desktop paw cursor; interactive elements show a "pressed" paw, text fields keep the I-beam. */
 @media (hover: hover) and (pointer: fine) {
   html,
   body {
@@ -331,8 +331,10 @@
   [role="switch"],
   label[for],
   select,
-  summary {
-    cursor: pointer;
+  summary,
+  a *,
+  button * {
+    cursor: url("/paw-cursor-press.svg") 11 3, pointer;
   }
   input:not([type="checkbox"]):not([type="radio"]):not([type="button"]):not([type="submit"]),
   textarea,
