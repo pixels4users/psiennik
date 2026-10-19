@@ -512,8 +512,7 @@ function DeleteAccountCard() {
                     </p>
                   ) : null}
                   <p className="mt-3">
-                    Jeśli chcesz zachować dane, pobierz je najpierw przyciskiem „Pobierz moje
-                    dane”.
+                    Jeśli chcesz zachować dane, pobierz je najpierw przyciskiem „Pobierz moje dane”.
                   </p>
                   <p className="mt-3">
                     Aby potwierdzić, wpisz poniżej słowo <strong>usuń</strong>.
