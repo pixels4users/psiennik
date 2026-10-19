@@ -15,6 +15,9 @@ export function SiteFooter() {
           <Link to="/poradnik" className="underline hover:text-primary">
             Poradniki
           </Link>
+          <Link to="/psiennik-w-chatgpt" className="underline hover:text-primary">
+            Psiennik w ChatGPT
+          </Link>
           <Link to="/kontakt" className="underline hover:text-primary">
             Kontakt
           </Link>

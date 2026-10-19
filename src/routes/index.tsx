@@ -304,6 +304,38 @@ function LandingPage() {
         </div>
       </section>
 
+      <section className="landing-section mx-auto max-w-6xl px-5 sm:px-8">
+        <div className="grid items-center gap-10 md:grid-cols-2 md:gap-16">
+          <Reveal distance="sm">
+            <p className="eyebrow">Psiennik w Twoim AI</p>
+            <h2 className="section-title mt-4">
+              Zapytaj ChatGPT
+              <br />
+              <em>o swojego psa.</em>
+            </h2>
+            <p className="mt-6 max-w-md text-base leading-relaxed text-muted-foreground">
+              Połącz Psiennika z ChatGPT raz, a potem pytaj swoimi słowami. Asystent sam zajrzy do dziennika i zaleceń
+              — bez przepisywania notatek.
+            </p>
+            <Button asChild size="lg" variant="outline" className="mt-8">
+              <Link to="/psiennik-w-chatgpt">
+                Zobacz, jak połączyć (2 minuty)
+                <ArrowUpRight />
+              </Link>
+            </Button>
+          </Reveal>
+          <Reveal distance="sm" order={1} className="space-y-3 rounded-[2rem] bg-secondary p-6 sm:p-8">
+            <p className="ml-auto max-w-[85%] rounded-2xl rounded-br-sm bg-primary p-4 text-sm text-primary-foreground">
+              Jak Lucy radziła sobie na spacerach w tym tygodniu?
+            </p>
+            <p className="max-w-[90%] rounded-2xl rounded-bl-sm bg-background p-4 text-sm leading-relaxed text-foreground">
+              Na 5 spacerów 3 były oceniane „Dobrze". Trudniej było w czwartek przy innym psie. Behawiorystka zaleciła
+              zwiększyć dystans — chcesz, żebym przygotował pytania na kolejną konsultację?
+            </p>
+          </Reveal>
+        </div>
+      </section>
+
       <section className="mx-auto mb-16 max-w-7xl px-5 sm:px-8">
         <div className="relative isolate overflow-hidden rounded-[2rem] bg-primary px-6 py-14 text-center sm:py-20">
           <Paw className="pointer-events-none absolute -left-6 -top-8 -z-10 w-48 rotate-[-20deg] text-sage/10" />
