@@ -147,6 +147,30 @@ function ProfilePage() {
     }
   };
 
+  const saveButton = (isDirty: boolean) => (
+    <div className="flex justify-end gap-2 pt-2">
+      {saving ? (
+        <Button type="submit" disabled>
+          Zapisywanie…
+        </Button>
+      ) : isDirty ? (
+        <Button type="submit">Zapisz zmiany</Button>
+      ) : saved ? (
+        <p className="flex items-center gap-1.5 text-sm text-foreground">
+          <Check className="size-4" aria-hidden="true" />
+          Zapisano zmiany
+        </p>
+      ) : null}
+    </div>
+  );
+
+  const formSkeleton = (
+    <div className="grid gap-4">
+      <Skeleton className="h-10 w-full" />
+      <Skeleton className="h-10 w-full" />
+    </div>
+  );
+
   return (
     <div className="mx-auto max-w-2xl px-5 py-12">
       <div className="flex flex-wrap items-center justify-between gap-3">
@@ -164,106 +188,120 @@ function ProfilePage() {
         </Button>
       </div>
 
-      <Card className="mt-8 shadow-none">
-        <CardContent className="p-6">
-          {isLoading ? (
-            <div className="grid gap-4">
-              <Skeleton className="h-10 w-full" />
-              <Skeleton className="h-10 w-full" />
-            </div>
-          ) : (
-            <form onSubmit={save} className="grid gap-5">
-              <div className="grid gap-2">
-                <Label htmlFor="display-name">Nazwa wyświetlana</Label>
-                <Input
-                  id="display-name"
-                  value={displayName}
-                  onChange={(e) => setDisplayName(e.target.value)}
-                  placeholder="np. Miłosz"
-                />
-              </div>
-              <div className="grid gap-2">
-                <Label htmlFor="profile-email">Adres do powiadomień</Label>
-                <Input
-                  id="profile-email"
-                  type="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  placeholder="adres do powiadomień"
-                />
-                <p className="text-xs text-muted-foreground">
-                  Tu wysyłamy powiadomienia. Sposób logowania pozostaje bez zmian.
-                </p>
-                {notifications && !isUsableEmail(email) && (
-                  <p className="text-xs text-primary">
-                    Podaj adres, z którego korzystasz na co dzień — inaczej powiadomienia mogą do
-                    Ciebie nie dotrzeć.
-                  </p>
-                )}
-              </div>
+      <Tabs
+        value={tab}
+        onValueChange={(value) =>
+          navigate({ to: "/profil", search: { tab: value as SettingsTab }, replace: true })
+        }
+        className="mt-8"
+      >
+        <TabsList className="grid w-full grid-cols-3">
+          <TabsTrigger value="profil">Profil</TabsTrigger>
+          <TabsTrigger value="dostepy">Dostępy</TabsTrigger>
+          <TabsTrigger value="powiadomienia">Powiadomienia</TabsTrigger>
+        </TabsList>
 
-              <div className="grid gap-3 rounded-lg border border-primary/10 p-4">
-                <div className="flex items-center justify-between gap-4">
-                  <Label htmlFor="notify-all" className="font-medium">
-                    Powiadomienia e-mail
-                  </Label>
-                  <Switch
-                    id="notify-all"
-                    checked={notifications}
-                    onCheckedChange={setNotifications}
-                  />
-                </div>
-                <p className="text-xs text-muted-foreground">
-                  Powiadomienia w aplikacji (dzwonek) działają zawsze.
-                </p>
-                <div className="grid gap-2.5">
-                  {NOTIFY_KINDS.map((kind) => (
-                    <div key={kind.key} className="flex items-center justify-between gap-4">
-                      <Label
-                        htmlFor={`notify-${kind.key}`}
-                        className={`text-sm font-normal ${notifications ? "" : "text-muted-foreground"}`}
-                      >
-                        {kind.label}
+        <TabsContent value="profil">
+          <Card className="mt-6 shadow-none">
+            <CardContent className="p-6">
+              {isLoading ? (
+                formSkeleton
+              ) : (
+                <form onSubmit={save} className="grid gap-5">
+                  <div className="grid gap-2">
+                    <Label htmlFor="display-name">Nazwa wyświetlana</Label>
+                    <Input
+                      id="display-name"
+                      value={displayName}
+                      onChange={(e) => setDisplayName(e.target.value)}
+                      placeholder="np. Miłosz"
+                    />
+                  </div>
+                  {saveButton(nameDirty)}
+                </form>
+              )}
+            </CardContent>
+          </Card>
+          <StorageCard />
+          <ChatGptCard />
+          <ExportDataCard />
+          <DeleteAccountCard />
+        </TabsContent>
+
+        <TabsContent value="dostepy">
+          <BehavioristCodeCard />
+          <DogAccessOverview />
+        </TabsContent>
+
+        <TabsContent value="powiadomienia">
+          <Card className="mt-6 shadow-none">
+            <CardContent className="p-6">
+              {isLoading ? (
+                formSkeleton
+              ) : (
+                <form onSubmit={save} className="grid gap-5">
+                  <div className="grid gap-2">
+                    <Label htmlFor="profile-email">Adres do powiadomień</Label>
+                    <Input
+                      id="profile-email"
+                      type="email"
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      placeholder="adres do powiadomień"
+                    />
+                    <p className="text-xs text-muted-foreground">
+                      Tu wysyłamy powiadomienia. Sposób logowania pozostaje bez zmian.
+                    </p>
+                    {notifications && !isUsableEmail(email) && (
+                      <p className="text-xs text-primary">
+                        Podaj adres, z którego korzystasz na co dzień — inaczej powiadomienia mogą
+                        do Ciebie nie dotrzeć.
+                      </p>
+                    )}
+                  </div>
+
+                  <div className="grid gap-3 rounded-lg border border-primary/10 p-4">
+                    <div className="flex items-center justify-between gap-4">
+                      <Label htmlFor="notify-all" className="font-medium">
+                        Powiadomienia e-mail
                       </Label>
                       <Switch
-                        id={`notify-${kind.key}`}
-                        disabled={!notifications}
-                        checked={kinds[kind.key]}
-                        onCheckedChange={(value) =>
-                          setKinds((prev) => ({ ...prev, [kind.key]: value }))
-                        }
+                        id="notify-all"
+                        checked={notifications}
+                        onCheckedChange={setNotifications}
                       />
                     </div>
-                  ))}
-                </div>
-              </div>
-
-              <div className="flex justify-end gap-2 pt-2">
-                {saving ? (
-                  <Button type="submit" disabled>
-                    Zapisywanie…
-                  </Button>
-                ) : dirty ? (
-                  <Button type="submit">Zapisz zmiany</Button>
-                ) : saved ? (
-                  <p className="flex items-center gap-1.5 text-sm text-foreground">
-                    <Check className="size-4" aria-hidden="true" />
-                    Zapisano zmiany
-                  </p>
-                ) : null}
-              </div>
-            </form>
-          )}
-        </CardContent>
-      </Card>
-
-      <StorageCard />
-      <ChatGptCard />
-      <ExportDataCard />
-      <BehavioristCodeCard />
-      <OwnerBehavioristsCard />
-      <BehavioristOwnersCard />
-      <DeleteAccountCard />
+                    <p className="text-xs text-muted-foreground">
+                      Powiadomienia w aplikacji (dzwonek) działają zawsze.
+                    </p>
+                    <div className="grid gap-2.5">
+                      {NOTIFY_KINDS.map((kind) => (
+                        <div key={kind.key} className="flex items-center justify-between gap-4">
+                          <Label
+                            htmlFor={`notify-${kind.key}`}
+                            className={`text-sm font-normal ${notifications ? "" : "text-muted-foreground"}`}
+                          >
+                            {kind.label}
+                          </Label>
+                          <Switch
+                            id={`notify-${kind.key}`}
+                            disabled={!notifications}
+                            checked={kinds[kind.key]}
+                            onCheckedChange={(value) =>
+                              setKinds((prev) => ({ ...prev, [kind.key]: value }))
+                            }
+                          />
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                  {saveButton(notifyDirty)}
+                </form>
+              )}
+            </CardContent>
+          </Card>
+        </TabsContent>
+      </Tabs>
       <JoinDialog open={joinOpen} onOpenChange={setJoinOpen} />
     </div>
   );
