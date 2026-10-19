@@ -314,3 +314,33 @@
     font-size: clamp(2rem, 9.8vw, 2.5rem);
   }
 }
+
+/* Desktop paw cursor; interactive elements keep the pointer, text fields keep the I-beam. */
+@media (hover: hover) and (pointer: fine) {
+  html,
+  body {
+    cursor: url("/paw-cursor.svg") 11 3, auto;
+  }
+  a,
+  button,
+  [role="button"],
+  [role="tab"],
+  [role="menuitem"],
+  [role="option"],
+  [role="checkbox"],
+  [role="switch"],
+  label[for],
+  select,
+  summary {
+    cursor: pointer;
+  }
+  input:not([type="checkbox"]):not([type="radio"]):not([type="button"]):not([type="submit"]),
+  textarea,
+  [contenteditable="true"] {
+    cursor: text;
+  }
+  :disabled,
+  [aria-disabled="true"] {
+    cursor: not-allowed;
+  }
+}
