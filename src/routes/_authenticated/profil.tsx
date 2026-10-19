@@ -5,13 +5,11 @@ import { toast } from "sonner";
 import { Check, Download, Ticket, Trash2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth, useProfile } from "@/lib/auth";
-import {
-  useOwnerBehaviorists,
-  useBehavioristOwners,
-  useRemoveOwnerBehaviorist,
-  useIsBehaviorist,
-  type OwnerBehavioristWithProfile,
-} from "@/lib/access";
+import { useIsBehaviorist, useDogAccess, type AccessWithProfile } from "@/lib/access";
+import { useDogs, type Dog } from "@/lib/dogs";
+import { AccessDialog } from "@/components/invite-dialog";
+import { DogAvatar } from "@/components/dog-avatar";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { BehavioristInviteCard } from "@/components/behaviorist-invite";
 import { JoinDialog } from "@/components/join-dialog";
 import { StorageCard } from "@/components/storage-card";
@@ -48,8 +46,16 @@ export const Route = createFileRoute("/_authenticated/profil")({
       privatePage: true,
     }),
   }),
+  validateSearch: (search: Record<string, unknown>): { tab?: SettingsTab | undefined } => ({
+    tab: SETTINGS_TABS.includes(search["tab"] as SettingsTab)
+      ? (search["tab"] as SettingsTab)
+      : undefined,
+  }),
   component: ProfilePage,
 });
+
+const SETTINGS_TABS = ["profil", "dostepy", "powiadomienia"] as const;
+type SettingsTab = (typeof SETTINGS_TABS)[number];
 
 const STATUS_LABELS: Record<string, string> = {
   active: "aktywna",
@@ -78,6 +84,8 @@ function ProfilePage() {
   const { data: profile, isLoading } = useProfile();
   const { data: isBehaviorist } = useIsBehaviorist();
   const queryClient = useQueryClient();
+  const tab = Route.useSearch().tab ?? "profil";
+  const navigate = useNavigate();
 
   const [displayName, setDisplayName] = useState("");
   const [email, setEmail] = useState("");
@@ -105,10 +113,13 @@ function ProfilePage() {
     });
   }, [profile]);
 
-  const dirty = useMemo(() => {
+  const nameDirty = useMemo(
+    () => !!profile && (displayName.trim() || null) !== (profile.display_name ?? null),
+    [profile, displayName],
+  );
+  const notifyDirty = useMemo(() => {
     if (!profile) return false;
     return (
-      (displayName.trim() || null) !== (profile.display_name ?? null) ||
       (email.trim() || null) !== (profile.email ?? null) ||
       notifications !== profile.email_notifications ||
       kinds.notify_entries !== profile.notify_entries ||
@@ -116,7 +127,7 @@ function ProfilePage() {
       kinds.notify_recommendations !== profile.notify_recommendations ||
       kinds.notify_access !== profile.notify_access
     );
-  }, [profile, displayName, email, notifications, kinds]);
+  }, [profile, email, notifications, kinds]);
 
   const save = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -147,6 +158,30 @@ function ProfilePage() {
     }
   };
 
+  const saveButton = (isDirty: boolean) => (
+    <div className="flex justify-end gap-2 pt-2">
+      {saving ? (
+        <Button type="submit" disabled>
+          Zapisywanie…
+        </Button>
+      ) : isDirty ? (
+        <Button type="submit">Zapisz zmiany</Button>
+      ) : saved ? (
+        <p className="flex items-center gap-1.5 text-sm text-foreground">
+          <Check className="size-4" aria-hidden="true" />
+          Zapisano zmiany
+        </p>
+      ) : null}
+    </div>
+  );
+
+  const formSkeleton = (
+    <div className="grid gap-4">
+      <Skeleton className="h-10 w-full" />
+      <Skeleton className="h-10 w-full" />
+    </div>
+  );
+
   return (
     <div className="mx-auto max-w-2xl px-5 py-12">
       <div className="flex flex-wrap items-center justify-between gap-3">
@@ -164,106 +199,120 @@ function ProfilePage() {
         </Button>
       </div>
 
-      <Card className="mt-8 shadow-none">
-        <CardContent className="p-6">
-          {isLoading ? (
-            <div className="grid gap-4">
-              <Skeleton className="h-10 w-full" />
-              <Skeleton className="h-10 w-full" />
-            </div>
-          ) : (
-            <form onSubmit={save} className="grid gap-5">
-              <div className="grid gap-2">
-                <Label htmlFor="display-name">Nazwa wyświetlana</Label>
-                <Input
-                  id="display-name"
-                  value={displayName}
-                  onChange={(e) => setDisplayName(e.target.value)}
-                  placeholder="np. Miłosz"
-                />
-              </div>
-              <div className="grid gap-2">
-                <Label htmlFor="profile-email">Adres do powiadomień</Label>
-                <Input
-                  id="profile-email"
-                  type="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  placeholder="adres do powiadomień"
-                />
-                <p className="text-xs text-muted-foreground">
-                  Tu wysyłamy powiadomienia. Sposób logowania pozostaje bez zmian.
-                </p>
-                {notifications && !isUsableEmail(email) && (
-                  <p className="text-xs text-primary">
-                    Podaj adres, z którego korzystasz na co dzień — inaczej powiadomienia mogą do
-                    Ciebie nie dotrzeć.
-                  </p>
-                )}
-              </div>
+      <Tabs
+        value={tab}
+        onValueChange={(value) =>
+          navigate({ to: "/profil", search: { tab: value as SettingsTab }, replace: true })
+        }
+        className="mt-8"
+      >
+        <TabsList className="grid w-full grid-cols-3">
+          <TabsTrigger value="profil">Profil</TabsTrigger>
+          <TabsTrigger value="dostepy">Dostępy</TabsTrigger>
+          <TabsTrigger value="powiadomienia">Powiadomienia</TabsTrigger>
+        </TabsList>
 
-              <div className="grid gap-3 rounded-lg border border-primary/10 p-4">
-                <div className="flex items-center justify-between gap-4">
-                  <Label htmlFor="notify-all" className="font-medium">
-                    Powiadomienia e-mail
-                  </Label>
-                  <Switch
-                    id="notify-all"
-                    checked={notifications}
-                    onCheckedChange={setNotifications}
-                  />
-                </div>
-                <p className="text-xs text-muted-foreground">
-                  Powiadomienia w aplikacji (dzwonek) działają zawsze.
-                </p>
-                <div className="grid gap-2.5">
-                  {NOTIFY_KINDS.map((kind) => (
-                    <div key={kind.key} className="flex items-center justify-between gap-4">
-                      <Label
-                        htmlFor={`notify-${kind.key}`}
-                        className={`text-sm font-normal ${notifications ? "" : "text-muted-foreground"}`}
-                      >
-                        {kind.label}
+        <TabsContent value="profil">
+          <Card className="mt-6 shadow-none">
+            <CardContent className="p-6">
+              {isLoading ? (
+                formSkeleton
+              ) : (
+                <form onSubmit={save} className="grid gap-5">
+                  <div className="grid gap-2">
+                    <Label htmlFor="display-name">Nazwa wyświetlana</Label>
+                    <Input
+                      id="display-name"
+                      value={displayName}
+                      onChange={(e) => setDisplayName(e.target.value)}
+                      placeholder="np. Miłosz"
+                    />
+                  </div>
+                  {saveButton(nameDirty)}
+                </form>
+              )}
+            </CardContent>
+          </Card>
+          <StorageCard />
+          <ChatGptCard />
+          <ExportDataCard />
+          <DeleteAccountCard />
+        </TabsContent>
+
+        <TabsContent value="dostepy">
+          <BehavioristCodeCard />
+          <DogAccessOverview />
+        </TabsContent>
+
+        <TabsContent value="powiadomienia">
+          <Card className="mt-6 shadow-none">
+            <CardContent className="p-6">
+              {isLoading ? (
+                formSkeleton
+              ) : (
+                <form onSubmit={save} className="grid gap-5">
+                  <div className="grid gap-2">
+                    <Label htmlFor="profile-email">Adres do powiadomień</Label>
+                    <Input
+                      id="profile-email"
+                      type="email"
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      placeholder="adres do powiadomień"
+                    />
+                    <p className="text-xs text-muted-foreground">
+                      Tu wysyłamy powiadomienia. Sposób logowania pozostaje bez zmian.
+                    </p>
+                    {notifications && !isUsableEmail(email) && (
+                      <p className="text-xs text-primary">
+                        Podaj adres, z którego korzystasz na co dzień — inaczej powiadomienia mogą
+                        do Ciebie nie dotrzeć.
+                      </p>
+                    )}
+                  </div>
+
+                  <div className="grid gap-3 rounded-lg border border-primary/10 p-4">
+                    <div className="flex items-center justify-between gap-4">
+                      <Label htmlFor="notify-all" className="font-medium">
+                        Powiadomienia e-mail
                       </Label>
                       <Switch
-                        id={`notify-${kind.key}`}
-                        disabled={!notifications}
-                        checked={kinds[kind.key]}
-                        onCheckedChange={(value) =>
-                          setKinds((prev) => ({ ...prev, [kind.key]: value }))
-                        }
+                        id="notify-all"
+                        checked={notifications}
+                        onCheckedChange={setNotifications}
                       />
                     </div>
-                  ))}
-                </div>
-              </div>
-
-              <div className="flex justify-end gap-2 pt-2">
-                {saving ? (
-                  <Button type="submit" disabled>
-                    Zapisywanie…
-                  </Button>
-                ) : dirty ? (
-                  <Button type="submit">Zapisz zmiany</Button>
-                ) : saved ? (
-                  <p className="flex items-center gap-1.5 text-sm text-foreground">
-                    <Check className="size-4" aria-hidden="true" />
-                    Zapisano zmiany
-                  </p>
-                ) : null}
-              </div>
-            </form>
-          )}
-        </CardContent>
-      </Card>
-
-      <StorageCard />
-      <ChatGptCard />
-      <ExportDataCard />
-      <BehavioristCodeCard />
-      <OwnerBehavioristsCard />
-      <BehavioristOwnersCard />
-      <DeleteAccountCard />
+                    <p className="text-xs text-muted-foreground">
+                      Powiadomienia w aplikacji (dzwonek) działają zawsze.
+                    </p>
+                    <div className="grid gap-2.5">
+                      {NOTIFY_KINDS.map((kind) => (
+                        <div key={kind.key} className="flex items-center justify-between gap-4">
+                          <Label
+                            htmlFor={`notify-${kind.key}`}
+                            className={`text-sm font-normal ${notifications ? "" : "text-muted-foreground"}`}
+                          >
+                            {kind.label}
+                          </Label>
+                          <Switch
+                            id={`notify-${kind.key}`}
+                            disabled={!notifications}
+                            checked={kinds[kind.key]}
+                            onCheckedChange={(value) =>
+                              setKinds((prev) => ({ ...prev, [kind.key]: value }))
+                            }
+                          />
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                  {saveButton(notifyDirty)}
+                </form>
+              )}
+            </CardContent>
+          </Card>
+        </TabsContent>
+      </Tabs>
       <JoinDialog open={joinOpen} onOpenChange={setJoinOpen} />
     </div>
   );
@@ -463,8 +512,7 @@ function DeleteAccountCard() {
                     </p>
                   ) : null}
                   <p className="mt-3">
-                    Jeśli chcesz zachować dane, pobierz je najpierw przyciskiem „Pobierz moje
-                    dane”.
+                    Jeśli chcesz zachować dane, pobierz je najpierw przyciskiem „Pobierz moje dane”.
                   </p>
                   <p className="mt-3">
                     Aby potwierdzić, wpisz poniżej słowo <strong>usuń</strong>.
@@ -505,148 +553,96 @@ function BehavioristCodeCard() {
   return <BehavioristInviteCard />;
 }
 
-function OwnerBehavioristsCard() {
-  const { data: rows, isLoading, isError, refetch } = useOwnerBehaviorists();
-  const remove = useRemoveOwnerBehaviorist();
+function DogAccessOverview() {
+  const { data: dogs, isLoading, isError, refetch } = useDogs();
 
   if (isLoading) {
     return (
+      <div className="mt-6 grid gap-4">
+        <Skeleton className="h-28 w-full" />
+        <Skeleton className="h-28 w-full" />
+      </div>
+    );
+  }
+
+  if (isError) {
+    return (
       <Card className="mt-6 shadow-none">
-        <CardHeader>
-          <CardTitle className="text-xl">Twoi behawioryści</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <Skeleton className="h-10 w-full" />
+        <CardContent className="grid justify-items-start gap-3 p-6">
+          <p role="alert" className="text-sm text-muted-foreground">
+            Nie udało się wczytać listy psów.
+          </p>
+          <Button variant="outline" size="sm" onClick={() => void refetch()}>
+            Spróbuj ponownie
+          </Button>
         </CardContent>
       </Card>
     );
   }
 
-  if (isError) {
-    return <CollaborationErrorCard title="Twoi behawioryści" onRetry={() => void refetch()} />;
-  }
-
-  if (!rows?.length) return null;
-
-  return (
-    <Card className="mt-6 shadow-none">
-      <CardHeader>
-        <CardTitle className="text-xl">Twoi behawioryści</CardTitle>
-      </CardHeader>
-      <CardContent className="grid gap-3">
-        {rows.map((row) => (
-          <BehavioristRow
-            key={row.id}
-            row={row}
-            onRemove={() => remove.mutate(row.behaviorist_id)}
-          />
-        ))}
-      </CardContent>
-    </Card>
-  );
-}
-
-function BehavioristOwnersCard() {
-  const { data: rows, isLoading, isError, refetch } = useBehavioristOwners();
-  const remove = useRemoveOwnerBehaviorist();
-
-  if (isLoading) {
+  if (!dogs?.length) {
     return (
       <Card className="mt-6 shadow-none">
-        <CardHeader>
-          <CardTitle className="text-xl">Twoi klienci</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <Skeleton className="h-10 w-full" />
+        <CardContent className="grid justify-items-start gap-3 p-6">
+          <p className="text-sm text-muted-foreground">Nie masz jeszcze żadnego psa.</p>
+          <Button asChild variant="outline">
+            <Link to="/psy">Dodaj psa</Link>
+          </Button>
         </CardContent>
       </Card>
     );
   }
 
-  if (isError) {
-    return <CollaborationErrorCard title="Twoi klienci" onRetry={() => void refetch()} />;
-  }
-
-  if (!rows?.length) return null;
-
   return (
-    <Card className="mt-6 shadow-none">
-      <CardHeader>
-        <CardTitle className="text-xl">Twoi klienci</CardTitle>
-      </CardHeader>
-      <CardContent className="grid gap-3">
-        {rows.map((row) => (
-          <OwnerRow key={row.id} row={row} onRemove={() => remove.mutate(row.owner_id)} />
-        ))}
-      </CardContent>
-    </Card>
+    <div className="mt-6 grid gap-4">
+      {dogs.map((dog) => (
+        <DogAccessCard key={dog.id} dog={dog} />
+      ))}
+    </div>
   );
 }
 
-function CollaborationErrorCard({ title, onRetry }: { title: string; onRetry: () => void }) {
+function DogAccessCard({ dog }: { dog: Dog }) {
+  const { data: access, isLoading } = useDogAccess(dog.id);
+  const [open, setOpen] = useState(false);
+
+  const coOwner = access?.find((row) => row.role === "owner" && row.user_id !== dog.owner_id);
+  const behaviorist = access?.find((row) => row.role === "behaviorist");
+  const personName = (row?: AccessWithProfile) =>
+    row ? row.profile?.display_name || row.profile?.email || "Bez nazwy" : "Brak";
+
   return (
-    <Card className="mt-6 shadow-none">
-      <CardHeader>
-        <CardTitle className="text-xl">{title}</CardTitle>
-      </CardHeader>
-      <CardContent className="grid justify-items-start gap-3">
-        <p role="alert" className="text-sm text-muted-foreground">
-          Nie udało się wczytać listy.
-        </p>
-        <Button variant="outline" size="sm" onClick={onRetry}>
-          Spróbuj ponownie
+    <Card className="shadow-none">
+      <CardContent className="flex flex-col gap-4 p-5 sm:flex-row sm:items-center">
+        <div className="flex min-w-0 flex-1 items-center gap-4">
+          <DogAvatar dog={dog} className="size-12" />
+          <div className="min-w-0">
+            <p className="break-words font-display text-lg">{dog.name}</p>
+            {isLoading ? (
+              <Skeleton className="mt-1 h-4 w-40" />
+            ) : (
+              <dl className="mt-1 grid gap-0.5 text-sm">
+                <div className="flex flex-wrap gap-1">
+                  <dt className="text-muted-foreground">Współwłaściciel:</dt>
+                  <dd>{personName(coOwner)}</dd>
+                </div>
+                <div className="flex flex-wrap gap-1">
+                  <dt className="text-muted-foreground">Behawiorysta:</dt>
+                  <dd>
+                    {personName(behaviorist)}
+                    {behaviorist &&
+                      ` · współpraca ${STATUS_LABELS[behaviorist.process_status] ?? behaviorist.process_status}`}
+                  </dd>
+                </div>
+              </dl>
+            )}
+          </div>
+        </div>
+        <Button variant="outline" className="shrink-0" onClick={() => setOpen(true)}>
+          Zarządzaj dostępem
         </Button>
       </CardContent>
+      <AccessDialog dog={dog} open={open} onOpenChange={setOpen} />
     </Card>
-  );
-}
-
-function BehavioristRow({
-  row,
-  onRemove,
-}: {
-  row: OwnerBehavioristWithProfile;
-  onRemove: () => void;
-}) {
-  const name = row.profile?.display_name || row.profile?.email;
-  return (
-    <div className="flex items-center justify-between gap-3 rounded-lg border border-border px-4 py-2.5">
-      <div className="min-w-0">
-        <p className="break-words text-sm font-medium">
-          {name ? `Behawiorysta: ${name}` : "Behawiorysta"}
-        </p>
-        <p className="text-xs text-muted-foreground">
-          Współpraca {STATUS_LABELS[row.process_status] ?? row.process_status}
-          {row.link && ` · kod ${row.link.invite_code}`}
-        </p>
-      </div>
-      <Button
-        variant="ghost"
-        size="icon"
-        className="shrink-0"
-        aria-label={name ? `Usuń powiązanie: ${name}` : "Usuń powiązanie"}
-        onClick={onRemove}
-      >
-        <Trash2 className="size-4" />
-      </Button>
-    </div>
-  );
-}
-
-function OwnerRow({ row, onRemove }: { row: OwnerBehavioristWithProfile; onRemove: () => void }) {
-  return (
-    <div className="flex items-center justify-between gap-3 rounded-lg border border-border px-4 py-2.5">
-      <div>
-        <p className="text-sm font-medium">
-          {row.profile?.display_name || row.profile?.email || "Właściciel"}
-        </p>
-        <p className="text-xs text-muted-foreground">
-          Współpraca {STATUS_LABELS[row.process_status] ?? row.process_status}
-        </p>
-      </div>
-      <Button variant="ghost" size="icon" aria-label="Usuń powiązanie" onClick={onRemove}>
-        <Trash2 className="size-4" />
-      </Button>
-    </div>
   );
 }
