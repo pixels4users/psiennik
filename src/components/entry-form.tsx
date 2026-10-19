@@ -91,6 +91,7 @@ export function EntryForm({
   const [deleting, setDeleting] = useState(false);
   const [confirmDeleteOpen, setConfirmDeleteOpen] = useState(false);
   const [coffeeOpen, setCoffeeOpen] = useState(false);
+  const [pendingDone, setPendingDone] = useState(false);
   const [entryId] = useState(() => entry?.id ?? crypto.randomUUID());
   const fileInputRef = useRef<HTMLInputElement>(null);
   const originalMedia = useState(() => (entry ? entryMedia(entry) : []))[0];
