@@ -126,10 +126,11 @@ function ChatGptGuide() {
         <ShieldCheck className="size-7 shrink-0 text-primary" aria-hidden="true" />
         <div className="text-sm leading-relaxed text-muted-foreground">
           <p className="font-medium text-primary">Twoje dane są bezpieczne</p>
-          <p className="mt-1">
-            ChatGPT widzi tylko psy, do których Ty masz dostęp, i tylko je czyta — niczego nie zmienia. Połączenie
-            możesz w każdej chwili usunąć w ustawieniach wtyczek ChatGPT.
-          </p>
+          <ul className="mt-2 space-y-2">
+            <li><strong>Bezpieczeństwo</strong> — ChatGPT może tylko odczytywać dane. Nie zmieni ani nie doda żadnych wpisów ani komentarzy.</li>
+            <li><strong>Prywatność</strong> — ChatGPT zobaczy tylko Twoje psy.</li>
+            <li><strong>Kontrola</strong> — połączenie z ChatGPT możesz usunąć w dowolnej chwili w ustawieniach ChatGPT.</li>
+          </ul>
         </div>
       </div>
 
