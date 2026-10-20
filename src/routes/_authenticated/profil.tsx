@@ -665,7 +665,7 @@ function DogAccessCard({ dog }: { dog: Dog }) {
             )}
           </div>
         </div>
-        <div className="flex shrink-0 flex-col gap-2">
+        <div className="flex shrink-0 flex-col gap-4">
           <Button variant="outline" onClick={() => setOpen(true)}>
             Zarządzaj dostępem
           </Button>
