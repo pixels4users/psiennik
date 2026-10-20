@@ -14,6 +14,7 @@ import { BehavioristInviteCard } from "@/components/behaviorist-invite";
 import { JoinDialog } from "@/components/join-dialog";
 import { CoffeePromptDialog } from "@/components/coffee-prompt-dialog";
 import { StorageCard } from "@/components/storage-card";
+import { DeleteDogButton } from "@/components/delete-dog-dialog";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -209,7 +210,7 @@ function ProfilePage() {
       >
         <TabsList className="grid w-full grid-cols-3">
           <TabsTrigger value="profil">Profil</TabsTrigger>
-          <TabsTrigger value="dostepy">Dostępy</TabsTrigger>
+          <TabsTrigger value="dostepy">Psy</TabsTrigger>
           <TabsTrigger value="powiadomienia">Powiadomienia</TabsTrigger>
         </TabsList>
 
@@ -628,6 +629,7 @@ function DogAccessOverview() {
 }
 
 function DogAccessCard({ dog }: { dog: Dog }) {
+  const { user } = useAuth();
   const { data: access, isLoading } = useDogAccess(dog.id);
   const [open, setOpen] = useState(false);
 
@@ -663,9 +665,12 @@ function DogAccessCard({ dog }: { dog: Dog }) {
             )}
           </div>
         </div>
-        <Button variant="outline" className="shrink-0" onClick={() => setOpen(true)}>
-          Zarządzaj dostępem
-        </Button>
+        <div className="flex shrink-0 flex-col gap-2">
+          <Button variant="outline" onClick={() => setOpen(true)}>
+            Zarządzaj dostępem
+          </Button>
+          {user?.id === dog.owner_id && <DeleteDogButton dog={dog} />}
+        </div>
       </CardContent>
       <AccessDialog dog={dog} open={open} onOpenChange={setOpen} />
     </Card>
