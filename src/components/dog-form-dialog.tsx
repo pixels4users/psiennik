@@ -248,26 +248,28 @@ export function DogFormDialog({
               </div>
             </div>
           </div>
-          <div className="flex justify-end gap-2 pt-2">
-            <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
-              Anuluj
-            </Button>
-            <Button type="submit" disabled={saving}>
-              {saving ? "Zapisywanie…" : "Zapisz"}
-            </Button>
+          <div className="flex items-center justify-between gap-2 pt-2">
+            {dog && user?.id === dog.owner_id ? (
+              <DeleteDogButton
+                dog={dog}
+                onDeleted={() => {
+                  onOpenChange(false);
+                  navigate({ to: "/psy" });
+                }}
+              />
+            ) : (
+              <span aria-hidden="true" />
+            )}
+            <div className="flex gap-2">
+              <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
+                Anuluj
+              </Button>
+              <Button type="submit" disabled={saving}>
+                {saving ? "Zapisywanie…" : "Zapisz"}
+              </Button>
+            </div>
           </div>
         </form>
-        {dog && user?.id === dog.owner_id && (
-          <div className="mt-2 border-t border-border pt-4">
-            <DeleteDogButton
-              dog={dog}
-              onDeleted={() => {
-                onOpenChange(false);
-                navigate({ to: "/psy" });
-              }}
-            />
-          </div>
-        )}
       </DialogContent>
     </Dialog>
   );
