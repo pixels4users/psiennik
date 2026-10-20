@@ -1,5 +1,76 @@
 import { createServerFn } from "@tanstack/react-start";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
+import type { SupabaseClient } from "@supabase/supabase-js";
+import type { Database } from "@/integrations/supabase/types";
+
+/**
+ * Usuwa psy razem z plikami (zdjęcia, wideo) i powiązanymi danymi.
+ * Wywoływać wyłącznie z klientem admina, po sprawdzeniu właściciela.
+ */
+async function purgeDogs(supabaseAdmin: SupabaseClient<Database>, dogIds: string[]) {
+  if (dogIds.length === 0) return;
+  for (const dogId of dogIds) {
+    const { data: files, error: listError } = await supabaseAdmin.storage
+      .from("dog-photos")
+      .list(dogId);
+    if (listError) throw new Error(`Nie udało się odczytać zdjęć: ${listError.message}`);
+    if (files && files.length > 0) {
+      const { error: removeError } = await supabaseAdmin.storage
+        .from("dog-photos")
+        .remove(files.map((f) => `${dogId}/${f.name}`));
+      if (removeError) throw new Error(`Nie udało się usunąć zdjęć: ${removeError.message}`);
+    }
+    const { data: folders, error: folderError } = await supabaseAdmin.storage
+      .from("dog-videos")
+      .list(dogId);
+    if (folderError) throw new Error(`Nie udało się odczytać wideo: ${folderError.message}`);
+    for (const folder of folders ?? []) {
+      const { data: vfiles, error: vErr } = await supabaseAdmin.storage
+        .from("dog-videos")
+        .list(`${dogId}/${folder.name}`);
+      if (vErr) throw new Error(`Nie udało się odczytać wideo: ${vErr.message}`);
+      if (vfiles && vfiles.length > 0) {
+        const { error: rmVideo } = await supabaseAdmin.storage
+          .from("dog-videos")
+          .remove(vfiles.map((f) => `${dogId}/${folder.name}/${f.name}`));
+        if (rmVideo) throw new Error(`Nie udało się usunąć wideo: ${rmVideo.message}`);
+      }
+    }
+  }
+  for (const step of [
+    supabaseAdmin.from("entries").delete().in("dog_id", dogIds),
+    supabaseAdmin.from("dog_views").delete().in("dog_id", dogIds),
+    supabaseAdmin.from("dog_invites").delete().in("dog_id", dogIds),
+    supabaseAdmin.from("dog_access").delete().in("dog_id", dogIds),
+  ]) {
+    const { error } = await step;
+    if (error) throw new Error(error.message);
+  }
+  const { error } = await supabaseAdmin.from("dogs").delete().in("id", dogIds);
+  if (error) throw new Error(error.message);
+}
+
+/** Trwale usuwa psa — tylko jego główny właściciel. */
+export const deleteDog = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input: { dogId: string }) => {
+    if (!input || typeof input.dogId !== "string" || !/^[0-9a-f-]{36}$/i.test(input.dogId))
+      throw new Error("Nieprawidłowy pies");
+    return input;
+  })
+  .handler(async ({ data, context }) => {
+    const { data: dog, error } = await context.supabase
+      .from("dogs")
+      .select("id, owner_id")
+      .eq("id", data.dogId)
+      .maybeSingle();
+    if (error) throw new Error(error.message);
+    if (!dog || dog.owner_id !== context.userId)
+      throw new Error("Tylko główny właściciel może usunąć psa");
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    await purgeDogs(supabaseAdmin, [dog.id]);
+    return { deleted: true } as const;
+  });
 
 /**
  * Trwale usuwa konto zalogowanego użytkownika: jego psy (wraz z wpisami i
@@ -48,55 +119,7 @@ export const deleteMyAccount = createServerFn({ method: "POST" })
     if (dogsError) throw new Error(dogsError.message);
 
     const dogIds = (ownedDogs ?? []).map((d) => d.id);
-
-    // Zdjęcia psów leżą w katalogach nazwanych identyfikatorem psa.
-    // Niepowodzenie przerywa operację — nie zgłaszamy sukcesu, gdy pliki zostały.
-    for (const dogId of dogIds) {
-      const { data: files, error: listError } = await supabaseAdmin.storage
-        .from("dog-photos")
-        .list(dogId);
-      if (listError) throw new Error(`Nie udało się odczytać zdjęć: ${listError.message}`);
-      if (files && files.length > 0) {
-        const { error: removeError } = await supabaseAdmin.storage
-          .from("dog-photos")
-          .remove(files.map((f) => `${dogId}/${f.name}`));
-        if (removeError) throw new Error(`Nie udało się usunąć zdjęć: ${removeError.message}`);
-      }
-    }
-
-    // Wideo z wydarzeń usuwanych psów: dogId/entryId/plik.
-    for (const dogId of dogIds) {
-      const { data: folders, error: folderError } = await supabaseAdmin.storage.from("dog-videos").list(dogId);
-      if (folderError) throw new Error(`Nie udało się odczytać wideo: ${folderError.message}`);
-      for (const folder of folders ?? []) {
-        const { data: files, error: listError } = await supabaseAdmin.storage
-          .from("dog-videos")
-          .list(`${dogId}/${folder.name}`);
-        if (listError) throw new Error(`Nie udało się odczytać wideo: ${listError.message}`);
-        if (files && files.length > 0) {
-          const { error: rmVideo } = await supabaseAdmin.storage
-            .from("dog-videos")
-            .remove(files.map((f) => `${dogId}/${folder.name}/${f.name}`));
-          if (rmVideo) throw new Error(`Nie udało się usunąć wideo: ${rmVideo.message}`);
-        }
-      }
-    }
-
-    if (dogIds.length > 0) {
-      // Wpisy, dostępy, zaproszenia i odsłony znikają razem z psem (kaskada),
-      // ale kasujemy je jawnie, aby nie zależeć od konfiguracji kluczy obcych.
-      for (const step of [
-        supabaseAdmin.from("entries").delete().in("dog_id", dogIds),
-        supabaseAdmin.from("dog_views").delete().in("dog_id", dogIds),
-        supabaseAdmin.from("dog_invites").delete().in("dog_id", dogIds),
-        supabaseAdmin.from("dog_access").delete().in("dog_id", dogIds),
-      ]) {
-        const { error } = await step;
-        if (error) throw new Error(error.message);
-      }
-      const { error } = await supabaseAdmin.from("dogs").delete().in("id", dogIds);
-      if (error) throw new Error(error.message);
-    }
+    await purgeDogs(supabaseAdmin, dogIds);
 
     // Powiązania użytkownika z cudzymi psami i behawiorystami.
     for (const step of [

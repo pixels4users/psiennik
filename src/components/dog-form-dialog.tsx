@@ -5,6 +5,8 @@ import { ImagePlus, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { deleteDogPhoto, uploadDogPhoto, useDogPhotoUrl, type Dog } from "@/lib/dogs";
+import { useAuth } from "@/lib/auth";
+import { DeleteDogButton } from "@/components/delete-dog-dialog";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -27,6 +29,7 @@ export function DogFormDialog({
   dog?: Dog;
 }) {
   const navigate = useNavigate();
+  const { user } = useAuth();
   const queryClient = useQueryClient();
   const [name, setName] = useState("");
   const [age, setAge] = useState("");
@@ -127,7 +130,7 @@ export function DogFormDialog({
       <DialogContent className="sm:max-w-md" aria-describedby={undefined}>
         <DialogHeader>
           <DialogTitle className="font-display text-2xl font-light text-primary">
-            {dog ? "Edytuj psa" : "Dodaj psa"}
+            {dog ? `${dog.name} — edycja` : "Dodaj psa"}
           </DialogTitle>
         </DialogHeader>
         <form onSubmit={handleSubmit} className="grid gap-4">
@@ -254,6 +257,17 @@ export function DogFormDialog({
             </Button>
           </div>
         </form>
+        {dog && user?.id === dog.owner_id && (
+          <div className="mt-2 border-t border-border pt-4">
+            <DeleteDogButton
+              dog={dog}
+              onDeleted={() => {
+                onOpenChange(false);
+                navigate({ to: "/psy" });
+              }}
+            />
+          </div>
+        )}
       </DialogContent>
     </Dialog>
   );
