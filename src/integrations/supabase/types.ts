@@ -522,6 +522,15 @@ export type Database = {
           size: number
         }[]
       }
+      my_owned_storage_files: {
+        Args: never
+        Returns: {
+          bucket: string
+          created_at: string
+          path: string
+          size: number
+        }[]
+      }
       my_storage_usage: { Args: never; Returns: number }
       my_video_files: {
         Args: never
