@@ -1,7 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 
-import { VIDEO_BUCKET, VIDEO_TOO_BIG_MESSAGE } from "@/lib/video-core";
+import { STORAGE_FULL_MESSAGE, VIDEO_BUCKET, VIDEO_TOO_BIG_MESSAGE } from "@/lib/video-core";
 import { reclaimStorage } from "@/lib/storage.functions";
 export * from "@/lib/video-core";
 
