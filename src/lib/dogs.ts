@@ -13,6 +13,8 @@ import {
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import type { Tables } from "@/integrations/supabase/types";
+import { ensureSpaceFor } from "@/lib/video";
+import { validateMediaFile } from "@/lib/video-core";
 
 export type Dog = Tables<"dogs">;
 export type Entry = Tables<"entries">;
@@ -186,10 +188,13 @@ export async function shrinkPhoto(file: File): Promise<Blob> {
 }
 
 export const PHOTO_QUOTA_MESSAGE =
-  "Brak miejsca na pliki (limit 50 MB na zdjęcia i wideo). Usuń starsze wideo w Ustawieniach albo starsze zdjęcie psa.";
+  "Brak miejsca na pliki (limit 250 MB na zdjęcia i wideo). Usuń część plików w Ustawieniach.";
 
 export async function uploadDogPhoto(file: File, dogId: string): Promise<string> {
+  const problem = validateMediaFile(file, []);
+  if (problem) throw new Error(problem);
   const body = await shrinkPhoto(file);
+  await ensureSpaceFor(body.size);
   const ext = body.type === "image/jpeg" ? "jpg" : (file.name.split(".").pop() ?? "jpg");
   const path = `${dogId}/${crypto.randomUUID()}.${ext}`;
   const { error } = await supabase.storage

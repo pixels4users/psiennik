@@ -29,6 +29,20 @@
       "when": 1792445631623,
       "tag": "0003_add_coffee_snooze_to_profiles",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1792568676647,
+      "tag": "0004_storage_quota_250mb_file_200mb",
+      "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1792568692295,
+      "tag": "0005_list_owned_storage_files",
+      "breakpoints": true
     }
   ]
 }

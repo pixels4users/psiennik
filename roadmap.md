@@ -1,4 +1,5 @@
 # Zadania
+- [x] Pliki: 250 MB na użytkownika, 200 MB na plik, automatyczne usuwanie najstarszych plików przy przesyłaniu; testy limitów i kolejności usuwania.
 
 - [x] Ustawienia: „Wyloguj się" w osobnej karcie „Konto" nad „Usunięciem konta"; „Zapisz" nieaktywny bez zmian, po zapisie „Zapisano zmiany"
 

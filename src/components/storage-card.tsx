@@ -56,15 +56,15 @@ export function StorageCard() {
               <div className={used >= STORAGE_WARN_BYTES ? "h-full bg-warn" : "h-full bg-primary"} style={{ width: `${pct}%` }} />
             </div>
             <p className="text-sm text-muted-foreground">
-              Zajęte {formatMb(used)} z 50 MB (zdjęcia psów i wideo).
+              Zajęte {formatMb(used)} z 250 MB (wszystkie zdjęcia i wideo).
             </p>
           </div>
         )}
         <p className="text-sm text-muted-foreground">
-          Gdy zabraknie miejsca na nowe wideo, najstarsze wideo zostaną usunięte automatycznie. Opis, ocena i komentarze wydarzenia zostają.
+          Maksymalnie 200 MB na plik. Gdy zabraknie miejsca na nowy plik, Twoje najstarsze zdjęcia i wideo zostaną trwale usunięte automatycznie, także zdjęcia profilowe psów. Opisy, oceny, zalecenia i komentarze zostają.
         </p>
         {used >= STORAGE_WARN_BYTES && (
-          <p className="text-sm font-medium text-warn">Kończy się miejsce na pliki wideo. Usuń starsze wideo.</p>
+          <p className="text-sm font-medium text-warn">Kończy się miejsce na pliki. Najstarsze zdjęcia i wideo mogą zostać usunięte przy następnym przesyłaniu.</p>
         )}
         {videos && videos.length > 0 ? (
           <ul className="grid divide-y rounded-lg border">
