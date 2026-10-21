@@ -500,6 +500,10 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      clear_removed_storage_references: {
+        Args: { _bucket: string; _paths: string[] }
+        Returns: undefined
+      }
       complete_behavioral_process: {
         Args: { p_behaviorist_id: string; p_dog_id: string }
         Returns: undefined
