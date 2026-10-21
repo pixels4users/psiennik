@@ -1,16 +1,16 @@
 export const VIDEO_BUCKET = "dog-videos";
 export const MB = 1024 * 1024;
 /** Maksymalny rozmiar jednego pliku wideo. */
-export const VIDEO_MAX_BYTES = 20 * MB;
+export const VIDEO_MAX_BYTES = 200 * MB;
 /** Wspólny limit konta na zdjęcia psów i wideo. */
-export const STORAGE_LIMIT_BYTES = 50 * MB;
+export const STORAGE_LIMIT_BYTES = 250 * MB;
 /** Od tego progu pokazujemy ostrzeżenie o kończącym się miejscu. */
-export const STORAGE_WARN_BYTES = 40 * MB;
+export const STORAGE_WARN_BYTES = 200 * MB;
 export const VIDEO_ACCEPT = "video/mp4,video/quicktime,video/webm,video/*";
 
-export const VIDEO_TOO_BIG_MESSAGE = "Wideo jest za duże — maksymalnie 20 MB. Skróć nagranie albo wklej link.";
+export const VIDEO_TOO_BIG_MESSAGE = "Wideo jest za duże — maksymalnie 200 MB. Skróć nagranie albo wklej link.";
 export const STORAGE_FULL_MESSAGE =
-  "Brak miejsca na pliki. Usuń starsze zdjęcia psa albo wklej link do wideo.";
+  "Brak miejsca na pliki (250 MB na użytkownika). Usuń część plików albo wklej link.";
 
 export function formatMb(bytes: number): string {
   const mb = bytes / MB;
@@ -64,7 +64,7 @@ export function parseVideoUrl(raw: string): VideoEmbed | null {
   return { kind: "link", href: url.toString() };
 }
 
-/** Wybiera najstarsze wideo do usunięcia, aby zmieścić `needed` bajtów. */
+/** Wybiera najstarsze pliki z listy uporządkowanej od najstarszego. */
 export function pickVideosToFree(
   videos: { path: string; size: number }[],
   usage: number,
@@ -124,7 +124,7 @@ export function countMedia(media: MediaItem[], type: MediaItem["type"]): number 
 export function validateMediaFile(file: { size: number; type: string }, media: MediaItem[]): string | null {
   if (file.type.startsWith("image/")) {
     if (countMedia(media, "photo") >= MAX_PHOTOS) return `Możesz dodać maksymalnie ${MAX_PHOTOS} zdjęć.`;
-    if (file.size > VIDEO_MAX_BYTES) return "Zdjęcie jest za duże — maksymalnie 20 MB.";
+    if (file.size > VIDEO_MAX_BYTES) return "Zdjęcie jest za duże — maksymalnie 200 MB.";
     return null;
   }
   if (file.type.startsWith("video/")) {

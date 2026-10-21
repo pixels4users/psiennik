@@ -2,11 +2,16 @@ import { test } from "node:test";
 import assert from "node:assert/strict";
 import { parseVideoUrl, pickVideosToFree, validateVideoFile, MB, STORAGE_LIMIT_BYTES, VIDEO_MAX_BYTES } from "../src/lib/video-core.ts";
 
-test("limit konta to 50 MB, pliku 20 MB", () => {
-  assert.equal(STORAGE_LIMIT_BYTES, 50 * MB);
-  assert.equal(VIDEO_MAX_BYTES, 20 * MB);
-  assert.equal(validateVideoFile({ size: 20 * MB, type: "video/mp4" }), null);
-  assert.notEqual(validateVideoFile({ size: 20 * MB + 1, type: "video/mp4" }), null);
+test("limit konta to 250 MB", () => {
+  assert.equal(STORAGE_LIMIT_BYTES, 250 * MB);
+});
+
+test("pojedynczy plik ma limit 200 MB", () => {
+  assert.equal(VIDEO_MAX_BYTES, 200 * MB);
+  assert.equal(validateVideoFile({ size: 200 * MB, type: "video/mp4" }), null);
+  assert.notEqual(validateVideoFile({ size: 200 * MB + 1, type: "video/mp4" }), null);
+  assert.equal(validateMediaFile({ size: 200 * MB, type: "image/jpeg" }, []), null);
+  assert.notEqual(validateMediaFile({ size: 200 * MB + 1, type: "image/jpeg" }, []), null);
   assert.notEqual(validateVideoFile({ size: 1, type: "image/png" }), null);
 });
 
@@ -20,11 +25,11 @@ test("linki YouTube, Shorts, Dysk, Vimeo", () => {
   assert.equal(parseVideoUrl("javascript:alert(1)"), null);
 });
 
-test("automatycznie usuwa najstarsze wideo, aż zmieści się nowe", () => {
-  const videos = [{ path: "a", size: 15 * MB }, { path: "b", size: 15 * MB }, { path: "c", size: 15 * MB }];
-  assert.deepEqual(pickVideosToFree(videos, 48 * MB, 18 * MB), { paths: ["a", "b"], enough: true });
-  assert.deepEqual(pickVideosToFree(videos, 10 * MB, 18 * MB), { paths: [], enough: true });
-  assert.equal(pickVideosToFree([], 45 * MB, 18 * MB).enough, false);
+test("automatycznie wybiera najstarsze zdjęcia i wideo tylko do zwolnienia potrzebnego miejsca", () => {
+  const files = [{ path: "old-photo", size: 10 * MB }, { path: "old-video", size: 100 * MB }, { path: "new-video", size: 100 * MB }];
+  assert.deepEqual(pickVideosToFree(files, 240 * MB, 100 * MB), { paths: ["old-photo", "old-video"], enough: true });
+  assert.deepEqual(pickVideosToFree(files, 50 * MB, 200 * MB), { paths: [], enough: true });
+  assert.equal(pickVideosToFree([], 240 * MB, 200 * MB).enough, false);
 });
 
 import { entryMedia, validateMediaFile, validateMediaLink, MAX_PHOTOS, MAX_LINKS } from "../src/lib/video-core.ts";

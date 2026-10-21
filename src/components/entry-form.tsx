@@ -27,7 +27,6 @@ import {
   VIDEO_BUCKET,
   STORAGE_WARN_BYTES,
   countMedia,
-  ensureSpaceFor,
   entryMedia,
   uploadMediaFile,
   useStorageUsage,
@@ -109,6 +108,9 @@ export function EntryForm({
   const invalidateStorage = () => {
     void queryClient.invalidateQueries({ queryKey: ["storage-usage"] });
     void queryClient.invalidateQueries({ queryKey: ["video-files"] });
+    void queryClient.invalidateQueries({ queryKey: ["dogs"] });
+    void queryClient.invalidateQueries({ queryKey: ["entries"] });
+    void queryClient.invalidateQueries({ queryKey: ["recent-entries"] });
   };
 
   const pickFiles = (list: FileList | null | undefined) => {
@@ -134,14 +136,23 @@ export function EntryForm({
     setPending(list);
     setUploading(true);
     try {
-      const total = list.reduce((sum, f) => sum + f.size, 0);
-      const freed = await ensureSpaceFor(total);
-      if (freed > 0) toast.info("Usunięto najstarsze wideo, aby zrobić miejsce.");
+      const protectedPaths: string[] = [];
       for (let i = 0; i < list.length; i++) {
+        const file = list[i];
+        if (!file) continue;
         setProgress(i / list.length);
-        const res = await uploadMediaFile(list[i]!, dogId, entryId, (f) =>
+        const res = await uploadMediaFile(file, dogId, entryId, (f) =>
           setProgress((i + f) / list.length),
+          protectedPaths,
+          (removed) => {
+            if (removed.length === 0) return;
+            const paths = new Set(removed.filter((item) => item.bucket === VIDEO_BUCKET).map((item) => item.path));
+            setMedia((items) => items.filter((item) => item.type === "link" || !paths.has(item.path)));
+            toast.info("Usunięto najstarsze pliki, aby zrobić miejsce. Wpisy i komentarze zostały zachowane.");
+            invalidateStorage();
+          },
         );
+        protectedPaths.push(res.path);
         setMedia((m) => [...m, { type: res.type, path: res.path, size: res.size }]);
         setPending((p) => p.slice(1));
       }
@@ -417,7 +428,8 @@ export function EntryForm({
           <div className="grid gap-1">
             <Label>Dodaj zdjęcie lub film (opcjonalnie)</Label>
             <p className="text-xs text-muted-foreground">
-              Do {MAX_PHOTOS} zdjęć i 1 wideo (maks. 20 MB) z telefonu lub komputera oraz do {MAX_LINKS} linków.
+              Do {MAX_PHOTOS} zdjęć i 1 wideo (maks. 200 MB na plik) z telefonu lub komputera oraz do {MAX_LINKS} linków.
+              Limit konta: 250 MB. Gdy zabraknie miejsca, najstarsze zdjęcia i wideo zostaną trwale usunięte, a wpisy i komentarze pozostaną.
             </p>
           </div>
           <input
@@ -487,7 +499,7 @@ export function EntryForm({
           )}
           {usage !== undefined && usage >= STORAGE_WARN_BYTES && (
             <p className="text-sm text-warn">
-              Kończy się miejsce na pliki ({formatMb(usage)} z 50 MB). Usuń starsze wideo w Ustawieniach — inaczej najstarsze zostaną usunięte automatycznie.
+              Kończy się miejsce na pliki ({formatMb(usage)} z 250 MB). Przy przesyłaniu najstarsze zdjęcia i wideo zostaną usunięte automatycznie, aby zrobić miejsce.
             </p>
           )}
 

@@ -1,7 +1,8 @@
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 
-import { STORAGE_FULL_MESSAGE, VIDEO_BUCKET, VIDEO_TOO_BIG_MESSAGE, pickVideosToFree } from "@/lib/video-core";
+import { VIDEO_BUCKET, VIDEO_TOO_BIG_MESSAGE } from "@/lib/video-core";
+import { reclaimStorage } from "@/lib/storage.functions";
 export * from "@/lib/video-core";
 
 export type VideoFile = {
@@ -44,13 +45,9 @@ export async function deleteVideos(paths: string[]): Promise<void> {
   await supabase.rpc("remove_entry_media", { paths });
 }
 
-/** Robi miejsce na nowy plik, usuwając najstarsze wideo. Zwraca liczbę usuniętych nagrań. */
-export async function ensureSpaceFor(size: number): Promise<number> {
-  const [usage, videos] = await Promise.all([fetchStorageUsage(), fetchVideoFiles()]);
-  const { paths, enough } = pickVideosToFree(videos.filter((v) => v.kind === "video"), usage, size);
-  if (!enough) throw new Error(STORAGE_FULL_MESSAGE);
-  await deleteVideos(paths);
-  return paths.length;
+/** Robi miejsce na nowy plik, usuwając najstarsze własne zdjęcia i wideo. */
+export async function ensureSpaceFor(size: number, protectedPaths: string[] = []) {
+  return reclaimStorage({ data: { size, protectedPaths } });
 }
 
 /** Wysyła zdjęcie (zmniejszone) lub wideo do galerii wydarzenia. */
@@ -59,15 +56,21 @@ export async function uploadMediaFile(
   dogId: string,
   entryId: string,
   onProgress?: (fraction: number) => void,
+  protectedPaths: string[] = [],
+  onReclaimed?: (removed: { bucket: string; path: string }[]) => void,
 ): Promise<{ path: string; size: number; type: "photo" | "video" }> {
   if (file.type.startsWith("image/")) {
     const { shrinkPhoto } = await import("@/lib/dogs");
     const blob = await shrinkPhoto(file);
     const name = blob === file ? file.name : "zdjecie.jpg";
     const body = new File([blob], name, { type: blob.type || file.type });
+    const { removed } = await ensureSpaceFor(body.size, protectedPaths);
+    onReclaimed?.(removed);
     const path = await uploadVideo(body, dogId, entryId, onProgress);
     return { path, size: body.size, type: "photo" };
   }
+  const { removed } = await ensureSpaceFor(file.size, protectedPaths);
+  onReclaimed?.(removed);
   const path = await uploadVideo(file, dogId, entryId, onProgress);
   return { path, size: file.size, type: "video" };
 }
@@ -116,7 +119,8 @@ export function useVideoUrl(path: string | null | undefined) {
     enabled: !!path,
     staleTime: 1000 * 60 * 4,
     queryFn: async (): Promise<string> => {
-      const { data, error } = await supabase.storage.from(VIDEO_BUCKET).createSignedUrl(path!, 300);
+      if (!path) throw new Error("Brak ścieżki pliku");
+      const { data, error } = await supabase.storage.from(VIDEO_BUCKET).createSignedUrl(path, 300);
       if (error) throw error;
       return data.signedUrl;
     },
