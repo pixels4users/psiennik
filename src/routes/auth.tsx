@@ -231,24 +231,7 @@ function AuthPage() {
       )}
 
       <Card className="mt-8 shadow-none">
-        <CardContent className="grid gap-5 p-6">
-          <div className="grid gap-2">
-            <Button variant="outline" disabled={busy} onClick={() => oauth("google", role)}>
-              Kontynuuj z Google
-            </Button>
-            <Button variant="outline" disabled={busy} onClick={() => oauth("apple", role)}>
-              Kontynuuj z Apple
-            </Button>
-
-            <LegalNotice />
-          </div>
-
-          <div className="flex items-center gap-3 text-xs tracking-wide text-muted-foreground uppercase">
-            <span className="h-px flex-1 bg-border" />
-            albo e-mailem
-            <span className="h-px flex-1 bg-border" />
-          </div>
-
+        <CardContent className="p-6">
           <Tabs defaultValue={rola ? "register" : "login"}>
             <TabsList className="w-full">
               <TabsTrigger value="login" className="flex-1">
@@ -259,8 +242,17 @@ function AuthPage() {
               </TabsTrigger>
             </TabsList>
 
-            <TabsContent value="login">
-              <form onSubmit={signIn} className="grid gap-4 pt-4">
+            <TabsContent value="login" className="grid gap-5 pt-5">
+              <div className="grid gap-2">
+                <Button variant="outline" disabled={busy} onClick={() => oauth("google")}>
+                  Kontynuuj z Google
+                </Button>
+                <Button variant="outline" disabled={busy} onClick={() => oauth("apple")}>
+                  Kontynuuj z Apple
+                </Button>
+              </div>
+              <OrEmail />
+              <form onSubmit={signIn} className="grid gap-4">
                 <div className="grid gap-2">
                   <Label htmlFor="login-email">E-mail</Label>
                   <Input
@@ -287,29 +279,38 @@ function AuthPage() {
               </form>
             </TabsContent>
 
-            <TabsContent value="register">
-              <form onSubmit={signUp} className="grid gap-4 pt-4">
-                <fieldset className="grid gap-2">
-                  <legend className="mb-2 text-sm font-medium">Zakładam konto jako</legend>
-                  <div className="grid grid-cols-2 gap-2">
-                    <Button
-                      type="button"
-                      variant={role === "owner" ? "default" : "outline"}
-                      aria-pressed={role === "owner"}
-                      onClick={() => setRole("owner")}
-                    >
-                      Właściciel psa
-                    </Button>
-                    <Button
-                      type="button"
-                      variant={role === "behaviorist" ? "default" : "outline"}
-                      aria-pressed={role === "behaviorist"}
-                      onClick={() => setRole("behaviorist")}
-                    >
-                      Behawiorysta
-                    </Button>
-                  </div>
-                </fieldset>
+            <TabsContent value="register" className="grid gap-5 pt-5">
+              <fieldset className="grid gap-2">
+                <legend className="mb-2 text-sm font-medium">Zakładam konto jako</legend>
+                <div className="grid grid-cols-2 gap-2">
+                  <Button
+                    type="button"
+                    variant={role === "owner" ? "default" : "outline"}
+                    aria-pressed={role === "owner"}
+                    onClick={() => setRole("owner")}
+                  >
+                    Właściciel psa
+                  </Button>
+                  <Button
+                    type="button"
+                    variant={role === "behaviorist" ? "default" : "outline"}
+                    aria-pressed={role === "behaviorist"}
+                    onClick={() => setRole("behaviorist")}
+                  >
+                    Behawiorysta
+                  </Button>
+                </div>
+              </fieldset>
+              <div className="grid gap-2">
+                <Button variant="outline" disabled={busy} onClick={() => oauth("google", role)}>
+                  Kontynuuj z Google
+                </Button>
+                <Button variant="outline" disabled={busy} onClick={() => oauth("apple", role)}>
+                  Kontynuuj z Apple
+                </Button>
+              </div>
+              <OrEmail />
+              <form onSubmit={signUp} className="grid gap-4">
                 <div className="grid gap-2">
                   <Label htmlFor="reg-name">Imię</Label>
                   <Input id="reg-name" value={name} onChange={(e) => setName(e.target.value)} />
@@ -363,6 +364,16 @@ function AuthPage() {
           </div>
         </div>
       )}
+    </div>
+  );
+}
+
+function OrEmail() {
+  return (
+    <div className="flex items-center gap-3 text-xs tracking-wide text-muted-foreground uppercase">
+      <span className="h-px flex-1 bg-border" />
+      albo e-mailem
+      <span className="h-px flex-1 bg-border" />
     </div>
   );
 }
