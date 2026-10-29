@@ -15,6 +15,7 @@ import { lovable } from "@/integrations/lovable";
 import { useAuth } from "@/lib/auth";
 import { inviteErrorMessage, useRedeemInvite } from "@/lib/access";
 import { claimBehavioristRole } from "@/lib/role.functions";
+import { emailSignupMetadata, rememberOAuthRole, takePendingBehavioristRole } from "@/lib/signup-role";
 
 import {
   DEMO_BEHAVIORIST_EMAIL,
@@ -36,7 +37,6 @@ const searchSchema = z.object({
   next: z.string().optional(),
 });
 
-const PENDING_ROLE_KEY = "psiennik.pending-role";
 
 export const Route = createFileRoute("/auth")({
   ssr: false,
@@ -78,9 +78,8 @@ function AuthPage() {
   // i po powrocie z sesją nadajemy ją na serwerze (tylko dla świeżego konta).
   useEffect(() => {
     if (loading || !user || claimedRef.current) return;
-    if (sessionStorage.getItem(PENDING_ROLE_KEY) !== "behaviorist") return;
+    if (!takePendingBehavioristRole(sessionStorage)) return;
     claimedRef.current = true;
-    sessionStorage.removeItem(PENDING_ROLE_KEY);
     claimBehaviorist({ data: {} })
       .then(() => queryClient.invalidateQueries())
       .catch(() => undefined);
@@ -116,8 +115,7 @@ function AuthPage() {
   const oauth = async (provider: "google" | "apple", chosenRole?: "owner" | "behaviorist") => {
     setBusy(true);
     try {
-      if (chosenRole === "behaviorist") sessionStorage.setItem(PENDING_ROLE_KEY, "behaviorist");
-      else sessionStorage.removeItem(PENDING_ROLE_KEY);
+      rememberOAuthRole(sessionStorage, chosenRole);
       const redirectTo = searchCode
         ? `${window.location.origin}/auth?code=${encodeURIComponent(searchCode)}`
         : nextTarget
@@ -163,7 +161,7 @@ function AuthPage() {
             : nextTarget
               ? new URL(nextTarget, window.location.origin).href
               : window.location.origin,
-          data: { display_name: name, role },
+          data: emailSignupMetadata(name, role),
         },
       });
       if (error) throw error;
