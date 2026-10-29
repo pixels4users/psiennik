@@ -11,7 +11,7 @@
     "lint": "eslint .",
     "format": "prettier --write .",
     "dev:ui-review": "node scripts/ui-review.mjs",
-    "test:ui": "node --test scripts/selected-dog.test.ts scripts/video.test.ts"
+    "test:ui": "node --test scripts/selected-dog.test.ts scripts/video.test.ts scripts/signup-role.test.ts"
   },
   "overrides": {
     "rolldown": "1.2.1",
