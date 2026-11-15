@@ -41,6 +41,7 @@ class SignupRoleE2E(unittest.TestCase):
         self.role = "owner"
         self.claims = 0
         self.signup_payloads = []
+        self.email_redirect = None
         self.oauth_requests = []
         self.unexpected = []
         self.errors = []
@@ -83,6 +84,7 @@ class SignupRoleE2E(unittest.TestCase):
             if path.endswith("/signup"):
                 payload = request.post_data_json
                 self.signup_payloads.append(payload)
+                self.email_redirect = parse_qs(parsed.query)["redirect_to"][0]
                 self.role = payload["data"]["role"]
                 route.fulfill(json={"user": self.user, "session": None})
             elif path.endswith("/user"):
@@ -137,7 +139,7 @@ class SignupRoleE2E(unittest.TestCase):
         self.assertEqual(self.claims, claims)
         self.assertIsNone(self.page.evaluate("sessionStorage.getItem('psiennik.pending-role')"))
         # Role is read back through the app's authenticated UI, not just the request payload.
-        badge = self.page.get_by_text("Tryb behawiorysty", exact=True)
+        badge = self.page.get_by_role("link", name="Psy pod opieką", exact=True)
         if role == "behaviorist":
             expect(badge).to_be_visible()
         else:
@@ -161,7 +163,8 @@ class SignupRoleE2E(unittest.TestCase):
         expect(self.page.get_by_role("heading", name="Potwierdź adres e-mail")).to_be_visible()
         self.assertEqual(len(self.signup_payloads), 1)
         self.assertEqual(self.signup_payloads[0]["data"], {"display_name": "Test E2E", "role": role})
-        self.page.goto(self.callback_url(self.signup_payloads[0]["email_redirect_to"]))
+        self.assertIsNotNone(self.email_redirect)
+        self.page.goto(self.callback_url(self.email_redirect))
         self.assert_return(role, 0)
 
     def test_google_behaviorist(self): self.oauth_signup("google", "behaviorist")
