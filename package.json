@@ -11,7 +11,8 @@
     "lint": "eslint .",
     "format": "prettier --write .",
     "dev:ui-review": "node scripts/ui-review.mjs",
-    "test:ui": "node --test scripts/selected-dog.test.ts scripts/video.test.ts scripts/signup-role.test.ts"
+    "test:ui": "node --test scripts/selected-dog.test.ts scripts/video.test.ts scripts/signup-role.test.ts",
+    "test:e2e:signup": "python3 scripts/signup-role.e2e.py"
   },
   "overrides": {
     "rolldown": "1.2.1",
