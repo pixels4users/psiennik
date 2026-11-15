@@ -65,6 +65,7 @@ function AuthPage() {
   const [busy, setBusy] = useState(false);
   const redeemedRef = useRef(false);
   const claimedRef = useRef(false);
+  const [roleReady, setRoleReady] = useState(false);
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -78,15 +79,19 @@ function AuthPage() {
   // i po powrocie z sesją nadajemy ją na serwerze (tylko dla świeżego konta).
   useEffect(() => {
     if (loading || !user || claimedRef.current) return;
-    if (!takePendingBehavioristRole(sessionStorage)) return;
     claimedRef.current = true;
+    if (!takePendingBehavioristRole(sessionStorage)) {
+      setRoleReady(true);
+      return;
+    }
     claimBehaviorist({ data: {} })
       .then(() => queryClient.invalidateQueries())
-      .catch(() => undefined);
+      .catch(() => toast.error("Nie udało się ustawić roli behawiorysty"))
+      .finally(() => setRoleReady(true));
   }, [loading, user, claimBehaviorist, queryClient]);
 
   useEffect(() => {
-    if (loading || !user) return;
+    if (loading || !user || !roleReady) return;
 
     if (searchCode && !redeemedRef.current) {
       redeemedRef.current = true;
@@ -110,23 +115,23 @@ function AuthPage() {
       if (nextTarget) window.location.replace(nextTarget);
       else navigate({ to: "/psy", replace: true });
     }
-  }, [loading, user, searchCode, navigate, redeem, nextTarget]);
+  }, [loading, user, roleReady, searchCode, navigate, redeem, nextTarget]);
 
   const oauth = async (provider: "google" | "apple", chosenRole?: "owner" | "behaviorist") => {
     setBusy(true);
     try {
       rememberOAuthRole(sessionStorage, chosenRole);
-      const redirectTo = searchCode
-        ? `${window.location.origin}/auth?code=${encodeURIComponent(searchCode)}`
-        : nextTarget
-          ? new URL(nextTarget, window.location.origin).href
-          : window.location.origin;
+      // Always hydrate the session and finish role assignment on the public auth page.
+      const callback = new URL("/auth", window.location.origin);
+      if (searchCode) callback.searchParams.set("code", searchCode);
+      if (nextTarget) callback.searchParams.set("next", nextTarget);
+      const redirectTo = callback.href;
       const result = await lovable.auth.signInWithOAuth(provider, {
         redirect_uri: redirectTo,
       });
 
       if (result.error) throw result.error;
-      if (!result.redirected) navigate({ to: "/psy", replace: true });
+      // Auth effects complete role assignment before navigating, also for popup OAuth.
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Nie udało się zalogować");
     } finally {
